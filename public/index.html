@@ -826,13 +826,14 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن
+    شاشة الكابتن (مع زر تفعيل الإشعارات)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
             <div class="logo"><h1>🛵 كابتن التوصيل</h1><span class="badge" id="driverBadge">🚗</span></div>
             <div class="user-badge">
                 <button class="btn btn-success" id="driverStatusBtn" onclick="toggleDriverStatus()">🟢 متصل</button>
+                <button class="btn btn-info" onclick="requestNotificationPermission()">🔔 تفعيل الإشعارات</button>
                 <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
                 <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
@@ -940,7 +941,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript - نسخة الخادم الخلفي (مع تعديل إشعار الكابتن)
+    JavaScript - نسخة الخادم الخلفي (مع Notification API)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1059,7 +1060,7 @@
         }
 
         // =================================================================
-        //  إشعارات
+        //  إشعارات (داخل التطبيق)
         // =================================================================
         function showNotification(msg, type = 'success') {
             const div = document.createElement('div');
@@ -1067,6 +1068,55 @@
             div.textContent = msg;
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 4000);
+        }
+
+        // =================================================================
+        //  Notification API (إشعارات سطح المكتب)
+        // =================================================================
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                showNotification('⚠️ متصفحك لا يدعم إشعارات سطح المكتب', 'warning');
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                showNotification('✅ الإشعارات مفعلة بالفعل', 'success');
+                return;
+            }
+            if (Notification.permission === 'denied') {
+                showNotification('❌ تم رفض الإشعارات مسبقاً. يمكنك تغيير الإعدادات من المتصفح.', 'error');
+                return;
+            }
+            // طلب الإذن
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    showNotification('✅ تم تفعيل الإشعارات بنجاح!', 'success');
+                    // إشعار ترحيبي
+                    new Notification('🔔 نظام التوصيل', {
+                        body: 'سيتم تنبيهك عند وجود طلب جديد جاهز للتوصيل.',
+                        icon: '🍔' // يمكنك وضع رابط أيقونة حقيقية
+                    });
+                } else {
+                    showNotification('❌ لم يتم تفعيل الإشعارات', 'error');
+                }
+            });
+        }
+
+        // دالة لإرسال إشعار سطح المكتب
+        function sendDesktopNotification(title, body) {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '🚀' // أيقونة اختيارية
+                });
+            } else if (Notification.permission === 'default') {
+                // حاول طلب الإذن تلقائياً
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        new Notification(title, { body, icon: '🚀' });
+                    }
+                });
+            }
         }
 
         // =================================================================
@@ -1559,7 +1609,6 @@
             }
         }
 
-        // ====== التعديل الأساسي: إرسال إشعار مخصص للكابتن عند جاهزية الطلب ======
         async function restaurantReady(orderId) {
             try {
                 await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
@@ -2015,7 +2064,7 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات المشتركة (مع إضافة نوع NEW_READY_ORDER)
+        //  الاستماع للتحديثات المشتركة (مع إضافة إشعار سطح المكتب)
         // =================================================================
         channel.onmessage = function(event) {
             // تحديث القوائم العامة
@@ -2043,15 +2092,20 @@
                 }
             }
 
-            // ====== معالجة إشعار الطلب الجديد للكابتن ======
+            // ====== معالجة إشعار الطلب الجديد للكابتن (داخل التطبيق + سطح المكتب) ======
             if (event.data.type === 'NEW_READY_ORDER') {
                 // فقط إذا كانت صفحة الكابتن مفتوحة ونشطة
                 if (document.getElementById('driverPage').classList.contains('active')) {
                     const order = event.data.order;
-                    // عرض إشعار منبثق للكابتن
+                    // إشعار داخل التطبيق
                     showNotification(
                         `🚀 طلب جديد جاهز للتوصيل من ${order.restaurantName} إلى ${order.customerName} (طلب #${order.id})`,
                         'success'
+                    );
+                    // إشعار سطح المكتب (Notification API)
+                    sendDesktopNotification(
+                        '🚀 طلب جديد جاهز للتوصيل!',
+                        `من ${order.restaurantName} إلى ${order.customerName} (طلب #${order.id})`
                     );
                 }
             }
@@ -2063,7 +2117,11 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي (مع إشعار الكابتن)');
+        // طلب إذن الإشعارات تلقائياً عند تحميل الصفحة (اختياري)
+        // يمكن تفعيل السطر التالي إن أردت طلب الإذن فوراً:
+        // setTimeout(() => requestNotificationPermission(), 3000);
+
+        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي (مع Notification API)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

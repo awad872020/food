@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام توصيل الطعام - خادم خلفي</title>
+    <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ========== الأنماط العامة ========== */
         * {
@@ -677,9 +677,9 @@
     ============================================================ -->
     <div id="homePage" class="page active">
         <div class="container">
-            <h1>🍔 نظام توصيل الطعام</h1>
+            <h1>🍔 ديليفري اذنا 🍔</h1>
             <p class="sub">اختر التطبيق المناسب للبدء</p>
-            <span class="live-badge">🟢 نظام متكامل - خادم خلفي</span>
+            <span class="live-badge">🟢 نظام متكامل</span>
             <div id="serverStatus" class="server-status">🔄 جاري الاتصال بالخادم...</div>
             <div class="apps-grid">
                 <div class="app-card customer" onclick="navigateTo('customer')">
@@ -893,7 +893,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن (مع أقسام منفصلة)
+    شاشة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -915,7 +915,7 @@
             <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
         </div>
 
-        <!-- ====== أقسام الكابتن المنفصلة ====== -->
+        <!-- أقسام الكابتن المنفصلة -->
         <div id="driverReadySection" class="status-section" style="display:none;">
             <h3>📦 طلبات جاهزة للاستلام</h3>
             <div class="mini-grid" id="driverReadyGrid"></div>
@@ -1039,7 +1039,7 @@
         // =================================================================
         const API_BASE = window.location.origin + '/api';
         const CONFIG = {
-            APP_NAME: 'نظام توصيل الطعام',
+            APP_NAME: 'ديليفري اذنا',
             LOCATION: 'أذنا',
             CURRENCY: 'شيكل',
             DELIVERY_FEE: 7,
@@ -1236,7 +1236,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer) - بدون تغيير كبير
+        //  العميل (Customer)
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1560,7 +1560,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع أقسام منفصلة
+        //  المطعم (Restaurant)
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1867,7 +1867,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مع أقسام منفصلة وفلتر تاريخ
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -1948,7 +1948,6 @@
             document.getElementById('driverPassword').value = '';
         }
 
-        // فلتر التاريخ للكابتن
         function filterDriverOrdersByDate() {
             const dateInput = document.getElementById('driverDateFilter');
             if (dateInput.value) {
@@ -1967,7 +1966,6 @@
             displayDriverStatusSections();
         }
 
-        // قائمة الطلبات الرئيسية (بدون أزرار الإجراءات، تظهر فقط معلومات)
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -2002,7 +2000,6 @@
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
                     let actions = '';
-                    // عرض الحالة فقط بدون أزرار
                     if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز للاستلام</span>`;
                     else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام</span>`;
                     else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
@@ -2025,7 +2022,6 @@
             }
         }
 
-        // الأقسام المنفصلة للكابتن
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
             try {
@@ -2046,7 +2042,7 @@
                     });
                 }
 
-                // 1. Ready for pickup (جاهزة)
+                // 1. Ready
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('driverReadyGrid');
                 const readySection = document.getElementById('driverReadySection');
@@ -2066,7 +2062,7 @@
                     `).join('');
                 }
 
-                // 2. Picking (استلام)
+                // 2. Picking
                 const picking = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username);
                 const pickGrid = document.getElementById('driverPickingGrid');
                 const pickSection = document.getElementById('driverPickingSection');
@@ -2085,7 +2081,7 @@
                     `).join('');
                 }
 
-                // 3. Delivering (توصيل)
+                // 3. Delivering
                 const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
                 const delGrid = document.getElementById('driverDeliveringGrid');
                 const delSection = document.getElementById('driverDeliveringSection');
@@ -2105,7 +2101,7 @@
                     `).join('');
                 }
 
-                // 4. Completed (مكتملة)
+                // 4. Completed
                 const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
@@ -2126,7 +2122,6 @@
             }
         }
 
-        // دوال الإجراءات للكابتن
         async function driverAccept(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2482,7 +2477,7 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - أقسام منفصلة للكابتن والمطعم، تاريخ ميلادي');
+        console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

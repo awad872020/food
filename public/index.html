@@ -586,6 +586,51 @@
             font-size: 0.8rem;
         }
 
+        /* ========== الأقسام الجديدة للمطعم ========== */
+        .status-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 5%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .status-section h3 {
+            margin-bottom: 1rem;
+            color: #2d3436;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        .status-section .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .mini-order-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            border-right: 4px solid #1e90ff;
+        }
+        .mini-order-card .mini-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        .mini-order-card .mini-details {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .mini-order-card .mini-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .mini-order-card .btn {
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
         /* ========== تنسيقات الجوال ========== */
         @media (max-width: 768px) {
             .stats-container {
@@ -610,6 +655,9 @@
             }
             .apps-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+            .status-section .mini-grid {
+                grid-template-columns: 1fr;
             }
         }
         @media (max-width: 480px) {
@@ -769,7 +817,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة المطعم (مع إضافة فلتر التاريخ)
+    شاشة المطعم (مع أقسام منفصلة للتحضير والجاهزة)
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -790,8 +838,27 @@
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
         </div>
 
+        <!-- ====== الأقسام الجديدة المنفصلة ====== -->
+        <!-- قسم الطلبات قيد التحضير -->
+        <div id="restaurantPreparingSection" class="status-section" style="display:none;">
+            <h3>👨‍🍳 الطلبات قيد التحضير</h3>
+            <div class="mini-grid" id="restaurantPreparingGrid"></div>
+        </div>
+
+        <!-- قسم الطلبات الجاهزة -->
+        <div id="restaurantReadySection" class="status-section" style="display:none;">
+            <h3>📦 الطلبات الجاهزة (في انتظار الكابتن)</h3>
+            <div class="mini-grid" id="restaurantReadyGrid"></div>
+        </div>
+
+        <!-- قسم الطلبات قيد التوصيل -->
+        <div id="restaurantDeliveringSection" class="status-section" style="display:none;">
+            <h3>🛵 الطلبات قيد التوصيل</h3>
+            <div class="mini-grid" id="restaurantDeliveringGrid"></div>
+        </div>
+
+        <!-- قائمة الطلبات الرئيسية (مع فلتر) -->
         <div class="orders-section">
-            <!-- ====== إضافة فلتر التاريخ ====== -->
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ:</label>
                 <input type="date" id="restaurantDateFilter" onchange="filterRestaurantOrdersByDate()" style="padding:0.4rem;border-radius:8px;border:1px solid #ddd;">
@@ -800,7 +867,7 @@
             </div>
 
             <div class="orders-header">
-                <h2>📋 الطلبات</h2>
+                <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
                     <button class="filter-btn active" data-filter="all" onclick="filterRestaurantOrders('all')">الكل</button>
                     <button class="filter-btn" data-filter="pending" onclick="filterRestaurantOrders('pending')">جديدة</button>
@@ -828,7 +895,6 @@
                 </form>
             </div>
         </div>
-        <!-- لوحة المطعم تظهر عند تسجيل الدخول -->
         <div id="restaurantDashboard" style="display:none;"></div>
     </div>
 
@@ -869,7 +935,6 @@
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
 
-        <!-- شاشة تسجيل دخول الكابتن -->
         <div id="driverLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🛵</div>
@@ -888,10 +953,9 @@
     </div>
 
     <!-- ============================================================
-    شاشة الأدمن (محمية بكلمة مرور)
+    شاشة الأدمن
     ============================================================ -->
     <div id="adminPage" class="page">
-        <!-- شاشة تسجيل دخول الأدمن (تظهر أولاً) -->
         <div id="adminLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">👑</div>
@@ -905,7 +969,6 @@
             </div>
         </div>
 
-        <!-- لوحة تحكم الأدمن (تظهر فقط بعد تسجيل الدخول) -->
         <div id="adminDashboard" style="display:none;">
             <div class="header-bar">
                 <div class="logo"><h1>👑 لوحة التحكم - الأدمن</h1></div>
@@ -927,8 +990,8 @@
                     <form class="login-form" onsubmit="adminSaveUser(event)">
                         <input type="hidden" id="adminEditId">
                         <input type="text" id="adminUsername" placeholder="اسم المستخدم" required>
-                        <input type="text" id="adminDisplayName" placeholder="الاسم الظاهر (مثال: مطعم شاورما / كابتن محمد)" required>
-                        <input type="text" id="adminExtra" placeholder="معلومات إضافية (مثال: نوع المركبة أو وصف المطعم)">
+                        <input type="text" id="adminDisplayName" placeholder="الاسم الظاهر" required>
+                        <input type="text" id="adminExtra" placeholder="معلومات إضافية">
                         <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
                         <div style="display:flex;gap:1rem;">
                             <button type="submit" class="btn btn-success">حفظ</button>
@@ -948,16 +1011,13 @@
     </div>
 
     <!-- ============================================================
-    JavaScript - نسخة الخادم الخلفي (مع فلتر التاريخ والصوت)
+    JavaScript
     ============================================================ -->
     <script>
         // =================================================================
-        //  CONFIG - عنوان الخادم
+        //  CONFIG
         // =================================================================
         const API_BASE = window.location.origin + '/api';
-        // إذا كنت تعمل محلياً على منفذ مختلف، غيّر الرابط:
-        // const API_BASE = 'http://localhost:3000/api';
-
         const CONFIG = {
             APP_NAME: 'نظام توصيل الطعام',
             LOCATION: 'أذنا',
@@ -970,19 +1030,16 @@
                 DRIVER_SESSION: 'driver_session'
             }
         };
-
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
-        //  دوال الاتصال بالخادم
+        //  دوال الخادم
         // =================================================================
-
         async function getOrders() {
             const res = await fetch(`${API_BASE}/orders`);
             if (!res.ok) throw new Error('فشل في جلب الطلبات');
             return await res.json();
         }
-
         async function createOrder(orderData) {
             const res = await fetch(`${API_BASE}/orders`, {
                 method: 'POST',
@@ -992,7 +1049,6 @@
             if (!res.ok) throw new Error('فشل في إنشاء الطلب');
             return await res.json();
         }
-
         async function updateOrderStatus(orderId, newStatus, additionalData = {}) {
             const res = await fetch(`${API_BASE}/orders/${orderId}`, {
                 method: 'PUT',
@@ -1002,13 +1058,11 @@
             if (!res.ok) throw new Error('فشل في تحديث الطلب');
             return await res.json();
         }
-
         async function getUsers() {
             const res = await fetch(`${API_BASE}/users`);
             if (!res.ok) throw new Error('فشل في جلب المستخدمين');
             return await res.json();
         }
-
         async function saveUsers(users) {
             const res = await fetch(`${API_BASE}/users`, {
                 method: 'PUT',
@@ -1018,7 +1072,6 @@
             if (!res.ok) throw new Error('فشل في حفظ المستخدمين');
             return await res.json();
         }
-
         async function adminLoginAPI(username, password) {
             const res = await fetch(`${API_BASE}/admin/login`, {
                 method: 'POST',
@@ -1029,7 +1082,7 @@
         }
 
         // =================================================================
-        //  التحقق من الاتصال بالخادم
+        //  التحقق من الخادم
         // =================================================================
         async function checkServer() {
             const statusEl = document.getElementById('serverStatus');
@@ -1045,7 +1098,7 @@
         }
 
         // =================================================================
-        //  التنقل بين الصفحات
+        //  التنقل
         // =================================================================
         function navigateTo(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1064,7 +1117,7 @@
         }
 
         // =================================================================
-        //  إشعارات (داخل التطبيق)
+        //  إشعارات
         // =================================================================
         function showNotification(msg, type = 'success') {
             const div = document.createElement('div');
@@ -1075,7 +1128,7 @@
         }
 
         // =================================================================
-        //  Notification API (سطح المكتب)
+        //  Notification API
         // =================================================================
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
@@ -1099,7 +1152,6 @@
                 }
             });
         }
-
         function sendDesktopNotification(title, body) {
             if (!('Notification' in window)) return;
             if (Notification.permission === 'granted') {
@@ -1112,7 +1164,7 @@
         }
 
         // =================================================================
-        //  🔊 أصوات التنبيه
+        //  أصوات
         // =================================================================
         function playRestaurantSound() {
             try {
@@ -1131,7 +1183,6 @@
                 });
             } catch (e) { /* ignore */ }
         }
-
         function playDriverSound() {
             try {
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
@@ -1473,11 +1524,11 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع إضافة فلتر التاريخ
+        //  المطعم (Restaurant) - مع الأقسام المنفصلة
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
-        let restaurantDateFilter = null; // جديد
+        let restaurantDateFilter = null;
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
@@ -1532,6 +1583,7 @@
             document.getElementById('restaurantDashboard').style.display = 'block';
             document.getElementById('restaurantBadge').textContent = `🍽️ ${currentRestaurantUser.displayName}`;
             displayRestaurantOrders();
+            displayRestaurantStatusSections();
         }
 
         function logoutRestaurant() {
@@ -1542,7 +1594,7 @@
             document.getElementById('restaurantPassword').value = '';
         }
 
-        // الدالة المعدلة لتطبيق فلتر التاريخ
+        // دالة عرض الطلبات الرئيسية (بدون أزرار تحضير/جاهزة)
         async function displayRestaurantOrders() {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1551,19 +1603,19 @@
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // ---- فلتر التاريخ ----
+                // فلتر التاريخ
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
-                    start.setHours(0, 0, 0, 0);
+                    start.setHours(0,0,0,0);
                     const end = new Date(restaurantDateFilter);
-                    end.setHours(23, 59, 59, 999);
+                    end.setHours(23,59,59,999);
                     orders = orders.filter(o => {
                         const orderDate = new Date(o.createdAt);
                         return orderDate >= start && orderDate <= end;
                     });
                 }
 
-                // ---- فلتر الحالة ----
+                // فلتر الحالة
                 if (restaurantFilter !== 'all') orders = orders.filter(o => o.status === restaurantFilter);
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -1576,23 +1628,20 @@
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
                     let actions = '';
+                    // فقط للطلبات الجديدة نعرض أزرار القبول/الرفض
                     if (o.status === 'pending') {
                         actions = `
                             <button class="btn btn-success" onclick="restaurantAccept(${o.id})">قبول ✅</button>
                             <button class="btn btn-danger" onclick="restaurantReject(${o.id})">رفض ❌</button>
                         `;
-                    } else if (o.status === 'preparing') {
-                        actions = `<button class="btn btn-success" onclick="restaurantReady(${o.id})">جاهز للاستلام 📦</button>`;
-                    } else if (o.status === 'ready_for_pickup') {
-                        actions = `<span style="color:#00b894;">⏳ في انتظار الكابتن</span>`;
-                    } else if (o.status === 'picking') {
-                        actions = `<span style="color:#ffa502;">🏪 الكابتن يستلم</span>`;
-                    } else if (o.status === 'delivering') {
-                        actions = `<span style="color:#1e90ff;">🛵 جاري التوصيل</span>`;
-                    } else if (o.status === 'completed') {
-                        actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
-                    } else if (o.status === 'cancelled') {
-                        actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    } else {
+                        // باقي الحالات تعرض كنص وصفي
+                        if (o.status === 'preparing') actions = `<span style="color:#1e90ff;">👨‍🍳 قيد التحضير</span>`;
+                        else if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
+                        else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 الكابتن يستلم</span>`;
+                        else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
+                        else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
+                        else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     }
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
@@ -1616,6 +1665,7 @@
             if (dateInput.value) {
                 restaurantDateFilter = new Date(dateInput.value);
                 displayRestaurantOrders();
+                displayRestaurantStatusSections(); // نحدّث الأقسام أيضاً
             } else {
                 clearRestaurantDateFilter();
             }
@@ -1625,6 +1675,7 @@
             restaurantDateFilter = null;
             document.getElementById('restaurantDateFilter').value = '';
             displayRestaurantOrders();
+            displayRestaurantStatusSections();
         }
 
         function updateRestaurantStats(orders) {
@@ -1646,27 +1697,126 @@
             displayRestaurantOrders();
         }
 
+        // ===== وظائف الأقسام المنفصلة =====
+        async function displayRestaurantStatusSections() {
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                // تطبيق فلتر التاريخ إذا كان موجوداً
+                if (restaurantDateFilter) {
+                    const start = new Date(restaurantDateFilter);
+                    start.setHours(0,0,0,0);
+                    const end = new Date(restaurantDateFilter);
+                    end.setHours(23,59,59,999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                // 1. الطلبات قيد التحضير
+                const preparing = orders.filter(o => o.status === 'preparing');
+                const prepGrid = document.getElementById('restaurantPreparingGrid');
+                const prepSection = document.getElementById('restaurantPreparingSection');
+                if (preparing.length === 0) {
+                    prepSection.style.display = 'none';
+                } else {
+                    prepSection.style.display = 'block';
+                    prepGrid.innerHTML = preparing.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#1e90ff;">
+                            <div class="mini-header">
+                                <span>#${o.id}</span>
+                                <span>${o.customerName}</span>
+                            </div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-actions">
+                                <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 2. الطلبات الجاهزة
+                const ready = orders.filter(o => o.status === 'ready_for_pickup');
+                const readyGrid = document.getElementById('restaurantReadyGrid');
+                const readySection = document.getElementById('restaurantReadySection');
+                if (ready.length === 0) {
+                    readySection.style.display = 'none';
+                } else {
+                    readySection.style.display = 'block';
+                    readyGrid.innerHTML = ready.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#00b894;">
+                            <div class="mini-header">
+                                <span>#${o.id}</span>
+                                <span>${o.customerName}</span>
+                            </div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-actions">
+                                <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 3. الطلبات قيد التوصيل (picking أو delivering)
+                const delivering = orders.filter(o => o.status === 'picking' || o.status === 'delivering');
+                const delGrid = document.getElementById('restaurantDeliveringGrid');
+                const delSection = document.getElementById('restaurantDeliveringSection');
+                if (delivering.length === 0) {
+                    delSection.style.display = 'none';
+                } else {
+                    delSection.style.display = 'block';
+                    delGrid.innerHTML = delivering.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#ff9f1c;">
+                            <div class="mini-header">
+                                <span>#${o.id}</span>
+                                <span>${o.customerName}</span>
+                            </div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                showNotification('فشل في تحديث الأقسام', 'error');
+            }
+        }
+
+        // دالة لإعادة إرسال إشعار للكابتن (للتذكير)
+        async function resendDriverNotification(orderId) {
+            try {
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (order && order.status === 'ready_for_pickup') {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                    showNotification(`🔔 تم إرسال إشعار جديد للكابتن للطلب #${orderId}`);
+                } else {
+                    showNotification('⚠️ الطلب ليس في حالة جاهزة', 'warning');
+                }
+            } catch (e) {
+                showNotification('فشل في إرسال الإشعار', 'error');
+            }
+        }
+
+        // دوال التحكم بالطلبات
         async function restaurantAccept(orderId) {
             try {
                 await updateOrderStatus(orderId, 'preparing');
                 showNotification(`✅ تم قبول الطلب #${orderId}`);
-                displayRestaurantOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+                await refreshRestaurantViews();
             } catch (e) {
                 showNotification('فشل في قبول الطلب', 'error');
             }
         }
 
-        // دالة الرفض: تغير الحالة إلى cancelled ويبقى الطلب
         async function restaurantReject(orderId) {
             if (!confirm('تأكيد رفض الطلب؟')) return;
             try {
                 await updateOrderStatus(orderId, 'cancelled');
                 showNotification(`❌ تم رفض الطلب #${orderId}`);
-                displayRestaurantOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+                await refreshRestaurantViews();
             } catch (e) {
                 showNotification('فشل في رفض الطلب', 'error');
             }
@@ -1676,14 +1826,24 @@
             try {
                 await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
                 showNotification(`📦 الطلب #${orderId} جاهز للاستلام`);
-                displayRestaurantOrders();
+                await refreshRestaurantViews();
+                // إرسال إشعار للكابتن
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
-                channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                if (order) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                }
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 showNotification('فشل في تحديث الطلب', 'error');
             }
+        }
+
+        async function refreshRestaurantViews() {
+            const allOrders = await getOrders();
+            channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            displayRestaurantOrders();
+            displayRestaurantStatusSections();
         }
 
         function showRestaurantNotifications() {
@@ -1691,7 +1851,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver)
+        //  الكابتن (Driver) - بدون تغيير
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2125,7 +2285,7 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات المشتركة
+        //  الاستماع للتحديثات
         // =================================================================
         channel.onmessage = function(event) {
             // طلب جديد للمطعم
@@ -2135,7 +2295,7 @@
                     if (currentRestaurantUser.displayName === order.restaurantName) {
                         playRestaurantSound();
                         showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
-                        displayRestaurantOrders();
+                        refreshRestaurantViews();
                     }
                 }
             }
@@ -2170,6 +2330,7 @@
                 }
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     displayRestaurantOrders();
+                    displayRestaurantStatusSections();
                 }
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     displayDriverOrders();
@@ -2183,7 +2344,7 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - مع سجل الطلبات وتاريخ + أصوات');
+        console.log('🍔 نظام توصيل الطعام - مع أقسام منفصلة للتحضير والجاهزة');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -1570,7 +1571,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver)
+        //  الكابتن (Driver) - تم تعديل هذه الدالة لإظهار رقم الهاتف
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -1619,7 +1620,6 @@
                 document.getElementById('driverLoginError').style.display = 'none';
                 currentDriverUser = found;
                 localStorage.setItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION, JSON.stringify(found));
-                // استعادة الإحصائيات من localStorage (أو من الخادم لاحقاً)
                 const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
@@ -1648,6 +1648,7 @@
             localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
         }
 
+        // ======= الدالة المعدلة التي تعرض رقم الهاتف مع زر اتصال =======
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -1685,9 +1686,13 @@
                     } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
                         actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
                     }
+                    // تمت إضافة رقم الهاتف وزر الاتصال هنا
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
-                        <div><strong>${o.restaurantName}</strong> → ${o.customerName}</div>
+                        <div>
+                            <strong>${o.restaurantName}</strong> → ${o.customerName}
+                            <a href="tel:${o.phone}" style="margin-right:10px;color:#1e90ff;text-decoration:none;font-weight:bold;">📞 اتصل</a>
+                        </div>
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">المجموع: ${o.total} شيكل</div>
@@ -1695,7 +1700,6 @@
                     `;
                     grid.appendChild(card);
                 });
-                // تحديث الإحصائيات
                 const driverOrders = allOrders.filter(o => o.driverId === currentDriverUser.username);
                 const completed = driverOrders.filter(o => o.status === 'completed');
                 driverStatsData.completedOrders = completed.length;
@@ -1715,7 +1719,6 @@
             document.getElementById('dCompleted').textContent = driverStatsData.completedOrders || 0;
             document.getElementById('dEarnings').textContent = driverStatsData.totalEarnings || 0;
             document.getElementById('dRating').textContent = (driverStatsData.rating || 5.0).toFixed(1);
-            // تحديث القيم الفعلية من الطلبات
             getOrders().then(allOrders => {
                 const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
                 document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
@@ -2028,10 +2031,7 @@
         // =================================================================
         //  التهيئة
         // =================================================================
-        // التحقق من الخادم عند التحميل
         checkServer();
-
-        // بدء التطبيق بالصفحة الرئيسية
         navigateTo('home');
 
         console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي');

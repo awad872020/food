@@ -586,7 +586,7 @@
             font-size: 0.8rem;
         }
 
-        /* ========== الأقسام الجديدة للمطعم ========== */
+        /* ========== الأقسام الجديدة للمطعم والكابتن ========== */
         .status-section {
             background: white;
             border-radius: 15px;
@@ -817,7 +817,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة المطعم (مع أقسام منفصلة للتحضير والجاهزة)
+    شاشة المطعم
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -838,29 +838,24 @@
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
         </div>
 
-        <!-- ====== الأقسام الجديدة المنفصلة ====== -->
-        <!-- قسم الطلبات قيد التحضير -->
+        <!-- أقسام المطعم المنفصلة -->
         <div id="restaurantPreparingSection" class="status-section" style="display:none;">
             <h3>👨‍🍳 الطلبات قيد التحضير</h3>
             <div class="mini-grid" id="restaurantPreparingGrid"></div>
         </div>
-
-        <!-- قسم الطلبات الجاهزة -->
         <div id="restaurantReadySection" class="status-section" style="display:none;">
             <h3>📦 الطلبات الجاهزة (في انتظار الكابتن)</h3>
             <div class="mini-grid" id="restaurantReadyGrid"></div>
         </div>
-
-        <!-- قسم الطلبات قيد التوصيل -->
         <div id="restaurantDeliveringSection" class="status-section" style="display:none;">
             <h3>🛵 الطلبات قيد التوصيل</h3>
             <div class="mini-grid" id="restaurantDeliveringGrid"></div>
         </div>
 
-        <!-- قائمة الطلبات الرئيسية (مع فلتر) -->
+        <!-- قائمة الطلبات الرئيسية مع فلتر -->
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
-                <label style="font-weight:bold;">📅 تصفية حسب التاريخ:</label>
+                <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
                 <input type="date" id="restaurantDateFilter" onchange="filterRestaurantOrdersByDate()" style="padding:0.4rem;border-radius:8px;border:1px solid #ddd;">
                 <button class="btn btn-primary" onclick="filterRestaurantOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearRestaurantDateFilter()">إلغاء التصفية</button>
@@ -880,7 +875,6 @@
             <div class="orders-grid" id="restaurantOrdersGrid"></div>
         </div>
 
-        <!-- شاشة تسجيل دخول المطعم -->
         <div id="restaurantLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🍽️</div>
@@ -899,7 +893,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن
+    شاشة الكابتن (مع أقسام منفصلة)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -921,9 +915,35 @@
             <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
         </div>
 
+        <!-- ====== أقسام الكابتن المنفصلة ====== -->
+        <div id="driverReadySection" class="status-section" style="display:none;">
+            <h3>📦 طلبات جاهزة للاستلام</h3>
+            <div class="mini-grid" id="driverReadyGrid"></div>
+        </div>
+        <div id="driverPickingSection" class="status-section" style="display:none;">
+            <h3>🏪 طلبات قيد الاستلام</h3>
+            <div class="mini-grid" id="driverPickingGrid"></div>
+        </div>
+        <div id="driverDeliveringSection" class="status-section" style="display:none;">
+            <h3>🛵 طلبات قيد التوصيل</h3>
+            <div class="mini-grid" id="driverDeliveringGrid"></div>
+        </div>
+        <div id="driverCompletedSection" class="status-section" style="display:none;">
+            <h3>✅ الطلبات المكتملة</h3>
+            <div class="mini-grid" id="driverCompletedGrid"></div>
+        </div>
+
+        <!-- قائمة الطلبات الرئيسية مع فلتر التاريخ -->
         <div class="orders-section">
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
+                <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
+                <input type="date" id="driverDateFilter" onchange="filterDriverOrdersByDate()" style="padding:0.4rem;border-radius:8px;border:1px solid #ddd;">
+                <button class="btn btn-primary" onclick="filterDriverOrdersByDate()">عرض</button>
+                <button class="btn btn-outline" onclick="clearDriverDateFilter()">إلغاء التصفية</button>
+            </div>
+
             <div class="orders-header">
-                <h2>📋 الطلبات</h2>
+                <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="driverFilters">
                     <button class="filter-btn active" data-filter="all" onclick="filterDriverOrders('all')">الكل</button>
                     <button class="filter-btn" data-filter="ready_for_pickup" onclick="filterDriverOrders('ready_for_pickup')">جاهزة</button>
@@ -1082,6 +1102,22 @@
         }
 
         // =================================================================
+        //  دوال مساعدة لتنسيق التاريخ (ميلادي)
+        // =================================================================
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        // =================================================================
         //  التحقق من الخادم
         // =================================================================
         async function checkServer() {
@@ -1200,7 +1236,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer)
+        //  العميل (Customer) - بدون تغيير كبير
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1495,7 +1531,7 @@
                 else {
                     list.innerHTML = my.map(o => `
                         <div class="order-card" style="margin-bottom:0.5rem;">
-                            <div class="order-header"><span class="order-id">طلب #${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
+                            <div class="order-header"><span class="order-id">طلب #${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                             <p>المطعم: ${o.restaurantName}</p>
                             <p>المجموع: ${o.total} شيكل</p>
                             <p>الحالة: <span class="status-badge status-${o.status}">${o.status}</span></p>
@@ -1524,7 +1560,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع الأقسام المنفصلة
+        //  المطعم (Restaurant) - مع أقسام منفصلة
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1594,7 +1630,6 @@
             document.getElementById('restaurantPassword').value = '';
         }
 
-        // دالة عرض الطلبات الرئيسية (بدون أزرار تحضير/جاهزة)
         async function displayRestaurantOrders() {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1603,7 +1638,6 @@
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // فلتر التاريخ
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
                     start.setHours(0,0,0,0);
@@ -1615,7 +1649,6 @@
                     });
                 }
 
-                // فلتر الحالة
                 if (restaurantFilter !== 'all') orders = orders.filter(o => o.status === restaurantFilter);
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -1628,14 +1661,12 @@
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
                     let actions = '';
-                    // فقط للطلبات الجديدة نعرض أزرار القبول/الرفض
                     if (o.status === 'pending') {
                         actions = `
                             <button class="btn btn-success" onclick="restaurantAccept(${o.id})">قبول ✅</button>
                             <button class="btn btn-danger" onclick="restaurantReject(${o.id})">رفض ❌</button>
                         `;
                     } else {
-                        // باقي الحالات تعرض كنص وصفي
                         if (o.status === 'preparing') actions = `<span style="color:#1e90ff;">👨‍🍳 قيد التحضير</span>`;
                         else if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
                         else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 الكابتن يستلم</span>`;
@@ -1644,7 +1675,7 @@
                         else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     }
                     card.innerHTML = `
-                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                         <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">المجموع: ${o.total} شيكل</div>
@@ -1659,13 +1690,12 @@
             }
         }
 
-        // دوال فلتر التاريخ
         function filterRestaurantOrdersByDate() {
             const dateInput = document.getElementById('restaurantDateFilter');
             if (dateInput.value) {
                 restaurantDateFilter = new Date(dateInput.value);
                 displayRestaurantOrders();
-                displayRestaurantStatusSections(); // نحدّث الأقسام أيضاً
+                displayRestaurantStatusSections();
             } else {
                 clearRestaurantDateFilter();
             }
@@ -1697,14 +1727,12 @@
             displayRestaurantOrders();
         }
 
-        // ===== وظائف الأقسام المنفصلة =====
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             try {
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // تطبيق فلتر التاريخ إذا كان موجوداً
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
                     start.setHours(0,0,0,0);
@@ -1716,7 +1744,7 @@
                     });
                 }
 
-                // 1. الطلبات قيد التحضير
+                // 1. Preparing
                 const preparing = orders.filter(o => o.status === 'preparing');
                 const prepGrid = document.getElementById('restaurantPreparingGrid');
                 const prepSection = document.getElementById('restaurantPreparingSection');
@@ -1726,11 +1754,8 @@
                     prepSection.style.display = 'block';
                     prepGrid.innerHTML = preparing.map(o => `
                         <div class="mini-order-card" style="border-right-color:#1e90ff;">
-                            <div class="mini-header">
-                                <span>#${o.id}</span>
-                                <span>${o.customerName}</span>
-                            </div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
                                 <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
                             </div>
@@ -1738,7 +1763,7 @@
                     `).join('');
                 }
 
-                // 2. الطلبات الجاهزة
+                // 2. Ready
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -1748,11 +1773,8 @@
                     readySection.style.display = 'block';
                     readyGrid.innerHTML = ready.map(o => `
                         <div class="mini-order-card" style="border-right-color:#00b894;">
-                            <div class="mini-header">
-                                <span>#${o.id}</span>
-                                <span>${o.customerName}</span>
-                            </div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
                                 <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
                             </div>
@@ -1760,7 +1782,7 @@
                     `).join('');
                 }
 
-                // 3. الطلبات قيد التوصيل (picking أو delivering)
+                // 3. Delivering (picking/delivering)
                 const delivering = orders.filter(o => o.status === 'picking' || o.status === 'delivering');
                 const delGrid = document.getElementById('restaurantDeliveringGrid');
                 const delSection = document.getElementById('restaurantDeliveringSection');
@@ -1770,11 +1792,8 @@
                     delSection.style.display = 'block';
                     delGrid.innerHTML = delivering.map(o => `
                         <div class="mini-order-card" style="border-right-color:#ff9f1c;">
-                            <div class="mini-header">
-                                <span>#${o.id}</span>
-                                <span>${o.customerName}</span>
-                            </div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${new Date(o.createdAt).toLocaleTimeString('ar-SA')}</div>
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
                         </div>
                     `).join('');
@@ -1784,7 +1803,6 @@
             }
         }
 
-        // دالة لإعادة إرسال إشعار للكابتن (للتذكير)
         async function resendDriverNotification(orderId) {
             try {
                 const allOrders = await getOrders();
@@ -1800,7 +1818,6 @@
             }
         }
 
-        // دوال التحكم بالطلبات
         async function restaurantAccept(orderId) {
             try {
                 await updateOrderStatus(orderId, 'preparing');
@@ -1827,7 +1844,6 @@
                 await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
                 showNotification(`📦 الطلب #${orderId} جاهز للاستلام`);
                 await refreshRestaurantViews();
-                // إرسال إشعار للكابتن
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
                 if (order) {
@@ -1851,10 +1867,11 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - بدون تغيير
+        //  الكابتن (Driver) - مع أقسام منفصلة وفلتر تاريخ
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
+        let driverDateFilter = null;
         let driverOnline = true;
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
 
@@ -1913,6 +1930,7 @@
             document.getElementById('driverDashboard').style.display = 'block';
             document.getElementById('driverBadge').textContent = `🚗 ${currentDriverUser.displayName}`;
             displayDriverOrders();
+            displayDriverStatusSections();
             updateDriverStats();
             const savedStatus = JSON.parse(localStorage.getItem(`driver_online_${currentDriverUser.username}`) || 'true');
             driverOnline = savedStatus;
@@ -1930,6 +1948,26 @@
             document.getElementById('driverPassword').value = '';
         }
 
+        // فلتر التاريخ للكابتن
+        function filterDriverOrdersByDate() {
+            const dateInput = document.getElementById('driverDateFilter');
+            if (dateInput.value) {
+                driverDateFilter = new Date(dateInput.value);
+                displayDriverOrders();
+                displayDriverStatusSections();
+            } else {
+                clearDriverDateFilter();
+            }
+        }
+
+        function clearDriverDateFilter() {
+            driverDateFilter = null;
+            document.getElementById('driverDateFilter').value = '';
+            displayDriverOrders();
+            displayDriverStatusSections();
+        }
+
+        // قائمة الطلبات الرئيسية (بدون أزرار الإجراءات، تظهر فقط معلومات)
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -1940,58 +1978,155 @@
                     if (o.status === 'ready_for_pickup' && driverOnline) return true;
                     return o.driverId === currentDriverUser.username;
                 });
+
+                if (driverDateFilter) {
+                    const start = new Date(driverDateFilter);
+                    start.setHours(0,0,0,0);
+                    const end = new Date(driverDateFilter);
+                    end.setHours(23,59,59,999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
                 if (driverFilter !== 'all') orders = orders.filter(o => o.status === driverFilter);
+
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 if (!orders.length) {
                     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
                     return;
                 }
+
                 orders.forEach(o => {
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
                     let actions = '';
-                    if (o.status === 'ready_for_pickup' && driverOnline) {
-                        actions = `
-                            <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول الطلب 🚀</button>
-                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
-                        `;
-                    } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
-                        actions = `
-                            <button class="btn btn-warning" onclick="driverPickup(${o.id})">تأكيد الاستلام ✅</button>
-                        `;
-                    } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
-                        actions = `
-                            <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
-                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
-                        `;
-                    } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
-                        actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
-                    }
+                    // عرض الحالة فقط بدون أزرار
+                    if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز للاستلام</span>`;
+                    else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام</span>`;
+                    else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
+                    else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
+                    else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+
                     card.innerHTML = `
-                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
-                        <div>
-                            <strong>${o.restaurantName}</strong> → ${o.customerName} (📞 ${o.phone})
-                            <a href="tel:${o.phone}" style="margin-right:10px;color:#1e90ff;text-decoration:none;font-weight:bold;">اتصل</a>
-                        </div>
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
+                        <div><strong>${o.restaurantName}</strong> → ${o.customerName} (📞 ${o.phone})</div>
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">المجموع شامل رسوم التوصيل: ${o.total} شيكل</div>
-                        <div class="delivery-fee-note">⚠️ رسوم التوصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} شيكل مضمنة</div>
                         <div class="order-actions">${actions}</div>
                     `;
                     grid.appendChild(card);
                 });
-                const driverOrders = allOrders.filter(o => o.driverId === currentDriverUser.username);
-                const completed = driverOrders.filter(o => o.status === 'completed');
-                driverStatsData.completedOrders = completed.length;
-                driverStatsData.totalEarnings = completed.reduce((s, o) => s + CONFIG.DELIVERY_FEE, 0);
-                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
                 updateDriverStats();
             } catch (e) {
                 showNotification('فشل في جلب الطلبات', 'error');
             }
         }
 
+        // الأقسام المنفصلة للكابتن
+        async function displayDriverStatusSections() {
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                if (driverDateFilter) {
+                    const start = new Date(driverDateFilter);
+                    start.setHours(0,0,0,0);
+                    const end = new Date(driverDateFilter);
+                    end.setHours(23,59,59,999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                // 1. Ready for pickup (جاهزة)
+                const ready = orders.filter(o => o.status === 'ready_for_pickup');
+                const readyGrid = document.getElementById('driverReadyGrid');
+                const readySection = document.getElementById('driverReadySection');
+                if (ready.length === 0) {
+                    readySection.style.display = 'none';
+                } else {
+                    readySection.style.display = 'block';
+                    readyGrid.innerHTML = ready.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#00b894;">
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-actions">
+                                <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول 🚀</button>
+                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 2. Picking (استلام)
+                const picking = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username);
+                const pickGrid = document.getElementById('driverPickingGrid');
+                const pickSection = document.getElementById('driverPickingSection');
+                if (picking.length === 0) {
+                    pickSection.style.display = 'none';
+                } else {
+                    pickSection.style.display = 'block';
+                    pickGrid.innerHTML = picking.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#ffa502;">
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-actions">
+                                <button class="btn btn-warning" onclick="driverPickup(${o.id})">تأكيد الاستلام ✅</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 3. Delivering (توصيل)
+                const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
+                const delGrid = document.getElementById('driverDeliveringGrid');
+                const delSection = document.getElementById('driverDeliveringSection');
+                if (delivering.length === 0) {
+                    delSection.style.display = 'none';
+                } else {
+                    delSection.style.display = 'block';
+                    delGrid.innerHTML = delivering.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#9c27b0;">
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-actions">
+                                <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
+                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 4. Completed (مكتملة)
+                const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
+                const compGrid = document.getElementById('driverCompletedGrid');
+                const compSection = document.getElementById('driverCompletedSection');
+                if (completed.length === 0) {
+                    compSection.style.display = 'none';
+                } else {
+                    compSection.style.display = 'block';
+                    compGrid.innerHTML = completed.map(o => `
+                        <div class="mini-order-card" style="border-right-color:#00b894;">
+                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-details">✅ تم التسليم</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                showNotification('فشل في تحديث أقسام الكابتن', 'error');
+            }
+        }
+
+        // دوال الإجراءات للكابتن
         async function driverAccept(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2005,6 +2140,7 @@
                 if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
                     showNotification('⚠️ هذا الطلب تم قبوله من كابتن آخر أو غير متاح', 'warning');
                     displayDriverOrders();
+                    displayDriverStatusSections();
                     return;
                 }
                 await updateOrderStatus(orderId, 'picking', {
@@ -2014,12 +2150,49 @@
                     driverPhone: '0590000000'
                 });
                 showNotification(`✅ تم قبول الطلب #${orderId} بواسطة ${currentDriverUser.displayName}`);
-                displayDriverOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+                await refreshDriverViews();
             } catch (e) {
                 showNotification('فشل في قبول الطلب', 'error');
             }
+        }
+
+        async function driverPickup(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'delivering', { pickedUpAt: new Date().toISOString() });
+                showNotification(`✅ تم استلام الطلب #${orderId}، ابدأ التوصيل`);
+                await refreshDriverViews();
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+            }
+        }
+
+        async function driverDeliver(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'completed', { completedAt: new Date().toISOString() });
+                driverStatsData.completedOrders += 1;
+                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
+                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
+                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
+                showNotification(`✅ تم توصيل الطلب #${orderId} (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
+                await refreshDriverViews();
+            } catch (e) {
+                showNotification('فشل في تأكيد التسليم', 'error');
+            }
+        }
+
+        async function refreshDriverViews() {
+            const allOrders = await getOrders();
+            channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            displayDriverOrders();
+            displayDriverStatusSections();
+            updateDriverStats();
+        }
+
+        function filterDriverOrders(filter) {
+            driverFilter = filter;
+            document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`#driverFilters [data-filter="${filter}"]`).classList.add('active');
+            displayDriverOrders();
         }
 
         function updateDriverStats() {
@@ -2039,18 +2212,12 @@
             }).catch(() => {});
         }
 
-        function filterDriverOrders(filter) {
-            driverFilter = filter;
-            document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`#driverFilters [data-filter="${filter}"]`).classList.add('active');
-            displayDriverOrders();
-        }
-
         function toggleDriverStatus() {
             driverOnline = !driverOnline;
             localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
             updateDriverStatusUI();
             displayDriverOrders();
+            displayDriverStatusSections();
             showNotification(driverOnline ? '🟢 أنت متصل' : '🔴 أنت غير متصل', driverOnline ? 'success' : 'error');
         }
 
@@ -2062,34 +2229,6 @@
             } else {
                 btn.className = 'btn btn-danger';
                 btn.textContent = '🔴 غير متصل';
-            }
-        }
-
-        async function driverPickup(orderId) {
-            try {
-                await updateOrderStatus(orderId, 'delivering', { pickedUpAt: new Date().toISOString() });
-                showNotification(`✅ تم استلام الطلب #${orderId}، ابدأ التوصيل`);
-                displayDriverOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            } catch (e) {
-                showNotification('فشل في تأكيد الاستلام', 'error');
-            }
-        }
-
-        async function driverDeliver(orderId) {
-            try {
-                await updateOrderStatus(orderId, 'completed', { completedAt: new Date().toISOString() });
-                driverStatsData.completedOrders += 1;
-                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
-                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
-                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
-                showNotification(`✅ تم توصيل الطلب #${orderId} (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
-                displayDriverOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            } catch (e) {
-                showNotification('فشل في تأكيد التسليم', 'error');
             }
         }
 
@@ -2288,7 +2427,6 @@
         //  الاستماع للتحديثات
         // =================================================================
         channel.onmessage = function(event) {
-            // طلب جديد للمطعم
             if (event.data.type === 'NEW_ORDER') {
                 const order = event.data.order;
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
@@ -2300,7 +2438,6 @@
                 }
             }
 
-            // طلب جاهز للكابتن
             if (event.data.type === 'NEW_READY_ORDER') {
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     const order = event.data.order;
@@ -2308,10 +2445,10 @@
                     showNotification(`📢 طلب جاهز #${order.id} من ${order.restaurantName}`, 'success');
                     sendDesktopNotification('📢 طلب جاهز للتوصيل', `طلب #${order.id} من ${order.restaurantName}`);
                     displayDriverOrders();
+                    displayDriverStatusSections();
                 }
             }
 
-            // تحديث عام
             if (event.data.type === 'ORDERS_UPDATED') {
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     if (customerTrackingId) {
@@ -2334,6 +2471,7 @@
                 }
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     displayDriverOrders();
+                    displayDriverStatusSections();
                 }
             }
         };
@@ -2344,7 +2482,7 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - مع أقسام منفصلة للتحضير والجاهزة');
+        console.log('🍔 نظام توصيل الطعام - أقسام منفصلة للكابتن والمطعم، تاريخ ميلادي');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

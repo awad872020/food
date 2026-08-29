@@ -416,6 +416,11 @@
             text-align: left;
             margin: 0.5rem 0;
         }
+        .delivery-fee-note {
+            font-size: 0.85rem;
+            color: #636e72;
+            margin: 0.2rem 0;
+        }
         .payment-method {
             display: inline-block;
             padding: 0.2rem 0.8rem;
@@ -1571,7 +1576,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - تم تعديل هذه الدالة لإظهار رقم الهاتف
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -1648,7 +1653,7 @@
             localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
         }
 
-        // ======= الدالة المعدلة التي تعرض رقم الهاتف مع زر اتصال =======
+        // ======= الدالة المعدلة: قبول الطلب مباشرة لأول كابتن يضغط =======
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -1671,7 +1676,7 @@
                     let actions = '';
                     if (o.status === 'ready_for_pickup' && driverOnline) {
                         actions = `
-                            <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول ✅</button>
+                            <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول الطلب 🚀</button>
                             <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
                         `;
                     } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
@@ -1686,16 +1691,16 @@
                     } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
                         actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
                     }
-                    // تمت إضافة رقم الهاتف وزر الاتصال هنا
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
                         <div>
-                            <strong>${o.restaurantName}</strong> → ${o.customerName}
-                            <a href="tel:${o.phone}" style="margin-right:10px;color:#1e90ff;text-decoration:none;font-weight:bold;">📞 اتصل</a>
+                            <strong>${o.restaurantName}</strong> → ${o.customerName} (📞 ${o.phone})
+                            <a href="tel:${o.phone}" style="margin-right:10px;color:#1e90ff;text-decoration:none;font-weight:bold;">اتصل</a>
                         </div>
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                        <div class="order-total">المجموع: ${o.total} شيكل</div>
+                        <div class="order-total">المجموع شامل رسوم التوصيل: ${o.total} شيكل</div>
+                        <div class="delivery-fee-note">⚠️ رسوم التوصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} شيكل مضمنة</div>
                         <div class="order-actions">${actions}</div>
                     `;
                     grid.appendChild(card);
@@ -1708,6 +1713,42 @@
                 updateDriverStats();
             } catch (e) {
                 showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        // دالة القبول المباشر: الكابتن الذي يضغط أولاً يحصل على الطلب
+        async function driverAccept(orderId) {
+            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
+            try {
+                // نأخذ الطلب الحالي من الخادم للتأكد من أنه لا يزال متاحاً
+                const orders = await getOrders();
+                const idx = orders.findIndex(o => o.id === orderId);
+                if (idx === -1) {
+                    showNotification('⚠️ الطلب غير موجود', 'error');
+                    return;
+                }
+                const order = orders[idx];
+                // التحقق من أن الطلب لا يزال في حالة ready_for_pickup ولم يتم تعيين كابتن له
+                if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
+                    showNotification('⚠️ هذا الطلب تم قبوله من كابتن آخر أو غير متاح', 'warning');
+                    // تحديث القائمة لإزالة الطلب من الواجهة
+                    displayDriverOrders();
+                    return;
+                }
+
+                // قبول الطلب لهذا الكابتن
+                await updateOrderStatus(orderId, 'picking', {
+                    driverId: currentDriverUser.username,
+                    driverAssigned: true,
+                    driverName: currentDriverUser.displayName,
+                    driverPhone: '0590000000'
+                });
+                showNotification(`✅ تم قبول الطلب #${orderId} بواسطة ${currentDriverUser.displayName}`);
+                displayDriverOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في قبول الطلب', 'error');
             }
         }
 
@@ -1751,32 +1792,6 @@
             } else {
                 btn.className = 'btn btn-danger';
                 btn.textContent = '🔴 غير متصل';
-            }
-        }
-
-        async function driverAccept(orderId) {
-            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
-            try {
-                const orders = await getOrders();
-                const idx = orders.findIndex(o => o.id === orderId);
-                if (idx === -1) return;
-                const order = orders[idx];
-                if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
-                    showNotification('⚠️ هذا الطلب غير متاح', 'warning');
-                    return;
-                }
-                const updated = await updateOrderStatus(orderId, 'picking', {
-                    driverId: currentDriverUser.username,
-                    driverAssigned: true,
-                    driverName: currentDriverUser.displayName,
-                    driverPhone: '0590000000'
-                });
-                showNotification(`✅ تم قبول الطلب #${orderId}`);
-                displayDriverOrders();
-                const allOrders = await getOrders();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            } catch (e) {
-                showNotification('فشل في قبول الطلب', 'error');
             }
         }
 

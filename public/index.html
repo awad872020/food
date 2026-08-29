@@ -103,7 +103,14 @@
             color: #2d3436;
             margin-bottom: 10px;
         }
-        /* تم حذف النص "اختر التطبيق المناسب للبدء" */
+        .live-badge {
+            background: #00b894;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
         .apps-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -137,18 +144,20 @@
         .app-card.customer { border-color: #ff6b35; }
         .app-card.restaurant { border-color: #00b894; }
         .app-card.driver { border-color: #1e90ff; }
-        /* تم حذف البطاقة الخاصة بالأدمن من الشبكة */
-        .live-badge {
-            background: #00b894;
-            color: white;
-            padding: 5px 20px;
-            border-radius: 30px;
-            display: inline-block;
-            font-size: 0.9rem;
+        .server-status {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+            color: #2e7d32;
+            font-weight: bold;
         }
-        /* تم حذف النص "اختر الدور المناسب لبدء التجربة" */
+        .server-status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
 
-        /* ========== زر الأدمن المصغر في الزاوية السفلية اليسرى ========== */
+        /* ========== زر الأدمن المصغر ========== */
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -172,12 +181,7 @@
             transform: scale(1.1);
             background: #5a4bd1;
         }
-        .admin-mini-btn span {
-            font-size: 1rem;
-            margin-right: 2px;
-        }
 
-        /* باقي الأنماط كما هي (تم اختصارها هنا للاختصار) */
         /* ========== شاشات تسجيل الدخول ========== */
         .login-page {
             display: flex;
@@ -378,7 +382,7 @@
         .order-card.picking { border-right-color: #ffa502; }
         .order-card.delivering { border-right-color: #ff9f1c; }
         .order-card.completed { border-right-color: #00b894; }
-        .order-card.cancelled { border-right-color: #ff4757; opacity: 0.7; }
+        .order-card.cancelled { border-right-color: #ff4757; opacity: 0.8; background: #fff5f5; }
 
         .order-header {
             display: flex;
@@ -424,11 +428,6 @@
             font-size: 1.1rem;
             text-align: left;
             margin: 0.5rem 0;
-        }
-        .delivery-fee-note {
-            font-size: 0.85rem;
-            color: #636e72;
-            margin: 0.2rem 0;
         }
         .payment-method {
             display: inline-block;
@@ -513,6 +512,11 @@
             border-color: #00b894;
             background: #00b894;
             color: white;
+        }
+        .tracking-step.cancelled .step-icon {
+            border-color: #ff4757;
+            background: #ffebee;
+            color: #ff4757;
         }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7); }
@@ -690,12 +694,11 @@
 <body>
 
     <!-- ============================================================
-    الصفحة الرئيسية (تم حذف النصوص المطلوبة)
+    الصفحة الرئيسية
     ============================================================ -->
     <div id="homePage" class="page active">
         <div class="container">
             <h1>🍔 ديليفري اذنا 🍔</h1>
-            <!-- تم حذف النص "اختر التطبيق المناسب للبدء" -->
             <span class="live-badge">🟢 نظام متكامل</span>
             <div id="serverStatus" class="server-status">🔄 جاري الاتصال بالخادم...</div>
             <div class="apps-grid">
@@ -711,21 +714,16 @@
                     <div class="icon">🛵</div>
                     <div class="title">الكابتن</div>
                 </div>
-                <!-- تم حذف بطاقة الأدمن من هنا -->
             </div>
-            <!-- تم حذف النص "اختر الدور المناسب لبدء التجربة" -->
         </div>
     </div>
 
-    <!-- ===== زر الأدمن المصغر في الزاوية السفلية اليسرى ===== -->
-    <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">
-        👑
-    </button>
+    <!-- ===== زر الأدمن المصغر ===== -->
+    <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    باقي الصفحات (شاشة العميل، المطعم، الكابتن، الأدمن) كما هي
+    شاشة العميل
     ============================================================ -->
-    <!-- شاشة العميل -->
     <div id="customerPage" class="page">
         <div class="header-bar">
             <div class="logo"><span style="font-size:2rem;">🍔</span><h1>اطلب طعامك</h1></div>
@@ -736,7 +734,7 @@
                 <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
-        <!-- باقي محتوى العميل ... (محذوف للاختصار) -->
+
         <div style="padding:1rem 5%;display:flex;gap:1rem;flex-wrap:wrap;background:linear-gradient(135deg,#ff6b35,#ff9f1c);">
             <div style="flex:1;display:flex;background:white;border-radius:30px;padding:0.2rem 1rem;">
                 <input type="text" id="customerSearch" placeholder="ابحث عن مطعم..." onkeyup="filterCustomerRestaurants()" style="flex:1;border:none;outline:none;padding:0.5rem;">
@@ -744,6 +742,7 @@
             </div>
             <button class="btn btn-light" onclick="getCustomerLocation()" style="background:white;border:none;border-radius:30px;padding:0.3rem 1.2rem;">📍 <span id="customerLocationText">أذنا</span></button>
         </div>
+
         <div style="padding:1rem 5%;overflow-x:auto;white-space:nowrap;">
             <div style="display:inline-flex;gap:0.8rem;" id="customerCategories">
                 <button class="btn btn-primary active" data-cat="all" onclick="filterCustomerCategory('all',this)">🍽️ الكل</button>
@@ -753,10 +752,12 @@
                 <button class="btn btn-outline" data-cat="arabic" onclick="filterCustomerCategory('arabic',this)">🧆 عربي</button>
             </div>
         </div>
+
         <div class="orders-section">
             <h2 style="margin-bottom:1.5rem;">المطاعم المتاحة</h2>
             <div class="orders-grid" id="customerRestaurantsGrid"></div>
         </div>
+
         <div id="customerTracking" style="display:none;padding:1.5rem 5%;background:white;margin:1rem 5%;border-radius:15px;">
             <h2>📍 تتبع طلبك</h2>
             <p>طلب رقم: <span id="trackingOrderId">#1001</span></p>
@@ -766,6 +767,7 @@
                 <div class="tracking-step" id="cstep3"><div class="step-icon">🛵</div><span>قيد التوصيل</span></div>
                 <div class="tracking-step" id="cstep4"><div class="step-icon">🏠</div><span>تم التسليم</span></div>
             </div>
+            <div id="customerTrackingMessage" style="margin-top:1rem;padding:0.8rem;border-radius:10px;background:#f8f9fa;text-align:center;"></div>
             <div id="customerDriverInfo" style="display:none;background:#f0f0f0;padding:1rem;border-radius:10px;margin-top:1rem;">
                 <h4>🚗 معلومات الكابتن:</h4>
                 <p>الاسم: <span id="cDriverName">-</span></p>
@@ -773,6 +775,7 @@
                 <p>الوقت المتوقع: <span id="cEstimatedTime">-</span></p>
             </div>
         </div>
+
         <div class="modal" id="customerCartModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="toggleCustomerCart()">&times;</button>
@@ -782,6 +785,7 @@
                 <button class="btn btn-success" onclick="customerCheckout()" style="width:100%;margin-top:1rem;">إتمام الطلب</button>
             </div>
         </div>
+
         <div class="modal" id="customerLoginModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerLogin()">&times;</button>
@@ -794,6 +798,7 @@
                 </form>
             </div>
         </div>
+
         <div class="modal" id="customerCheckoutModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerCheckout()">&times;</button>
@@ -812,6 +817,7 @@
                 </form>
             </div>
         </div>
+
         <div class="modal" id="customerOrdersModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerOrders()">&times;</button>
@@ -821,7 +827,9 @@
         </div>
     </div>
 
-    <!-- شاشة المطعم -->
+    <!-- ============================================================
+    شاشة المطعم
+    ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
             <div class="logo"><h1>📋 لوحة المطعم</h1><span class="badge" id="restaurantBadge">🍽️</span></div>
@@ -831,6 +839,7 @@
                 <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
+
         <div class="stats-container" id="restaurantStats">
             <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
             <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
@@ -839,6 +848,7 @@
             <div class="stat-card"><div class="icon">✅</div><div class="value" id="rCompletedOrders">0</div><div class="label">مكتملة</div></div>
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
         </div>
+
         <div id="restaurantPreparingSection" class="status-section" style="display:none;">
             <h3>👨‍🍳 الطلبات قيد التحضير</h3>
             <div class="mini-grid" id="restaurantPreparingGrid"></div>
@@ -851,6 +861,7 @@
             <h3>🛵 الطلبات قيد التوصيل</h3>
             <div class="mini-grid" id="restaurantDeliveringGrid"></div>
         </div>
+
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -858,6 +869,7 @@
                 <button class="btn btn-primary" onclick="filterRestaurantOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearRestaurantDateFilter()">إلغاء التصفية</button>
             </div>
+
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
@@ -871,6 +883,7 @@
             </div>
             <div class="orders-grid" id="restaurantOrdersGrid"></div>
         </div>
+
         <div id="restaurantLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🍽️</div>
@@ -888,7 +901,9 @@
         <div id="restaurantDashboard" style="display:none;"></div>
     </div>
 
-    <!-- شاشة الكابتن -->
+    <!-- ============================================================
+    شاشة الكابتن
+    ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
             <div class="logo"><h1>🛵 كابتن التوصيل</h1><span class="badge" id="driverBadge">🚗</span></div>
@@ -899,6 +914,7 @@
                 <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
+
         <div class="stats-container" id="driverStats">
             <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
             <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
@@ -907,6 +923,7 @@
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="dEarnings">0</div><div class="label">أرباح</div></div>
             <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
         </div>
+
         <div id="driverReadySection" class="status-section" style="display:none;">
             <h3>📦 طلبات جاهزة للاستلام</h3>
             <div class="mini-grid" id="driverReadyGrid"></div>
@@ -923,6 +940,7 @@
             <h3>✅ الطلبات المكتملة</h3>
             <div class="mini-grid" id="driverCompletedGrid"></div>
         </div>
+
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -930,6 +948,7 @@
                 <button class="btn btn-primary" onclick="filterDriverOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearDriverDateFilter()">إلغاء التصفية</button>
             </div>
+
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="driverFilters">
@@ -942,6 +961,7 @@
             </div>
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
+
         <div id="driverLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🛵</div>
@@ -959,7 +979,9 @@
         <div id="driverDashboard" style="display:none;"></div>
     </div>
 
-    <!-- شاشة الأدمن -->
+    <!-- ============================================================
+    شاشة الأدمن
+    ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
@@ -1012,7 +1034,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript (نفس الكود السابق مع التعديلات الطفيفة)
+    JavaScript
     ============================================================ -->
     <script>
         // =================================================================
@@ -1034,7 +1056,7 @@
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
-        //  دوال الخادم (كما هي)
+        //  دوال الخادم
         // =================================================================
         async function getOrders() {
             const res = await fetch(`${API_BASE}/orders`);
@@ -1083,7 +1105,7 @@
         }
 
         // =================================================================
-        //  دوال مساعدة لتنسيق التاريخ (ميلادي)
+        //  دوال مساعدة
         // =================================================================
         function formatDate(dateStr) {
             const d = new Date(dateStr);
@@ -1217,7 +1239,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer) - مختصر للاختصار
+        //  العميل (Customer)
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1454,7 +1476,14 @@
                 document.getElementById('customerTracking').style.display = 'block';
                 document.getElementById('trackingOrderId').textContent = `#${orderId}`;
                 updateCustomerTrackingSteps(order.status);
-                if (order.driverAssigned) {
+                const msgDiv = document.getElementById('customerTrackingMessage');
+                if (order.status === 'cancelled') {
+                    msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                    msgDiv.style.color = '#ff4757';
+                } else {
+                    msgDiv.innerHTML = '';
+                }
+                if (order.driverAssigned && order.status !== 'cancelled') {
                     document.getElementById('customerDriverInfo').style.display = 'block';
                     document.getElementById('cDriverName').textContent = order.driverName || '-';
                     document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
@@ -1467,13 +1496,25 @@
 
         function updateCustomerTrackingSteps(status) {
             const map = { pending: 1, preparing: 2, ready_for_pickup: 2, picking: 2, delivering: 3, completed: 4,
-            cancelled: 0 };
+            cancelled: -1 };
             const cur = map[status] || 1;
             for (let i = 1; i <= 4; i++) {
                 const el = document.getElementById('cstep' + i);
                 el.className = 'tracking-step';
-                if (i < cur) el.classList.add('completed');
-                else if (i === cur) el.classList.add('active');
+                if (status === 'cancelled') {
+                    el.classList.add('cancelled');
+                } else if (i < cur) {
+                    el.classList.add('completed');
+                } else if (i === cur) {
+                    el.classList.add('active');
+                }
+            }
+            const msgDiv = document.getElementById('customerTrackingMessage');
+            if (status === 'cancelled') {
+                msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                msgDiv.style.color = '#ff4757';
+            } else {
+                msgDiv.innerHTML = '';
             }
         }
 
@@ -1487,11 +1528,20 @@
                     const order = orders.find(o => o.id === orderId);
                     if (!order) return;
                     updateCustomerTrackingSteps(order.status);
-                    if (order.driverAssigned) {
+                    const msgDiv = document.getElementById('customerTrackingMessage');
+                    if (order.status === 'cancelled') {
+                        msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                        msgDiv.style.color = '#ff4757';
+                    } else {
+                        msgDiv.innerHTML = '';
+                    }
+                    if (order.driverAssigned && order.status !== 'cancelled') {
                         document.getElementById('customerDriverInfo').style.display = 'block';
                         document.getElementById('cDriverName').textContent = order.driverName || '-';
                         document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
                         document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime || '15 دقيقة';
+                    } else {
+                        document.getElementById('customerDriverInfo').style.display = 'none';
                     }
                     if (['completed', 'cancelled'].includes(order.status)) {
                         clearInterval(customerTrackingInterval);
@@ -1511,13 +1561,13 @@
                 if (!my.length) list.innerHTML = '<p style="text-align:center;padding:1rem;">لا توجد طلبات</p>';
                 else {
                     list.innerHTML = my.map(o => `
-                        <div class="order-card" style="margin-bottom:0.5rem;">
+                        <div class="order-card ${o.status}">
                             <div class="order-header"><span class="order-id">طلب #${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                             <p>المطعم: ${o.restaurantName}</p>
                             <p>المجموع: ${o.total} شيكل</p>
-                            <p>الحالة: <span class="status-badge status-${o.status}">${o.status}</span></p>
+                            <p>الحالة: <span class="status-badge status-${o.status}">${o.status === 'cancelled' ? 'ملغي ❌' : o.status}</span></p>
                             ${o.driverName ? `<p>🚗 الكابتن: ${o.driverName}</p>` : ''}
-                            <button class="btn btn-primary" onclick="showCustomerTracking(${o.id})">تتبع</button>
+                            ${o.status !== 'cancelled' ? `<button class="btn btn-primary" onclick="showCustomerTracking(${o.id})">تتبع</button>` : ''}
                         </div>
                     `).join('');
                 }
@@ -1541,7 +1591,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مختصر
+        //  المطعم (Restaurant)
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1806,11 +1856,19 @@
             }
         }
 
+        // ===== الدالة المعدلة لإرسال إشعار للعميل عند الرفض =====
         async function restaurantReject(orderId) {
             if (!confirm('تأكيد رفض الطلب؟')) return;
             try {
                 await updateOrderStatus(orderId, 'cancelled');
                 showNotification(`❌ تم رفض الطلب #${orderId}`);
+                // إرسال إشعار للعميل عبر القناة
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    channel.postMessage({ type: 'ORDER_REJECTED', order: order });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
                 await refreshRestaurantViews();
             } catch (e) {
                 showNotification('فشل في رفض الطلب', 'error');
@@ -1845,7 +1903,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مختصر
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2212,7 +2270,7 @@
         }
 
         // =================================================================
-        //  الأدمن (Admin) - مختصر
+        //  الأدمن (Admin)
         // =================================================================
         let adminLoggedIn = false;
 
@@ -2393,7 +2451,7 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات
+        //  الاستماع للتحديثات (مع إضافة ORDER_REJECTED)
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
@@ -2418,18 +2476,38 @@
                 }
             }
 
+            // ===== إشعار رفض الطلب للعميل =====
+            if (event.data.type === 'ORDER_REJECTED') {
+                const order = event.data.order;
+                // إذا كانت صفحة العميل مفتوحة، نعرض إشعاراً
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    showNotification(`⚠️ تم رفض طلبك #${order.id} من قبل المطعم`, 'error');
+                    // تحديث قائمة الطلبات وتتبع الطلب إذا كان مفتوحاً
+                    if (customerTrackingId == order.id) {
+                        showCustomerTracking(order.id);
+                        updateCustomerTrackingSteps('cancelled');
+                    }
+                }
+                // تحديث واجهة العميل إذا كانت مفتوحة (طلباتي)
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    // يمكن تحديث القائمة إذا كانت مفتوحة
+                }
+            }
+
             if (event.data.type === 'ORDERS_UPDATED') {
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     if (customerTrackingId) {
                         const order = event.data.orders.find(o => o.id === customerTrackingId);
                         if (order) {
                             updateCustomerTrackingSteps(order.status);
-                            if (order.driverAssigned) {
+                            if (order.driverAssigned && order.status !== 'cancelled') {
                                 document.getElementById('customerDriverInfo').style.display = 'block';
                                 document.getElementById('cDriverName').textContent = order.driverName || '-';
                                 document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
                                 document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime ||
                                     '15 دقيقة';
+                            } else {
+                                document.getElementById('customerDriverInfo').style.display = 'none';
                             }
                         }
                     }

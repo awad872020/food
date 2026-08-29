@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -826,7 +825,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن (مع زر تفعيل الإشعارات)
+    شاشة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -941,7 +940,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript - نسخة الخادم الخلفي (مع Notification API)
+    JavaScript - نسخة الخادم الخلفي (مع أصوات تنبيه)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1086,14 +1085,12 @@
                 showNotification('❌ تم رفض الإشعارات مسبقاً. يمكنك تغيير الإعدادات من المتصفح.', 'error');
                 return;
             }
-            // طلب الإذن
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     showNotification('✅ تم تفعيل الإشعارات بنجاح!', 'success');
-                    // إشعار ترحيبي
                     new Notification('🔔 نظام التوصيل', {
                         body: 'سيتم تنبيهك عند وجود طلب جديد جاهز للتوصيل.',
-                        icon: '🍔' // يمكنك وضع رابط أيقونة حقيقية
+                        icon: '🍔'
                     });
                 } else {
                     showNotification('❌ لم يتم تفعيل الإشعارات', 'error');
@@ -1101,22 +1098,56 @@
             });
         }
 
-        // دالة لإرسال إشعار سطح المكتب
         function sendDesktopNotification(title, body) {
             if (!('Notification' in window)) return;
             if (Notification.permission === 'granted') {
-                new Notification(title, {
-                    body: body,
-                    icon: '🚀' // أيقونة اختيارية
-                });
+                new Notification(title, { body, icon: '🚀' });
             } else if (Notification.permission === 'default') {
-                // حاول طلب الإذن تلقائياً
                 Notification.requestPermission().then(perm => {
                     if (perm === 'granted') {
                         new Notification(title, { body, icon: '🚀' });
                     }
                 });
             }
+        }
+
+        // =================================================================
+        //  🔊 أصوات التنبيه باستخدام Web Audio API
+        // =================================================================
+        function playRestaurantSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                // نغمة مزدوجة (تنبيه المطعم)
+                [0, 0.2].forEach(delay => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 600;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + 0.3);
+                });
+            } catch (e) { /* تجاهل */ }
+        }
+
+        function playDriverSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                // نغمة عالية (تنبيه الكابتن)
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 1000;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.25);
+            } catch (e) { /* تجاهل */ }
         }
 
         // =================================================================
@@ -1146,10 +1177,8 @@
         function initCustomer() {
             displayCustomerRestaurants();
             updateCustomerCartUI();
-            // استعادة بيانات العميل
             const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOMER_INFO);
             if (saved) customerUser = JSON.parse(saved);
-            // استعادة تتبع الطلب
             const tid = localStorage.getItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
             if (tid) {
                 getOrders().then(orders => {
@@ -1344,7 +1373,9 @@
                 showNotification(`✅ تم تأكيد طلب #${order.id}`);
                 showCustomerTracking(order.id);
                 startCustomerTracking(order.id);
-                // إرسال تحديث للقناة
+
+                // إرسال إشعار الطلب الجديد للمطعم (مع الصوت)
+                channel.postMessage({ type: 'NEW_ORDER', order: order });
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (err) {
@@ -1616,9 +1647,8 @@
                 displayRestaurantOrders();
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
-                // إرسال إشعار مخصص للكابتن (يتم التعامل معه في channel.onmessage)
+                // إرسال إشعار للكابتن (مع الصوت)
                 channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
-                // إرسال تحديث عام للقوائم
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 showNotification('فشل في تحديث الطلب', 'error');
@@ -2064,10 +2094,38 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات المشتركة (مع إضافة إشعار سطح المكتب)
+        //  الاستماع للتحديثات المشتركة + تشغيل الأصوات
         // =================================================================
         channel.onmessage = function(event) {
-            // تحديث القوائم العامة
+            // --- 1. معالجة الطلب الجديد (للمطعم) ---
+            if (event.data.type === 'NEW_ORDER') {
+                const order = event.data.order;
+                // التأكد من أن صفحة المطعم نشطة والمستخدم هو المطعم المستهدف
+                if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
+                    if (currentRestaurantUser.displayName === order.restaurantName) {
+                        // 🔔 تشغيل صوت خاص بالمطعم
+                        playRestaurantSound();
+                        showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
+                        // تحديث الإحصائيات واللوحة فوراً
+                        displayRestaurantOrders();
+                    }
+                }
+            }
+
+            // --- 2. معالجة الطلب الجاهز (للكابتن) ---
+            if (event.data.type === 'NEW_READY_ORDER') {
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
+                    const order = event.data.order;
+                    // 🔔 تشغيل صوت خاص بالكابتن
+                    playDriverSound();
+                    showNotification(`📢 طلب جاهز #${order.id} من ${order.restaurantName}`, 'success');
+                    sendDesktopNotification('📢 طلب جاهز للتوصيل', `طلب #${order.id} من ${order.restaurantName}`);
+                    // تحديث قائمة الطلبات
+                    displayDriverOrders();
+                }
+            }
+
+            // --- 3. التحديث العام للقوائم ---
             if (event.data.type === 'ORDERS_UPDATED') {
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     if (customerTrackingId) {
@@ -2091,24 +2149,6 @@
                     displayDriverOrders();
                 }
             }
-
-            // ====== معالجة إشعار الطلب الجديد للكابتن (داخل التطبيق + سطح المكتب) ======
-            if (event.data.type === 'NEW_READY_ORDER') {
-                // فقط إذا كانت صفحة الكابتن مفتوحة ونشطة
-                if (document.getElementById('driverPage').classList.contains('active')) {
-                    const order = event.data.order;
-                    // إشعار داخل التطبيق
-                    showNotification(
-                        `🚀 طلب جديد جاهز للتوصيل من ${order.restaurantName} إلى ${order.customerName} (طلب #${order.id})`,
-                        'success'
-                    );
-                    // إشعار سطح المكتب (Notification API)
-                    sendDesktopNotification(
-                        '🚀 طلب جديد جاهز للتوصيل!',
-                        `من ${order.restaurantName} إلى ${order.customerName} (طلب #${order.id})`
-                    );
-                }
-            }
         };
 
         // =================================================================
@@ -2117,11 +2157,7 @@
         checkServer();
         navigateTo('home');
 
-        // طلب إذن الإشعارات تلقائياً عند تحميل الصفحة (اختياري)
-        // يمكن تفعيل السطر التالي إن أردت طلب الإذن فوراً:
-        // setTimeout(() => requestNotificationPermission(), 3000);
-
-        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي (مع Notification API)');
+        console.log('🍔 نظام توصيل الطعام - مع أصوات تنبيه للمطعم والكابتن');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

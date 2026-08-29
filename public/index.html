@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام توصيل الطعام - خادم خلفي</title>
+    <style>
+        /* ========== الأنماط العامة ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            direction: rtl;
+            min-height: 100vh;
+        }
+        .page {
+            display: none;
+            padding-bottom: 80px;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* ========== أزرار التنقل العامة ========== */
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #e55a2b;
+        }
+        .btn-success {
+            background: #00b894;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #00a381;
+        }
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #ee5a24;
+        }
+        .btn-warning {
+            background: #ffa502;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e88f00;
+        }
+        .btn-info {
+            background: #1e90ff;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #187bcd;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+        }
+        .btn-outline:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        /* ========== الصفحة الرئيسية ========== */
+        #homePage {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #homePage .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        #homePage h1 {
+            font-size: 2.5rem;
+            color: #2d3436;
+            margin-bottom: 10px;
+        }
+        #homePage p.sub {
+            color: #636e72;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .app-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px 10px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            border: 3px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .app-card .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .app-card .title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .app-card.customer { border-color: #ff6b35; }
+        .app-card.restaurant { border-color: #00b894; }
+        .app-card.driver { border-color: #1e90ff; }
+        .app-card.admin { border-color: #6c5ce7; }
+        .live-badge {
+            background: #00b894;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .hint {
+            color: #999;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+        .server-status {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .server-status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* ========== شاشات تسجيل الدخول ========== */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2d3436;
+        }
+        .login-box .logo-big {
+            text-align: center;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .login-form input,
+        .login-form select {
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .login-form input:focus,
+        .login-form select:focus {
+            border-color: #ff6b35;
+        }
+        .login-form button {
+            padding: 0.8rem;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .login-form button:hover {
+            background: #e55a2b;
+        }
+        .error-msg {
+            color: #ff4757;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* ========== الأقسام المشتركة ========== */
+        .header-bar {
+            background: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header-bar .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .header-bar .logo h1 {
+            font-size: 1.5rem;
+            color: #ff6b35;
+        }
+        .header-bar .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #ff9f1c;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .logout-btn:hover {
+            background: #ee5a24;
+        }
+
+        /* ========== إحصائيات ========== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem 5%;
+        }
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .stat-card .icon {
+            font-size: 2rem;
+        }
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        .stat-card .label {
+            color: #636e72;
+            font-size: 0.8rem;
+        }
+
+        /* ========== قوائم الطلبات ========== */
+        .orders-section {
+            padding: 1rem 5% 2rem;
+        }
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+        .filter-btn:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-right: 5px solid #1e90ff;
+            transition: 0.3s;
+        }
+        .order-card:hover {
+            transform: translateY(-3px);
+        }
+        .order-card.pending { border-right-color: #ffa502; }
+        .order-card.preparing { border-right-color: #1e90ff; }
+        .order-card.ready_for_pickup { border-right-color: #00b894; }
+        .order-card.picking { border-right-color: #ffa502; }
+        .order-card.delivering { border-right-color: #ff9f1c; }
+        .order-card.completed { border-right-color: #00b894; }
+        .order-card.cancelled { border-right-color: #ff4757; opacity: 0.7; }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+        .order-id {
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        .order-time {
+            color: #636e72;
+            font-size: 0.85rem;
+        }
+        .customer-info h4 {
+            margin-bottom: 0.3rem;
+        }
+        .customer-details {
+            color: #636e72;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+        .order-items {
+            background: #f8f9fa;
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            font-weight: bold;
+            color: #ff6b35;
+            font-size: 1.1rem;
+            text-align: left;
+            margin: 0.5rem 0;
+        }
+        .payment-method {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            background: #f0f0f0;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .order-actions .btn {
+            flex: 1;
+            min-width: 80px;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status-pending { background: #fff3e0; color: #ffa502; }
+        .status-preparing { background: #e3f2fd; color: #1e90ff; }
+        .status-ready_for_pickup { background: #e8f5e9; color: #00b894; }
+        .status-picking { background: #fff3e0; color: #ffa502; }
+        .status-delivering { background: #f3e5f5; color: #9c27b0; }
+        .status-completed { background: #e8f5e9; color: #00b894; }
+        .status-cancelled { background: #ffebee; color: #ff4757; }
+
+        /* ========== تتبع الطلب ========== */
+        .tracking-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        .tracking-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #ddd;
+            z-index: 0;
+        }
+        .tracking-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        .step-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: 0.3s;
+        }
+        .tracking-step.active .step-icon {
+            border-color: #ffa502;
+            background: #fff3e0;
+            animation: pulse 2s infinite;
+        }
+        .tracking-step.completed .step-icon {
+            border-color: #00b894;
+            background: #00b894;
+            color: white;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 165, 2, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
+        }
+
+        /* ========== النوافذ المنبثقة ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: #2d3436;
+        }
+        .close-modal:hover {
+            color: #ff6b35;
+        }
+
+        /* ========== الإشعارات ========== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 90%;
+        }
+        .notification.success { background: #00b894; }
+        .notification.error { background: #ff4757; }
+        .notification.warning { background: #ffa502; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ========== إدارة الأدمن ========== */
+        .admin-users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .admin-users-table th,
+        .admin-users-table td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .admin-users-table th {
+            background: #f0f0f0;
+        }
+        .admin-users-table .btn {
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        /* ========== تنسيقات الجوال ========== */
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(3, 1fr);
+                padding: 1rem 3%;
+                gap: 0.5rem;
+            }
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-bar {
+                padding: 0.8rem 3%;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .header-bar .user-badge {
+                justify-content: center;
+            }
+            .login-box {
+                padding: 1.5rem;
+            }
+            .apps-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    الصفحة الرئيسية
+    ============================================================ -->
+    <div id="homePage" class="page active">
+        <div class="container">
+            <h1>🍔 نظام توصيل الطعام</h1>
+            <p class="sub">اختر التطبيق المناسب للبدء</p>
+            <span class="live-badge">🟢 نظام متكامل - خادم خلفي</span>
+            <div id="serverStatus" class="server-status">🔄 جاري الاتصال بالخادم...</div>
+            <div class="apps-grid">
+                <div class="app-card customer" onclick="navigateTo('customer')">
+                    <div class="icon">👤</div>
+                    <div class="title">العميل</div>
+                </div>
+                <div class="app-card restaurant" onclick="navigateTo('restaurant')">
+                    <div class="icon">🍽️</div>
+                    <div class="title">المطعم</div>
+                </div>
+                <div class="app-card driver" onclick="navigateTo('driver')">
+                    <div class="icon">🛵</div>
+                    <div class="title">الكابتن</div>
+                </div>
+                <div class="app-card admin" onclick="navigateTo('admin')">
+                    <div class="icon">👑</div>
+                    <div class="title">الأدمن</div>
+                </div>
+            </div>
+            <div class="hint">🚀 اختر الدور المناسب لبدء التجربة</div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    شاشة العميل
+    ============================================================ -->
+    <div id="customerPage" class="page">
+        <div class="header-bar">
+            <div class="logo"><span style="font-size:2rem;">🍔</span><h1>اطلب طعامك</h1></div>
+            <div class="user-badge">
+                <button class="btn btn-outline" onclick="showCustomerOrders()">📋 طلباتي</button>
+                <button class="btn btn-outline" onclick="toggleCustomerCart()">🛒 السلة <span id="customerCartCount" style="background:#ff6b35;color:white;border-radius:50%;padding:0 8px;">0</span></button>
+                <button class="btn btn-primary" onclick="showCustomerLogin()">👤 حسابي</button>
+                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
+            </div>
+        </div>
+
+        <!-- بحث وموقع -->
+        <div style="padding:1rem 5%;display:flex;gap:1rem;flex-wrap:wrap;background:linear-gradient(135deg,#ff6b35,#ff9f1c);">
+            <div style="flex:1;display:flex;background:white;border-radius:30px;padding:0.2rem 1rem;">
+                <input type="text" id="customerSearch" placeholder="ابحث عن مطعم..." onkeyup="filterCustomerRestaurants()" style="flex:1;border:none;outline:none;padding:0.5rem;">
+                <button style="background:none;border:none;font-size:1.2rem;">🔍</button>
+            </div>
+            <button class="btn btn-light" onclick="getCustomerLocation()" style="background:white;border:none;border-radius:30px;padding:0.3rem 1.2rem;">📍 <span id="customerLocationText">أذنا</span></button>
+        </div>
+
+        <!-- فئات -->
+        <div style="padding:1rem 5%;overflow-x:auto;white-space:nowrap;">
+            <div style="display:inline-flex;gap:0.8rem;" id="customerCategories">
+                <button class="btn btn-primary active" data-cat="all" onclick="filterCustomerCategory('all',this)">🍽️ الكل</button>
+                <button class="btn btn-outline" data-cat="shawarma" onclick="filterCustomerCategory('shawarma',this)">🥙 شاورما</button>
+                <button class="btn btn-outline" data-cat="pizza" onclick="filterCustomerCategory('pizza',this)">🍕 بيتزا</button>
+                <button class="btn btn-outline" data-cat="broast" onclick="filterCustomerCategory('broast',this)">🍗 بروست</button>
+                <button class="btn btn-outline" data-cat="arabic" onclick="filterCustomerCategory('arabic',this)">🧆 عربي</button>
+            </div>
+        </div>
+
+        <!-- قائمة المطاعم -->
+        <div class="orders-section">
+            <h2 style="margin-bottom:1.5rem;">المطاعم المتاحة</h2>
+            <div class="orders-grid" id="customerRestaurantsGrid"></div>
+        </div>
+
+        <!-- تتبع الطلب -->
+        <div id="customerTracking" style="display:none;padding:1.5rem 5%;background:white;margin:1rem 5%;border-radius:15px;">
+            <h2>📍 تتبع طلبك</h2>
+            <p>طلب رقم: <span id="trackingOrderId">#1001</span></p>
+            <div class="tracking-steps">
+                <div class="tracking-step" id="cstep1"><div class="step-icon">✅</div><span>تم الطلب</span></div>
+                <div class="tracking-step" id="cstep2"><div class="step-icon">👨‍🍳</div><span>قيد التحضير</span></div>
+                <div class="tracking-step" id="cstep3"><div class="step-icon">🛵</div><span>قيد التوصيل</span></div>
+                <div class="tracking-step" id="cstep4"><div class="step-icon">🏠</div><span>تم التسليم</span></div>
+            </div>
+            <div id="customerDriverInfo" style="display:none;background:#f0f0f0;padding:1rem;border-radius:10px;margin-top:1rem;">
+                <h4>🚗 معلومات الكابتن:</h4>
+                <p>الاسم: <span id="cDriverName">-</span></p>
+                <p>رقم الجوال: <span id="cDriverPhone">-</span></p>
+                <p>الوقت المتوقع: <span id="cEstimatedTime">-</span></p>
+            </div>
+        </div>
+
+        <!-- السلة -->
+        <div class="modal" id="customerCartModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="toggleCustomerCart()">&times;</button>
+                <h2>🛒 سلة الطلبات</h2>
+                <div id="customerCartItems"></div>
+                <div style="margin-top:1rem;text-align:left;"><h3>المجموع: <span id="customerCartTotal">0</span> شيكل</h3></div>
+                <button class="btn btn-success" onclick="customerCheckout()" style="width:100%;margin-top:1rem;">إتمام الطلب</button>
+            </div>
+        </div>
+
+        <!-- تسجيل دخول العميل -->
+        <div class="modal" id="customerLoginModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeCustomerLogin()">&times;</button>
+                <h2>👤 تسجيل الدخول</h2>
+                <form class="login-form" onsubmit="customerLogin(event)">
+                    <input type="text" placeholder="الاسم الكامل" required>
+                    <input type="tel" placeholder="رقم الجوال" required>
+                    <input type="text" placeholder="العنوان" required>
+                    <button type="submit">دخول</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- إتمام الطلب -->
+        <div class="modal" id="customerCheckoutModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeCustomerCheckout()">&times;</button>
+                <h2>📝 إتمام الطلب</h2>
+                <form class="login-form" onsubmit="customerSubmitOrder(event)">
+                    <input type="text" placeholder="الاسم الكامل" required>
+                    <input type="tel" placeholder="رقم الجوال" required>
+                    <textarea placeholder="العنوان بالتفصيل" required style="padding:0.8rem;border-radius:10px;border:2px solid #ddd;min-height:80px;"></textarea>
+                    <select required>
+                        <option value="">طريقة الدفع</option>
+                        <option value="cash">الدفع عند الاستلام 💵</option>
+                        <option value="card">بطاقة ائتمانية 💳</option>
+                        <option value="wallet">محفظة إلكترونية 📱</option>
+                    </select>
+                    <button type="submit">تأكيد الطلب ✅</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- طلباتي -->
+        <div class="modal" id="customerOrdersModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeCustomerOrders()">&times;</button>
+                <h2>📋 طلباتي</h2>
+                <div id="customerOrdersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    شاشة المطعم
+    ============================================================ -->
+    <div id="restaurantPage" class="page">
+        <div class="header-bar">
+            <div class="logo"><h1>📋 لوحة المطعم</h1><span class="badge" id="restaurantBadge">🍽️</span></div>
+            <div class="user-badge">
+                <button class="btn btn-primary" onclick="showRestaurantNotifications()">🔔 <span id="restaurantNotifBadge" style="background:red;color:white;border-radius:50%;padding:0 8px;">0</span></button>
+                <button class="logout-btn" onclick="logoutRestaurant()">تسجيل خروج</button>
+                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
+            </div>
+        </div>
+
+        <div class="stats-container" id="restaurantStats">
+            <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
+            <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
+            <div class="stat-card"><div class="icon">👨‍🍳</div><div class="value" id="rPreparingOrders">0</div><div class="label">تحضير</div></div>
+            <div class="stat-card"><div class="icon">📦</div><div class="value" id="rReadyOrders">0</div><div class="label">جاهزة</div></div>
+            <div class="stat-card"><div class="icon">✅</div><div class="value" id="rCompletedOrders">0</div><div class="label">مكتملة</div></div>
+            <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
+        </div>
+
+        <div class="orders-section">
+            <div class="orders-header">
+                <h2>📋 الطلبات</h2>
+                <div class="filter-buttons" id="restaurantFilters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterRestaurantOrders('all')">الكل</button>
+                    <button class="filter-btn" data-filter="pending" onclick="filterRestaurantOrders('pending')">جديدة</button>
+                    <button class="filter-btn" data-filter="preparing" onclick="filterRestaurantOrders('preparing')">تحضير</button>
+                    <button class="filter-btn" data-filter="ready_for_pickup" onclick="filterRestaurantOrders('ready_for_pickup')">جاهزة</button>
+                    <button class="filter-btn" data-filter="delivering" onclick="filterRestaurantOrders('delivering')">توصيل</button>
+                    <button class="filter-btn" data-filter="completed" onclick="filterRestaurantOrders('completed')">مكتملة</button>
+                </div>
+            </div>
+            <div class="orders-grid" id="restaurantOrdersGrid"></div>
+        </div>
+
+        <!-- شاشة تسجيل دخول المطعم -->
+        <div id="restaurantLoginPage" class="login-page" style="display:flex;">
+            <div class="login-box">
+                <div class="logo-big">🍽️</div>
+                <h2>تسجيل دخول المطعم</h2>
+                <form class="login-form" onsubmit="restaurantLogin(event)">
+                    <select id="restaurantUserSelect" required>
+                        <option value="">اختر المطعم</option>
+                    </select>
+                    <input type="password" id="restaurantPassword" placeholder="كلمة المرور" required>
+                    <div class="error-msg" id="restaurantLoginError">بيانات غير صحيحة</div>
+                    <button type="submit">دخول</button>
+                </form>
+            </div>
+        </div>
+        <!-- لوحة المطعم تظهر عند تسجيل الدخول -->
+        <div id="restaurantDashboard" style="display:none;"></div>
+    </div>
+
+    <!-- ============================================================
+    شاشة الكابتن
+    ============================================================ -->
+    <div id="driverPage" class="page">
+        <div class="header-bar">
+            <div class="logo"><h1>🛵 كابتن التوصيل</h1><span class="badge" id="driverBadge">🚗</span></div>
+            <div class="user-badge">
+                <button class="btn btn-success" id="driverStatusBtn" onclick="toggleDriverStatus()">🟢 متصل</button>
+                <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
+                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
+            </div>
+        </div>
+
+        <div class="stats-container" id="driverStats">
+            <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
+            <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
+            <div class="stat-card"><div class="icon">🛵</div><div class="value" id="dDelivering">0</div><div class="label">توصيل</div></div>
+            <div class="stat-card"><div class="icon">✅</div><div class="value" id="dCompleted">0</div><div class="label">مسلمة</div></div>
+            <div class="stat-card"><div class="icon">💰</div><div class="value" id="dEarnings">0</div><div class="label">أرباح</div></div>
+            <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
+        </div>
+
+        <div class="orders-section">
+            <div class="orders-header">
+                <h2>📋 الطلبات</h2>
+                <div class="filter-buttons" id="driverFilters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterDriverOrders('all')">الكل</button>
+                    <button class="filter-btn" data-filter="ready_for_pickup" onclick="filterDriverOrders('ready_for_pickup')">جاهزة</button>
+                    <button class="filter-btn" data-filter="picking" onclick="filterDriverOrders('picking')">استلام</button>
+                    <button class="filter-btn" data-filter="delivering" onclick="filterDriverOrders('delivering')">توصيل</button>
+                    <button class="filter-btn" data-filter="completed" onclick="filterDriverOrders('completed')">مكتملة</button>
+                </div>
+            </div>
+            <div class="orders-grid" id="driverOrdersGrid"></div>
+        </div>
+
+        <!-- شاشة تسجيل دخول الكابتن -->
+        <div id="driverLoginPage" class="login-page" style="display:flex;">
+            <div class="login-box">
+                <div class="logo-big">🛵</div>
+                <h2>تسجيل دخول الكابتن</h2>
+                <form class="login-form" onsubmit="driverLogin(event)">
+                    <select id="driverUserSelect" required>
+                        <option value="">اختر الكابتن</option>
+                    </select>
+                    <input type="password" id="driverPassword" placeholder="كلمة المرور" required>
+                    <div class="error-msg" id="driverLoginError">بيانات غير صحيحة</div>
+                    <button type="submit">دخول</button>
+                </form>
+            </div>
+        </div>
+        <div id="driverDashboard" style="display:none;"></div>
+    </div>
+
+    <!-- ============================================================
+    شاشة الأدمن (محمية بكلمة مرور)
+    ============================================================ -->
+    <div id="adminPage" class="page">
+        <!-- شاشة تسجيل دخول الأدمن (تظهر أولاً) -->
+        <div id="adminLoginPage" class="login-page" style="display:flex;">
+            <div class="login-box">
+                <div class="logo-big">👑</div>
+                <h2>تسجيل الدخول - الأدمن</h2>
+                <form class="login-form" onsubmit="adminLogin(event)">
+                    <input type="text" id="adminLoginUser" placeholder="اسم المستخدم" required>
+                    <input type="password" id="adminLoginPass" placeholder="كلمة المرور" required>
+                    <div class="error-msg" id="adminLoginError">بيانات غير صحيحة</div>
+                    <button type="submit">دخول</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- لوحة تحكم الأدمن (تظهر فقط بعد تسجيل الدخول) -->
+        <div id="adminDashboard" style="display:none;">
+            <div class="header-bar">
+                <div class="logo"><h1>👑 لوحة التحكم - الأدمن</h1></div>
+                <div class="user-badge">
+                    <button class="logout-btn" onclick="logoutAdmin()">تسجيل خروج</button>
+                    <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
+                </div>
+            </div>
+
+            <div style="padding:1.5rem 5%;">
+                <h2>إدارة المستخدمين</h2>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;">
+                    <button class="btn btn-success" onclick="showAdminAddForm('restaurant')">➕ إضافة مطعم</button>
+                    <button class="btn btn-info" onclick="showAdminAddForm('driver')">➕ إضافة كابتن</button>
+                </div>
+
+                <div id="adminFormContainer" style="display:none;background:white;padding:1.5rem;border-radius:15px;margin:1rem 0;">
+                    <h3 id="adminFormTitle">إضافة مستخدم</h3>
+                    <form class="login-form" onsubmit="adminSaveUser(event)">
+                        <input type="hidden" id="adminEditId">
+                        <input type="text" id="adminUsername" placeholder="اسم المستخدم" required>
+                        <input type="text" id="adminDisplayName" placeholder="الاسم الظاهر (مثال: مطعم شاورما / كابتن محمد)" required>
+                        <input type="text" id="adminExtra" placeholder="معلومات إضافية (مثال: نوع المركبة أو وصف المطعم)">
+                        <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
+                        <div style="display:flex;gap:1rem;">
+                            <button type="submit" class="btn btn-success">حفظ</button>
+                            <button type="button" class="btn btn-danger" onclick="hideAdminForm()">إلغاء</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="admin-users-table">
+                        <thead><tr><th>النوع</th><th>اسم المستخدم</th><th>الاسم الظاهر</th><th>معلومات إضافية</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="adminUsersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JavaScript - نسخة الخادم الخلفي
+    ============================================================ -->
+    <script>
+        // =================================================================
+        //  CONFIG - عنوان الخادم
+        // =================================================================
+        const API_BASE = window.location.origin + '/api';
+        // إذا كنت تعمل محلياً على منفذ مختلف، غيّر الرابط:
+        // const API_BASE = 'http://localhost:3000/api';
+
+        const CONFIG = {
+            APP_NAME: 'نظام توصيل الطعام',
+            LOCATION: 'أذنا',
+            CURRENCY: 'شيكل',
+            DELIVERY_FEE: 7,
+            DELIVERY_TIME: '20-30 دقيقة',
+            STORAGE_KEYS: {
+                CUSTOMER_INFO: 'customer_info',
+                TRACKING_ORDER_ID: 'tracking_order_id',
+                DRIVER_SESSION: 'driver_session'
+            }
+        };
+
+        const channel = new BroadcastChannel('food_delivery_channel');
+
+        // =================================================================
+        //  دوال الاتصال بالخادم
+        // =================================================================
+
+        // ----- الطلبات -----
+        async function getOrders() {
+            const res = await fetch(`${API_BASE}/orders`);
+            if (!res.ok) throw new Error('فشل في جلب الطلبات');
+            return await res.json();
+        }
+
+        async function createOrder(orderData) {
+            const res = await fetch(`${API_BASE}/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            if (!res.ok) throw new Error('فشل في إنشاء الطلب');
+            return await res.json();
+        }
+
+        async function updateOrderStatus(orderId, newStatus, additionalData = {}) {
+            const res = await fetch(`${API_BASE}/orders/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus, ...additionalData })
+            });
+            if (!res.ok) throw new Error('فشل في تحديث الطلب');
+            return await res.json();
+        }
+
+        // ----- المستخدمين (للأدمن) -----
+        async function getUsers() {
+            const res = await fetch(`${API_BASE}/users`);
+            if (!res.ok) throw new Error('فشل في جلب المستخدمين');
+            return await res.json();
+        }
+
+        async function saveUsers(users) {
+            const res = await fetch(`${API_BASE}/users`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(users)
+            });
+            if (!res.ok) throw new Error('فشل في حفظ المستخدمين');
+            return await res.json();
+        }
+
+        // ----- تسجيل دخول الأدمن -----
+        async function adminLoginAPI(username, password) {
+            const res = await fetch(`${API_BASE}/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            return await res.json();
+        }
+
+        // =================================================================
+        //  التحقق من الاتصال بالخادم
+        // =================================================================
+        async function checkServer() {
+            const statusEl = document.getElementById('serverStatus');
+            try {
+                await getOrders();
+                statusEl.textContent = '✅ الخادم متصل وجاهز';
+                statusEl.className = 'server-status';
+            } catch (e) {
+                statusEl.textContent = '❌ لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم (node server.js)';
+                statusEl.className = 'server-status error';
+                console.error('❌ خطأ في الاتصال بالخادم:', e);
+            }
+        }
+
+        // =================================================================
+        //  التنقل بين الصفحات
+        // =================================================================
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            if (page === 'home') {
+                document.getElementById('homePage').classList.add('active');
+                return;
+            }
+            const target = document.getElementById(page + 'Page');
+            if (target) {
+                target.classList.add('active');
+                if (page === 'customer') initCustomer();
+                else if (page === 'restaurant') initRestaurant();
+                else if (page === 'driver') initDriver();
+                else if (page === 'admin') initAdmin();
+            }
+        }
+
+        // =================================================================
+        //  إشعارات
+        // =================================================================
+        function showNotification(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `notification ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 4000);
+        }
+
+        // =================================================================
+        //  العميل (Customer)
+        // =================================================================
+        let customerCart = [];
+        let customerUser = null;
+        let customerFilter = 'all';
+        let customerTrackingInterval = null;
+        let customerTrackingId = null;
+
+        const customerRestaurants = [
+            { id: 1, name: 'مطعم شاورما', emoji: '🥙', cuisine: 'شاورما ووجبات سريعة', category: 'shawarma', rating: 4.5,
+                menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18,
+                    desc: 'مع طحينة' }, { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }] },
+            { id: 2, name: 'مطعم بيتزا', emoji: '🍕', cuisine: 'بيتزا وإيطالي', category: 'pizza', rating: 4.7,
+                menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28,
+                    desc: 'فلفل ومشروم' }] },
+            { id: 3, name: 'مطعم بروست', emoji: '🍗', cuisine: 'بروست ومقليات', category: 'broast', rating: 4.8,
+                menu: [{ id: 6, name: 'بروست دجاج', price: 35, desc: '8 قطع' }, { id: 7, name: 'أجنحة', price: 25,
+                    desc: '6 قطع' }] },
+            { id: 4, name: 'مطعم الشرق الأوسط', emoji: '🧆', cuisine: 'مأكولات عربية', category: 'arabic', rating: 4.6,
+                menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20,
+                    desc: 'مع لحم' }] }
+        ];
+
+        function initCustomer() {
+            displayCustomerRestaurants();
+            updateCustomerCartUI();
+            // استعادة بيانات العميل
+            const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOMER_INFO);
+            if (saved) customerUser = JSON.parse(saved);
+            // استعادة تتبع الطلب
+            const tid = localStorage.getItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
+            if (tid) {
+                getOrders().then(orders => {
+                    const order = orders.find(o => o.id === parseInt(tid));
+                    if (order && !['completed', 'cancelled'].includes(order.status)) {
+                        showCustomerTracking(order.id);
+                        startCustomerTracking(order.id);
+                    } else {
+                        localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
+                    }
+                }).catch(() => {});
+            }
+        }
+
+        function displayCustomerRestaurants() {
+            const grid = document.getElementById('customerRestaurantsGrid');
+            grid.innerHTML = '';
+            let list = customerRestaurants;
+            if (customerFilter !== 'all') list = list.filter(r => r.category === customerFilter);
+            const search = document.getElementById('customerSearch').value.toLowerCase();
+            if (search) list = list.filter(r => r.name.includes(search) || r.cuisine.includes(search));
+            if (!list.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#636e72;">لا توجد مطاعم</div>';
+                return;
+            }
+            list.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                card.style.borderRightColor = '#ff6b35';
+                card.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:2rem;">${r.emoji}</span>
+                        <span style="color:#ffd700;">⭐ ${r.rating}</span>
+                    </div>
+                    <h3>${r.name}</h3>
+                    <p style="color:#636e72;">${r.cuisine}</p>
+                    <p style="color:#00b894;">🚗 ${CONFIG.DELIVERY_TIME} | ${CONFIG.DELIVERY_FEE} شيكل</p>
+                    <button class="btn btn-primary" onclick="showCustomerMenu(${r.id})" style="width:100%;margin-top:0.5rem;">عرض القائمة</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCustomerCategory(cat, btn) {
+            document.querySelectorAll('#customerCategories .btn').forEach(b => b.className = 'btn btn-outline');
+            btn.className = 'btn btn-primary';
+            customerFilter = cat;
+            displayCustomerRestaurants();
+        }
+
+        function filterCustomerRestaurants() {
+            displayCustomerRestaurants();
+        }
+
+        function showCustomerMenu(restId) {
+            const rest = customerRestaurants.find(r => r.id === restId);
+            if (!rest) return;
+            const modal = document.getElementById('customerCartModal');
+            const container = document.getElementById('customerCartItems');
+            container.innerHTML = `<h3>${rest.emoji} ${rest.name}</h3><p style="color:#636e72;">${rest.cuisine}</p><hr>`;
+            rest.menu.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'order-item';
+                div.innerHTML = `
+                    <span>${item.name} - ${item.price} شيكل</span>
+                    <button class="btn btn-success" onclick="addToCustomerCart(${rest.id},${item.id})">➕</button>
+                `;
+                container.appendChild(div);
+            });
+            const back = document.createElement('button');
+            back.className = 'btn btn-primary';
+            back.textContent = '🛒 عرض السلة';
+            back.onclick = () => updateCustomerCartUI();
+            back.style.marginTop = '1rem';
+            container.appendChild(back);
+            modal.style.display = 'block';
+        }
+
+        function addToCustomerCart(restId, itemId) {
+            const rest = customerRestaurants.find(r => r.id === restId);
+            const item = rest.menu.find(i => i.id === itemId);
+            const existing = customerCart.find(c => c.itemId === itemId);
+            if (existing) existing.quantity += 1;
+            else customerCart.push({ restaurantId: restId, restaurantName: rest.name, itemId, itemName: item.name,
+                price: item.price, quantity: 1 });
+            updateCustomerCartUI();
+            showNotification(`تمت إضافة ${item.name} ✅`);
+        }
+
+        function updateCustomerCartUI() {
+            const count = customerCart.reduce((s, i) => s + i.quantity, 0);
+            document.getElementById('customerCartCount').textContent = count;
+            const container = document.getElementById('customerCartItems');
+            if (!container) return;
+            container.innerHTML = '<h3>🛒 السلة</h3>';
+            if (!customerCart.length) {
+                container.innerHTML += '<p style="text-align:center;padding:1rem;">السلة فارغة</p>';
+            } else {
+                let total = 0;
+                customerCart.forEach(item => {
+                    total += item.price * item.quantity;
+                    const div = document.createElement('div');
+                    div.className = 'order-item';
+                    div.innerHTML = `
+                        <span>${item.itemName} × ${item.quantity}</span>
+                        <span>${item.price * item.quantity} شيكل
+                            <button class="btn btn-danger" style="padding:0 8px;font-size:0.8rem;" onclick="updateCustomerQty(${item.itemId},-1)">-</button>
+                            <button class="btn btn-success" style="padding:0 8px;font-size:0.8rem;" onclick="updateCustomerQty(${item.itemId},1)">+</button>
+                        </span>
+                    `;
+                    container.appendChild(div);
+                });
+                document.getElementById('customerCartTotal').textContent = total;
+            }
+        }
+
+        function updateCustomerQty(itemId, delta) {
+            const item = customerCart.find(c => c.itemId === itemId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) customerCart = customerCart.filter(c => c.itemId !== itemId);
+                updateCustomerCartUI();
+            }
+        }
+
+        function toggleCustomerCart() {
+            const modal = document.getElementById('customerCartModal');
+            if (modal.style.display === 'block') modal.style.display = 'none';
+            else { updateCustomerCartUI();
+                modal.style.display = 'block'; }
+        }
+
+        function showCustomerLogin() {
+            document.getElementById('customerLoginModal').style.display = 'block';
+        }
+
+        function closeCustomerLogin() {
+            document.getElementById('customerLoginModal').style.display = 'none';
+        }
+
+        function customerLogin(e) {
+            e.preventDefault();
+            const name = e.target[0].value,
+                phone = e.target[1].value,
+                address = e.target[2].value;
+            customerUser = { name, phone, address };
+            localStorage.setItem(CONFIG.STORAGE_KEYS.CUSTOMER_INFO, JSON.stringify(customerUser));
+            closeCustomerLogin();
+            showNotification(`مرحباً ${name}! 👋`);
+        }
+
+        function customerCheckout() {
+            if (!customerCart.length) { showNotification('السلة فارغة!', 'error'); return; }
+            if (!customerUser) { showCustomerLogin(); return; }
+            document.getElementById('customerCartModal').style.display = 'none';
+            document.getElementById('customerCheckoutModal').style.display = 'block';
+            const form = document.querySelector('#customerCheckoutModal form');
+            form[0].value = customerUser.name;
+            form[1].value = customerUser.phone;
+            form[2].value = customerUser.address;
+        }
+
+        function closeCustomerCheckout() {
+            document.getElementById('customerCheckoutModal').style.display = 'none';
+        }
+
+        async function customerSubmitOrder(e) {
+            e.preventDefault();
+            const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
+            const total = itemsTotal + CONFIG.DELIVERY_FEE;
+            const orderData = {
+                restaurantId: customerCart[0].restaurantId,
+                restaurantName: customerCart[0].restaurantName,
+                customerName: e.target[0].value,
+                phone: e.target[1].value,
+                address: e.target[2].value,
+                items: customerCart.map(i => ({ ...i })),
+                itemsTotal,
+                total,
+                deliveryFee: CONFIG.DELIVERY_FEE,
+                paymentMethod: e.target[3].value,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                driverAssigned: false
+            };
+            try {
+                const order = await createOrder(orderData);
+                customerCart = [];
+                updateCustomerCartUI();
+                closeCustomerCheckout();
+                showNotification(`✅ تم تأكيد طلب #${order.id}`);
+                showCustomerTracking(order.id);
+                startCustomerTracking(order.id);
+                // إرسال تحديث للقناة
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (err) {
+                showNotification('❌ فشل في إنشاء الطلب: ' + err.message, 'error');
+            }
+        }
+
+        function showCustomerTracking(orderId) {
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                document.getElementById('customerTracking').style.display = 'block';
+                document.getElementById('trackingOrderId').textContent = `#${orderId}`;
+                updateCustomerTrackingSteps(order.status);
+                if (order.driverAssigned) {
+                    document.getElementById('customerDriverInfo').style.display = 'block';
+                    document.getElementById('cDriverName').textContent = order.driverName || '-';
+                    document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
+                    document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime || '15 دقيقة';
+                } else {
+                    document.getElementById('customerDriverInfo').style.display = 'none';
+                }
+            }).catch(() => {});
+        }
+
+        function updateCustomerTrackingSteps(status) {
+            const map = { pending: 1, preparing: 2, ready_for_pickup: 2, picking: 2, delivering: 3, completed: 4,
+            cancelled: 0 };
+            const cur = map[status] || 1;
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('cstep' + i);
+                el.className = 'tracking-step';
+                if (i < cur) el.classList.add('completed');
+                else if (i === cur) el.classList.add('active');
+            }
+        }
+
+        function startCustomerTracking(orderId) {
+            localStorage.setItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID, orderId);
+            if (customerTrackingInterval) clearInterval(customerTrackingInterval);
+            customerTrackingId = orderId;
+            customerTrackingInterval = setInterval(async () => {
+                try {
+                    const orders = await getOrders();
+                    const order = orders.find(o => o.id === orderId);
+                    if (!order) return;
+                    updateCustomerTrackingSteps(order.status);
+                    if (order.driverAssigned) {
+                        document.getElementById('customerDriverInfo').style.display = 'block';
+                        document.getElementById('cDriverName').textContent = order.driverName || '-';
+                        document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
+                        document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime || '15 دقيقة';
+                    }
+                    if (['completed', 'cancelled'].includes(order.status)) {
+                        clearInterval(customerTrackingInterval);
+                        localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
+                        if (order.status === 'completed') showNotification(`🎉 طلب #${orderId} تم توصيله!`);
+                    }
+                } catch (e) { /* ignore */ }
+            }, 3000);
+        }
+
+        async function showCustomerOrders() {
+            const modal = document.getElementById('customerOrdersModal');
+            const list = document.getElementById('customerOrdersList');
+            try {
+                const all = await getOrders();
+                const my = customerUser ? all.filter(o => o.customerName === customerUser.name) : all;
+                if (!my.length) list.innerHTML = '<p style="text-align:center;padding:1rem;">لا توجد طلبات</p>';
+                else {
+                    list.innerHTML = my.map(o => `
+                        <div class="order-card" style="margin-bottom:0.5rem;">
+                            <div class="order-header"><span class="order-id">طلب #${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
+                            <p>المطعم: ${o.restaurantName}</p>
+                            <p>المجموع: ${o.total} شيكل</p>
+                            <p>الحالة: <span class="status-badge status-${o.status}">${o.status}</span></p>
+                            ${o.driverName ? `<p>🚗 الكابتن: ${o.driverName}</p>` : ''}
+                            <button class="btn btn-primary" onclick="showCustomerTracking(${o.id})">تتبع</button>
+                        </div>
+                    `).join('');
+                }
+                modal.style.display = 'block';
+            } catch (e) {
+                showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        function closeCustomerOrders() {
+            document.getElementById('customerOrdersModal').style.display = 'none';
+        }
+
+        function getCustomerLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    () => document.getElementById('customerLocationText').textContent = '📍 تم التحديد',
+                    () => showNotification('لم نتمكن من تحديد الموقع', 'error')
+                );
+            }
+        }
+
+        // =================================================================
+        //  المطعم (Restaurant)
+        // =================================================================
+        let currentRestaurantUser = null;
+        let restaurantFilter = 'all';
+
+        function initRestaurant() {
+            const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
+            if (saved) {
+                currentRestaurantUser = saved;
+                showRestaurantDashboard();
+            } else {
+                document.getElementById('restaurantLoginPage').style.display = 'flex';
+                document.getElementById('restaurantDashboard').style.display = 'none';
+                populateRestaurantSelect();
+            }
+        }
+
+        async function populateRestaurantSelect() {
+            const sel = document.getElementById('restaurantUserSelect');
+            sel.innerHTML = '<option value="">اختر المطعم</option>';
+            try {
+                const users = await getUsers();
+                users.restaurants.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.username;
+                    opt.textContent = u.displayName;
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                showNotification('فشل في جلب بيانات المطاعم', 'error');
+            }
+        }
+
+        async function restaurantLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('restaurantUserSelect').value;
+            const pass = document.getElementById('restaurantPassword').value;
+            try {
+                const users = await getUsers();
+                const found = users.restaurants.find(u => u.username === username && u.password === pass);
+                if (!found) {
+                    document.getElementById('restaurantLoginError').style.display = 'block';
+                    return;
+                }
+                document.getElementById('restaurantLoginError').style.display = 'none';
+                currentRestaurantUser = found;
+                localStorage.setItem('current_restaurant_user', JSON.stringify(found));
+                showRestaurantDashboard();
+            } catch (e) {
+                showNotification('فشل في تسجيل الدخول', 'error');
+            }
+        }
+
+        function showRestaurantDashboard() {
+            document.getElementById('restaurantLoginPage').style.display = 'none';
+            document.getElementById('restaurantDashboard').style.display = 'block';
+            document.getElementById('restaurantBadge').textContent = `🍽️ ${currentRestaurantUser.displayName}`;
+            displayRestaurantOrders();
+        }
+
+        function logoutRestaurant() {
+            currentRestaurantUser = null;
+            localStorage.removeItem('current_restaurant_user');
+            document.getElementById('restaurantDashboard').style.display = 'none';
+            document.getElementById('restaurantLoginPage').style.display = 'flex';
+            document.getElementById('restaurantPassword').value = '';
+        }
+
+        async function displayRestaurantOrders() {
+            const grid = document.getElementById('restaurantOrdersGrid');
+            grid.innerHTML = '';
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                if (restaurantFilter !== 'all') orders = orders.filter(o => o.status === restaurantFilter);
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                if (!orders.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
+                    return;
+                }
+                orders.forEach(o => {
+                    const card = document.createElement('div');
+                    card.className = `order-card ${o.status}`;
+                    let actions = '';
+                    if (o.status === 'pending') {
+                        actions = `
+                            <button class="btn btn-success" onclick="restaurantAccept(${o.id})">قبول ✅</button>
+                            <button class="btn btn-danger" onclick="restaurantReject(${o.id})">رفض ❌</button>
+                        `;
+                    } else if (o.status === 'preparing') {
+                        actions = `<button class="btn btn-success" onclick="restaurantReady(${o.id})">جاهز للاستلام 📦</button>`;
+                    } else if (o.status === 'ready_for_pickup') {
+                        actions = `<span style="color:#00b894;">⏳ في انتظار الكابتن</span>`;
+                    } else if (o.status === 'picking') {
+                        actions = `<span style="color:#ffa502;">🏪 الكابتن يستلم</span>`;
+                    } else if (o.status === 'delivering') {
+                        actions = `<span style="color:#1e90ff;">🛵 جاري التوصيل</span>`;
+                    } else if (o.status === 'completed') {
+                        actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
+                    } else if (o.status === 'cancelled') {
+                        actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    }
+                    card.innerHTML = `
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
+                        <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
+                        <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                        <div class="order-total">المجموع: ${o.total} شيكل</div>
+                        <div class="payment-method">💳 ${o.paymentMethod}</div>
+                        <div class="order-actions">${actions}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                updateRestaurantStats(orders);
+            } catch (e) {
+                showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        function updateRestaurantStats(orders) {
+            if (!orders) orders = [];
+            document.getElementById('rTotalOrders').textContent = orders.length;
+            document.getElementById('rPendingOrders').textContent = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('rPreparingOrders').textContent = orders.filter(o => o.status === 'preparing').length;
+            document.getElementById('rReadyOrders').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
+            document.getElementById('rCompletedOrders').textContent = orders.filter(o => o.status === 'completed').length;
+            const rev = orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.total, 0);
+            document.getElementById('rRevenue').textContent = rev;
+            document.getElementById('restaurantNotifBadge').textContent = orders.filter(o => o.status === 'pending').length;
+        }
+
+        function filterRestaurantOrders(filter) {
+            restaurantFilter = filter;
+            document.querySelectorAll('#restaurantFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`#restaurantFilters [data-filter="${filter}"]`).classList.add('active');
+            displayRestaurantOrders();
+        }
+
+        async function restaurantAccept(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'preparing');
+                showNotification(`✅ تم قبول الطلب #${orderId}`);
+                displayRestaurantOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في قبول الطلب', 'error');
+            }
+        }
+
+        async function restaurantReject(orderId) {
+            if (!confirm('تأكيد رفض الطلب؟')) return;
+            try {
+                await updateOrderStatus(orderId, 'cancelled');
+                showNotification(`❌ تم رفض الطلب #${orderId}`);
+                displayRestaurantOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في رفض الطلب', 'error');
+            }
+        }
+
+        async function restaurantReady(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
+                showNotification(`📦 الطلب #${orderId} جاهز للاستلام`);
+                displayRestaurantOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تحديث الطلب', 'error');
+            }
+        }
+
+        function showRestaurantNotifications() {
+            showNotification('🔔 تحقق من الطلبات الجديدة في اللوحة');
+        }
+
+        // =================================================================
+        //  الكابتن (Driver)
+        // =================================================================
+        let currentDriverUser = null;
+        let driverFilter = 'all';
+        let driverOnline = true;
+        let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
+
+        function initDriver() {
+            const saved = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION) || 'null');
+            if (saved) {
+                currentDriverUser = saved;
+                showDriverDashboard();
+            } else {
+                document.getElementById('driverLoginPage').style.display = 'flex';
+                document.getElementById('driverDashboard').style.display = 'none';
+                populateDriverSelect();
+            }
+        }
+
+        async function populateDriverSelect() {
+            const sel = document.getElementById('driverUserSelect');
+            sel.innerHTML = '<option value="">اختر الكابتن</option>';
+            try {
+                const users = await getUsers();
+                users.drivers.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.username;
+                    opt.textContent = u.displayName + (u.extra ? ` (${u.extra})` : '');
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                showNotification('فشل في جلب بيانات الكباتن', 'error');
+            }
+        }
+
+        async function driverLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('driverUserSelect').value;
+            const pass = document.getElementById('driverPassword').value;
+            try {
+                const users = await getUsers();
+                const found = users.drivers.find(u => u.username === username && u.password === pass);
+                if (!found) {
+                    document.getElementById('driverLoginError').style.display = 'block';
+                    return;
+                }
+                document.getElementById('driverLoginError').style.display = 'none';
+                currentDriverUser = found;
+                localStorage.setItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION, JSON.stringify(found));
+                // استعادة الإحصائيات من localStorage (أو من الخادم لاحقاً)
+                const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
+                if (stats) driverStatsData = stats;
+                showDriverDashboard();
+            } catch (e) {
+                showNotification('فشل في تسجيل الدخول', 'error');
+            }
+        }
+
+        function showDriverDashboard() {
+            document.getElementById('driverLoginPage').style.display = 'none';
+            document.getElementById('driverDashboard').style.display = 'block';
+            document.getElementById('driverBadge').textContent = `🚗 ${currentDriverUser.displayName}`;
+            displayDriverOrders();
+            updateDriverStats();
+            const savedStatus = JSON.parse(localStorage.getItem(`driver_online_${currentDriverUser.username}`) || 'true');
+            driverOnline = savedStatus;
+            updateDriverStatusUI();
+        }
+
+        function logoutDriver() {
+            currentDriverUser = null;
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION);
+            document.getElementById('driverDashboard').style.display = 'none';
+            document.getElementById('driverLoginPage').style.display = 'flex';
+            document.getElementById('driverPassword').value = '';
+            localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
+        }
+
+        async function displayDriverOrders() {
+            const grid = document.getElementById('driverOrdersGrid');
+            grid.innerHTML = '';
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+                if (driverFilter !== 'all') orders = orders.filter(o => o.status === driverFilter);
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                if (!orders.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
+                    return;
+                }
+                orders.forEach(o => {
+                    const card = document.createElement('div');
+                    card.className = `order-card ${o.status}`;
+                    let actions = '';
+                    if (o.status === 'ready_for_pickup' && driverOnline) {
+                        actions = `
+                            <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول ✅</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <button class="btn btn-warning" onclick="driverPickup(${o.id})">تأكيد الاستلام ✅</button>
+                        `;
+                    } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
+                        actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
+                    }
+                    card.innerHTML = `
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${new Date(o.createdAt).toLocaleString('ar-SA')}</span></div>
+                        <div><strong>${o.restaurantName}</strong> → ${o.customerName}</div>
+                        <div class="customer-details">📍 ${o.address}</div>
+                        <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                        <div class="order-total">المجموع: ${o.total} شيكل</div>
+                        <div class="order-actions">${actions}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                // تحديث الإحصائيات
+                const driverOrders = allOrders.filter(o => o.driverId === currentDriverUser.username);
+                const completed = driverOrders.filter(o => o.status === 'completed');
+                driverStatsData.completedOrders = completed.length;
+                driverStatsData.totalEarnings = completed.reduce((s, o) => s + CONFIG.DELIVERY_FEE, 0);
+                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
+                updateDriverStats();
+            } catch (e) {
+                showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        function updateDriverStats() {
+            if (!currentDriverUser) return;
+            document.getElementById('dAvailable').textContent = '...';
+            document.getElementById('dPicking').textContent = '...';
+            document.getElementById('dDelivering').textContent = '...';
+            document.getElementById('dCompleted').textContent = driverStatsData.completedOrders || 0;
+            document.getElementById('dEarnings').textContent = driverStatsData.totalEarnings || 0;
+            document.getElementById('dRating').textContent = (driverStatsData.rating || 5.0).toFixed(1);
+            // تحديث القيم الفعلية من الطلبات
+            getOrders().then(allOrders => {
+                const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
+                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
+                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering').length;
+                document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status === 'ready_for_pickup')
+                    .length;
+            }).catch(() => {});
+        }
+
+        function filterDriverOrders(filter) {
+            driverFilter = filter;
+            document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`#driverFilters [data-filter="${filter}"]`).classList.add('active');
+            displayDriverOrders();
+        }
+
+        function toggleDriverStatus() {
+            driverOnline = !driverOnline;
+            localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
+            updateDriverStatusUI();
+            displayDriverOrders();
+            showNotification(driverOnline ? '🟢 أنت متصل' : '🔴 أنت غير متصل', driverOnline ? 'success' : 'error');
+        }
+
+        function updateDriverStatusUI() {
+            const btn = document.getElementById('driverStatusBtn');
+            if (driverOnline) {
+                btn.className = 'btn btn-success';
+                btn.textContent = '🟢 متصل';
+            } else {
+                btn.className = 'btn btn-danger';
+                btn.textContent = '🔴 غير متصل';
+            }
+        }
+
+        async function driverAccept(orderId) {
+            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
+            try {
+                const orders = await getOrders();
+                const idx = orders.findIndex(o => o.id === orderId);
+                if (idx === -1) return;
+                const order = orders[idx];
+                if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
+                    showNotification('⚠️ هذا الطلب غير متاح', 'warning');
+                    return;
+                }
+                const updated = await updateOrderStatus(orderId, 'picking', {
+                    driverId: currentDriverUser.username,
+                    driverAssigned: true,
+                    driverName: currentDriverUser.displayName,
+                    driverPhone: '0590000000'
+                });
+                showNotification(`✅ تم قبول الطلب #${orderId}`);
+                displayDriverOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في قبول الطلب', 'error');
+            }
+        }
+
+        async function driverPickup(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'delivering', { pickedUpAt: new Date().toISOString() });
+                showNotification(`✅ تم استلام الطلب #${orderId}، ابدأ التوصيل`);
+                displayDriverOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+            }
+        }
+
+        async function driverDeliver(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'completed', { completedAt: new Date().toISOString() });
+                driverStatsData.completedOrders += 1;
+                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
+                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
+                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
+                showNotification(`✅ تم توصيل الطلب #${orderId} (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
+                displayDriverOrders();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تأكيد التسليم', 'error');
+            }
+        }
+
+        function driverShowMap(orderId) {
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                const url =
+                    `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(order.restaurantName)}&destination=${encodeURIComponent(order.address)}`;
+                window.open(url, '_blank');
+            }).catch(() => {});
+        }
+
+        // =================================================================
+        //  الأدمن (Admin)
+        // =================================================================
+        let adminLoggedIn = false;
+
+        function initAdmin() {
+            document.getElementById('adminLoginPage').style.display = 'flex';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLoginUser').value = '';
+            document.getElementById('adminLoginPass').value = '';
+            document.getElementById('adminLoginError').style.display = 'none';
+        }
+
+        async function adminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminLoginUser').value;
+            const pass = document.getElementById('adminLoginPass').value;
+            try {
+                const result = await adminLoginAPI(user, pass);
+                if (result.success) {
+                    adminLoggedIn = true;
+                    showAdminDashboard();
+                    document.getElementById('adminLoginError').style.display = 'none';
+                    showNotification('✅ مرحباً بك في لوحة الأدمن');
+                } else {
+                    document.getElementById('adminLoginError').style.display = 'block';
+                    document.getElementById('adminLoginError').textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+                }
+            } catch (e) {
+                showNotification('فشل في الاتصال بالخادم', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            adminLoggedIn = false;
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLoginPage').style.display = 'flex';
+            document.getElementById('adminLoginUser').value = '';
+            document.getElementById('adminLoginPass').value = '';
+            showNotification('تم تسجيل الخروج من لوحة الأدمن');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLoginPage').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            renderAdminUsers();
+        }
+
+        async function renderAdminUsers() {
+            try {
+                const users = await getUsers();
+                const tbody = document.getElementById('adminUsersTableBody');
+                tbody.innerHTML = '';
+                users.restaurants.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>🍽️ مطعم</td>
+                        <td>${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td>${u.extra || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="adminEditUser('restaurant','${u.username}')">✏️</button>
+                            <button class="btn btn-danger" onclick="adminDeleteUser('restaurant','${u.username}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                users.drivers.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>🛵 كابتن</td>
+                        <td>${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td>${u.extra || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="adminEditUser('driver','${u.username}')">✏️</button>
+                            <button class="btn btn-danger" onclick="adminDeleteUser('driver','${u.username}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                if (!users.restaurants.length && !users.drivers.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;">لا يوجد مستخدمين</td></tr>';
+                }
+            } catch (e) {
+                showNotification('فشل في جلب المستخدمين', 'error');
+            }
+        }
+
+        function showAdminAddForm(type) {
+            document.getElementById('adminFormContainer').style.display = 'block';
+            document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '➕ إضافة مطعم' :
+            '➕ إضافة كابتن';
+            document.getElementById('adminEditId').value = '';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminDisplayName').value = '';
+            document.getElementById('adminExtra').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminFormContainer').dataset.type = type;
+        }
+
+        function hideAdminForm() {
+            document.getElementById('adminFormContainer').style.display = 'none';
+        }
+
+        async function adminSaveUser(e) {
+            e.preventDefault();
+            const type = document.getElementById('adminFormContainer').dataset.type;
+            const editId = document.getElementById('adminEditId').value;
+            const username = document.getElementById('adminUsername').value.trim();
+            const displayName = document.getElementById('adminDisplayName').value.trim();
+            const extra = document.getElementById('adminExtra').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            if (!username || !displayName || !password) { showNotification('جميع الحقول مطلوبة', 'error'); return; }
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                if (!editId && list.find(u => u.username === username)) {
+                    showNotification('اسم المستخدم موجود مسبقاً', 'error');
+                    return;
+                }
+                if (editId) {
+                    const idx = list.findIndex(u => u.username === editId);
+                    if (idx !== -1) {
+                        list[idx] = { username, displayName, extra, password };
+                    }
+                } else {
+                    list.push({ username, displayName, extra, password });
+                }
+                await saveUsers(users);
+                hideAdminForm();
+                renderAdminUsers();
+                showNotification(`✅ تم حفظ المستخدم ${displayName}`);
+                populateRestaurantSelect();
+                populateDriverSelect();
+            } catch (e) {
+                showNotification('فشل في حفظ المستخدم', 'error');
+            }
+        }
+
+        async function adminEditUser(type, username) {
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                const found = list.find(u => u.username === username);
+                if (!found) return;
+                document.getElementById('adminFormContainer').style.display = 'block';
+                document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '✏️ تعديل مطعم' :
+                '✏️ تعديل كابتن';
+                document.getElementById('adminEditId').value = username;
+                document.getElementById('adminUsername').value = found.username;
+                document.getElementById('adminDisplayName').value = found.displayName;
+                document.getElementById('adminExtra').value = found.extra || '';
+                document.getElementById('adminPassword').value = found.password;
+                document.getElementById('adminFormContainer').dataset.type = type;
+            } catch (e) {
+                showNotification('فشل في تحميل بيانات المستخدم', 'error');
+            }
+        }
+
+        async function adminDeleteUser(type, username) {
+            if (!confirm(`تأكيد حذف المستخدم "${username}"؟`)) return;
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                const idx = list.findIndex(u => u.username === username);
+                if (idx !== -1) {
+                    list.splice(idx, 1);
+                    await saveUsers(users);
+                    renderAdminUsers();
+                    showNotification(`🗑️ تم حذف المستخدم`);
+                    populateRestaurantSelect();
+                    populateDriverSelect();
+                    if (type === 'restaurant' && currentRestaurantUser?.username === username) logoutRestaurant();
+                    if (type === 'driver' && currentDriverUser?.username === username) logoutDriver();
+                }
+            } catch (e) {
+                showNotification('فشل في حذف المستخدم', 'error');
+            }
+        }
+
+        // =================================================================
+        //  الاستماع للتحديثات المشتركة
+        // =================================================================
+        channel.onmessage = function(event) {
+            if (event.data.type === 'ORDERS_UPDATED') {
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    if (customerTrackingId) {
+                        const order = event.data.orders.find(o => o.id === customerTrackingId);
+                        if (order) {
+                            updateCustomerTrackingSteps(order.status);
+                            if (order.driverAssigned) {
+                                document.getElementById('customerDriverInfo').style.display = 'block';
+                                document.getElementById('cDriverName').textContent = order.driverName || '-';
+                                document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
+                                document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime ||
+                                    '15 دقيقة';
+                            }
+                        }
+                    }
+                }
+                if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
+                    displayRestaurantOrders();
+                }
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
+                    displayDriverOrders();
+                }
+            }
+        };
+
+        // =================================================================
+        //  التهيئة
+        // =================================================================
+        // التحقق من الخادم عند التحميل
+        checkServer();
+
+        // بدء التطبيق بالصفحة الرئيسية
+        navigateTo('home');
+
+        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي');
+        console.log(`📡 API_BASE: ${API_BASE}`);
+        console.log('✅ بيانات الأدمن: awad / 050313651');
+    </script>
+</body>
+</html>

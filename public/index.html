@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
-        /* ========== الأنماط العامة ========== */
         * {
             margin: 0;
             padding: 0;
@@ -24,8 +23,6 @@
         .page.active {
             display: block;
         }
-
-        /* ========== أزرار التنقل العامة ========== */
         .btn {
             padding: 0.5rem 1.5rem;
             border: none;
@@ -79,8 +76,14 @@
             background: #ff6b35;
             color: white;
         }
+        .btn-light {
+            background: #f8f9fa;
+            color: #333;
+        }
+        .btn-light:hover {
+            background: #e2e6ea;
+        }
 
-        /* ========== الصفحة الرئيسية ========== */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
@@ -141,9 +144,15 @@
             font-weight: bold;
             font-size: 1.1rem;
         }
-        .app-card.customer { border-color: #ff6b35; }
-        .app-card.restaurant { border-color: #00b894; }
-        .app-card.driver { border-color: #1e90ff; }
+        .app-card.customer {
+            border-color: #ff6b35;
+        }
+        .app-card.restaurant {
+            border-color: #00b894;
+        }
+        .app-card.driver {
+            border-color: #1e90ff;
+        }
         .server-status {
             background: #e8f5e9;
             border-radius: 10px;
@@ -156,8 +165,6 @@
             background: #ffebee;
             color: #c62828;
         }
-
-        /* ========== زر الأدمن المصغر ========== */
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -182,7 +189,6 @@
             background: #5a4bd1;
         }
 
-        /* ========== شاشات تسجيل الدخول ========== */
         .login-page {
             display: flex;
             justify-content: center;
@@ -248,7 +254,6 @@
             display: none;
         }
 
-        /* ========== الأقسام المشتركة ========== */
         .header-bar {
             background: white;
             padding: 1rem 5%;
@@ -298,7 +303,6 @@
             background: #ee5a24;
         }
 
-        /* ========== إحصائيات ========== */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -325,7 +329,6 @@
             font-size: 0.8rem;
         }
 
-        /* ========== قوائم الطلبات ========== */
         .orders-section {
             padding: 1rem 5% 2rem;
         }
@@ -376,13 +379,29 @@
         .order-card:hover {
             transform: translateY(-3px);
         }
-        .order-card.pending { border-right-color: #ffa502; }
-        .order-card.preparing { border-right-color: #1e90ff; }
-        .order-card.ready_for_pickup { border-right-color: #00b894; }
-        .order-card.picking { border-right-color: #ffa502; }
-        .order-card.delivering { border-right-color: #ff9f1c; }
-        .order-card.completed { border-right-color: #00b894; }
-        .order-card.cancelled { border-right-color: #ff4757; opacity: 0.8; background: #fff5f5; }
+        .order-card.pending {
+            border-right-color: #ffa502;
+        }
+        .order-card.preparing {
+            border-right-color: #1e90ff;
+        }
+        .order-card.ready_for_pickup {
+            border-right-color: #00b894;
+        }
+        .order-card.picking {
+            border-right-color: #ffa502;
+        }
+        .order-card.delivering {
+            border-right-color: #ff9f1c;
+        }
+        .order-card.completed {
+            border-right-color: #00b894;
+        }
+        .order-card.cancelled {
+            border-right-color: #ff4757;
+            opacity: 0.8;
+            background: #fff5f5;
+        }
 
         .order-header {
             display: flex;
@@ -457,15 +476,35 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-        .status-pending { background: #fff3e0; color: #ffa502; }
-        .status-preparing { background: #e3f2fd; color: #1e90ff; }
-        .status-ready_for_pickup { background: #e8f5e9; color: #00b894; }
-        .status-picking { background: #fff3e0; color: #ffa502; }
-        .status-delivering { background: #f3e5f5; color: #9c27b0; }
-        .status-completed { background: #e8f5e9; color: #00b894; }
-        .status-cancelled { background: #ffebee; color: #ff4757; }
+        .status-pending {
+            background: #fff3e0;
+            color: #ffa502;
+        }
+        .status-preparing {
+            background: #e3f2fd;
+            color: #1e90ff;
+        }
+        .status-ready_for_pickup {
+            background: #e8f5e9;
+            color: #00b894;
+        }
+        .status-picking {
+            background: #fff3e0;
+            color: #ffa502;
+        }
+        .status-delivering {
+            background: #f3e5f5;
+            color: #9c27b0;
+        }
+        .status-completed {
+            background: #e8f5e9;
+            color: #00b894;
+        }
+        .status-cancelled {
+            background: #ffebee;
+            color: #ff4757;
+        }
 
-        /* ========== تتبع الطلب ========== */
         .tracking-steps {
             display: flex;
             justify-content: space-between;
@@ -519,12 +558,17 @@
             color: #ff4757;
         }
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 165, 2, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 165, 2, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 165, 2, 0);
+            }
         }
 
-        /* ========== النوافذ المنبثقة ========== */
         .modal {
             display: none;
             position: fixed;
@@ -532,7 +576,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
         }
         .modal-content {
@@ -559,7 +603,6 @@
             color: #ff6b35;
         }
 
-        /* ========== الإشعارات ========== */
         .notification {
             position: fixed;
             top: 20px;
@@ -567,20 +610,31 @@
             padding: 1rem 1.5rem;
             border-radius: 10px;
             color: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             z-index: 3000;
             animation: slideIn 0.3s ease-out;
             max-width: 90%;
         }
-        .notification.success { background: #00b894; }
-        .notification.error { background: #ff4757; }
-        .notification.warning { background: #ffa502; }
+        .notification.success {
+            background: #00b894;
+        }
+        .notification.error {
+            background: #ff4757;
+        }
+        .notification.warning {
+            background: #ffa502;
+        }
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        /* ========== إدارة الأدمن ========== */
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
@@ -600,13 +654,12 @@
             font-size: 0.8rem;
         }
 
-        /* ========== الأقسام الجديدة للمطعم والكابتن ========== */
         .status-section {
             background: white;
             border-radius: 15px;
             padding: 1rem 1.5rem;
             margin: 1rem 5%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
         .status-section h3 {
             margin-bottom: 1rem;
@@ -645,7 +698,18 @@
             font-size: 0.8rem;
         }
 
-        /* ========== تنسيقات الجوال ========== */
+        .verification-code {
+            background: #f1f1f1;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #2d3436;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -718,7 +782,6 @@
         </div>
     </div>
 
-    <!-- ===== زر الأدمن المصغر ===== -->
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
@@ -761,6 +824,10 @@
         <div id="customerTracking" style="display:none;padding:1.5rem 5%;background:white;margin:1rem 5%;border-radius:15px;">
             <h2>📍 تتبع طلبك</h2>
             <p>طلب رقم: <span id="trackingOrderId">#1001</span></p>
+            <div id="customerVerificationCode" style="margin:0.5rem 0;">
+                <span style="color:#636e72;">رمز التحقق: </span>
+                <span class="verification-code" id="trackingCodeDisplay">----</span>
+            </div>
             <div class="tracking-steps">
                 <div class="tracking-step" id="cstep1"><div class="step-icon">✅</div><span>تم الطلب</span></div>
                 <div class="tracking-step" id="cstep2"><div class="step-icon">👨‍🍳</div><span>قيد التحضير</span></div>
@@ -962,6 +1029,21 @@
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
 
+        <!-- ===== نافذة إدخال رمز التحقق للكابتن ===== -->
+        <div class="modal" id="driverVerifyModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeDriverVerifyModal()">&times;</button>
+                <h2>🔐 تأكيد استلام الطلب</h2>
+                <p>أدخل رمز التحقق المكون من 4 أرقام الذي حصلت عليه من العميل:</p>
+                <input type="text" id="driverVerifyCode" maxlength="4" placeholder="أدخل الرمز" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;font-size:1.5rem;text-align:center;letter-spacing:8px;margin:1rem 0;">
+                <div style="display:flex;gap:1rem;">
+                    <button class="btn btn-success" onclick="confirmDriverPickup()" style="flex:1;">تأكيد ✅</button>
+                    <button class="btn btn-danger" onclick="closeDriverVerifyModal()" style="flex:1;">إلغاء</button>
+                </div>
+                <div id="driverVerifyError" style="color:#ff4757;margin-top:0.5rem;display:none;">⚠️ الرمز غير صحيح، حاول مرة أخرى</div>
+            </div>
+        </div>
+
         <div id="driverLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🛵</div>
@@ -1118,6 +1200,11 @@
                 second: '2-digit',
                 hour12: false
             });
+        }
+
+        // توليد رمز عشوائي 4 أرقام
+        function generateVerificationCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
         }
 
         // =================================================================
@@ -1437,6 +1524,7 @@
             e.preventDefault();
             const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
             const total = itemsTotal + CONFIG.DELIVERY_FEE;
+            const verificationCode = generateVerificationCode(); // توليد رمز عشوائي
             const orderData = {
                 restaurantId: customerCart[0].restaurantId,
                 restaurantName: customerCart[0].restaurantName,
@@ -1451,14 +1539,15 @@
                 status: 'pending',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                driverAssigned: false
+                driverAssigned: false,
+                verificationCode: verificationCode // تخزين الرمز
             };
             try {
                 const order = await createOrder(orderData);
                 customerCart = [];
                 updateCustomerCartUI();
                 closeCustomerCheckout();
-                showNotification(`✅ تم تأكيد طلب #${order.id}`);
+                showNotification(`✅ تم تأكيد طلب #${order.id} - رمز التحقق: ${verificationCode}`);
                 showCustomerTracking(order.id);
                 startCustomerTracking(order.id);
                 channel.postMessage({ type: 'NEW_ORDER', order: order });
@@ -1475,6 +1564,8 @@
                 if (!order) return;
                 document.getElementById('customerTracking').style.display = 'block';
                 document.getElementById('trackingOrderId').textContent = `#${orderId}`;
+                // عرض رمز التحقق
+                document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                 updateCustomerTrackingSteps(order.status);
                 const msgDiv = document.getElementById('customerTrackingMessage');
                 if (order.status === 'cancelled') {
@@ -1528,6 +1619,7 @@
                     const order = orders.find(o => o.id === orderId);
                     if (!order) return;
                     updateCustomerTrackingSteps(order.status);
+                    document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                     const msgDiv = document.getElementById('customerTrackingMessage');
                     if (order.status === 'cancelled') {
                         msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
@@ -1566,6 +1658,7 @@
                             <p>المطعم: ${o.restaurantName}</p>
                             <p>المجموع: ${o.total} شيكل</p>
                             <p>الحالة: <span class="status-badge status-${o.status}">${o.status === 'cancelled' ? 'ملغي ❌' : o.status}</span></p>
+                            ${o.verificationCode ? `<p>🔐 رمز التحقق: <strong>${o.verificationCode}</strong></p>` : ''}
                             ${o.driverName ? `<p>🚗 الكابتن: ${o.driverName}</p>` : ''}
                             ${o.status !== 'cancelled' ? `<button class="btn btn-primary" onclick="showCustomerTracking(${o.id})">تتبع</button>` : ''}
                         </div>
@@ -1671,9 +1764,9 @@
 
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
-                    start.setHours(0,0,0,0);
+                    start.setHours(0, 0, 0, 0);
                     const end = new Date(restaurantDateFilter);
-                    end.setHours(23,59,59,999);
+                    end.setHours(23, 59, 59, 999);
                     orders = orders.filter(o => {
                         const orderDate = new Date(o.createdAt);
                         return orderDate >= start && orderDate <= end;
@@ -1766,9 +1859,9 @@
 
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
-                    start.setHours(0,0,0,0);
+                    start.setHours(0, 0, 0, 0);
                     const end = new Date(restaurantDateFilter);
-                    end.setHours(23,59,59,999);
+                    end.setHours(23, 59, 59, 999);
                     orders = orders.filter(o => {
                         const orderDate = new Date(o.createdAt);
                         return orderDate >= start && orderDate <= end;
@@ -1856,13 +1949,11 @@
             }
         }
 
-        // ===== الدالة المعدلة لإرسال إشعار للعميل عند الرفض =====
         async function restaurantReject(orderId) {
             if (!confirm('تأكيد رفض الطلب؟')) return;
             try {
                 await updateOrderStatus(orderId, 'cancelled');
                 showNotification(`❌ تم رفض الطلب #${orderId}`);
-                // إرسال إشعار للعميل عبر القناة
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
                 if (order) {
@@ -1903,13 +1994,14 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver)
+        //  الكابتن (Driver) - مع رمز التحقق
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
         let driverDateFilter = null;
         let driverOnline = true;
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
+        let pendingVerifyOrderId = null; // لتخزين رقم الطلب المراد التحقق منه
 
         function initDriver() {
             const saved = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION) || 'null');
@@ -2015,9 +2107,9 @@
 
                 if (driverDateFilter) {
                     const start = new Date(driverDateFilter);
-                    start.setHours(0,0,0,0);
+                    start.setHours(0, 0, 0, 0);
                     const end = new Date(driverDateFilter);
-                    end.setHours(23,59,59,999);
+                    end.setHours(23, 59, 59, 999);
                     orders = orders.filter(o => {
                         const orderDate = new Date(o.createdAt);
                         return orderDate >= start && orderDate <= end;
@@ -2036,11 +2128,27 @@
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
                     let actions = '';
-                    if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز للاستلام</span>`;
-                    else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام</span>`;
-                    else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
-                    else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
-                    else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    if (o.status === 'ready_for_pickup') {
+                        actions = `
+                            <button class="btn btn-success" onclick="openDriverVerifyModal(${o.id})">استلام الطلب 📦</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <span style="color:#ffa502;">⏳ في انتظار تأكيد الاستلام</span>
+                        `;
+                    } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
+                        actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
+                    } else if (o.status === 'cancelled') {
+                        actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    } else {
+                        actions = `<span style="color:#636e72;">-</span>`;
+                    }
 
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
@@ -2048,6 +2156,7 @@
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">المجموع شامل رسوم التوصيل: ${o.total} شيكل</div>
+                        ${o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز التحقق المطلوب: <strong>${o.verificationCode}</strong></div>` : ''}
                         <div class="order-actions">${actions}</div>
                     `;
                     grid.appendChild(card);
@@ -2069,9 +2178,9 @@
 
                 if (driverDateFilter) {
                     const start = new Date(driverDateFilter);
-                    start.setHours(0,0,0,0);
+                    start.setHours(0, 0, 0, 0);
                     const end = new Date(driverDateFilter);
-                    end.setHours(23,59,59,999);
+                    end.setHours(23, 59, 59, 999);
                     orders = orders.filter(o => {
                         const orderDate = new Date(o.createdAt);
                         return orderDate >= start && orderDate <= end;
@@ -2090,8 +2199,8 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <button class="btn btn-success" onclick="driverAccept(${o.id})">قبول 🚀</button>
-                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                                <button class="btn btn-success" onclick="openDriverVerifyModal(${o.id})">استلام 📦</button>
+                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
                             </div>
                         </div>
                     `).join('');
@@ -2109,7 +2218,7 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <button class="btn btn-warning" onclick="driverPickup(${o.id})">تأكيد الاستلام ✅</button>
+                                <span style="color:#ffa502;">⏳ في انتظار التأكيد</span>
                             </div>
                         </div>
                     `).join('');
@@ -2127,8 +2236,8 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
-                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                                <button class="btn btn-success" onclick="driverDeliver(${o.id})">تسليم ✅</button>
+                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
                             </div>
                         </div>
                     `).join('');
@@ -2154,45 +2263,84 @@
             }
         }
 
-        async function driverAccept(orderId) {
-            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
+        // ===== دوال نافذة التحقق =====
+        function openDriverVerifyModal(orderId) {
+            pendingVerifyOrderId = orderId;
+            document.getElementById('driverVerifyCode').value = '';
+            document.getElementById('driverVerifyError').style.display = 'none';
+            document.getElementById('driverVerifyModal').style.display = 'block';
+        }
+
+        function closeDriverVerifyModal() {
+            document.getElementById('driverVerifyModal').style.display = 'none';
+            pendingVerifyOrderId = null;
+        }
+
+        async function confirmDriverPickup() {
+            const code = document.getElementById('driverVerifyCode').value.trim();
+            if (!code || code.length !== 4) {
+                document.getElementById('driverVerifyError').textContent = '⚠️ الرمز يجب أن يكون 4 أرقام';
+                document.getElementById('driverVerifyError').style.display = 'block';
+                return;
+            }
+            if (!pendingVerifyOrderId) {
+                showNotification('خطأ: لم يتم تحديد طلب', 'error');
+                return;
+            }
             try {
                 const orders = await getOrders();
-                const idx = orders.findIndex(o => o.id === orderId);
-                if (idx === -1) {
-                    showNotification('⚠️ الطلب غير موجود', 'error');
+                const order = orders.find(o => o.id === pendingVerifyOrderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
                     return;
                 }
-                const order = orders[idx];
-                if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
-                    showNotification('⚠️ هذا الطلب تم قبوله من كابتن آخر أو غير متاح', 'warning');
-                    displayDriverOrders();
-                    displayDriverStatusSections();
+                if (order.status !== 'ready_for_pickup') {
+                    showNotification('الطلب ليس في حالة جاهزة للاستلام', 'warning');
+                    closeDriverVerifyModal();
                     return;
                 }
-                await updateOrderStatus(orderId, 'picking', {
+                // التحقق من الرمز
+                if (order.verificationCode !== code) {
+                    document.getElementById('driverVerifyError').textContent = '⚠️ الرمز غير صحيح، حاول مرة أخرى';
+                    document.getElementById('driverVerifyError').style.display = 'block';
+                    return;
+                }
+                // الرمز صحيح: نكمل عملية الاستلام
+                await updateOrderStatus(pendingVerifyOrderId, 'picking', {
                     driverId: currentDriverUser.username,
                     driverAssigned: true,
                     driverName: currentDriverUser.displayName,
-                    driverPhone: '0590000000'
+                    driverPhone: '0590000000',
+                    pickedUpAt: new Date().toISOString()
                 });
-                showNotification(`✅ تم قبول الطلب #${orderId} بواسطة ${currentDriverUser.displayName}`);
-                await refreshDriverViews();
-            } catch (e) {
-                showNotification('فشل في قبول الطلب', 'error');
-            }
-        }
-
-        async function driverPickup(orderId) {
-            try {
-                await updateOrderStatus(orderId, 'delivering', { pickedUpAt: new Date().toISOString() });
-                showNotification(`✅ تم استلام الطلب #${orderId}، ابدأ التوصيل`);
+                showNotification(`✅ تم تأكيد استلام الطلب #${pendingVerifyOrderId} بواسطة ${currentDriverUser.displayName}`);
+                closeDriverVerifyModal();
+                // ننتقل إلى حالة delivering مباشرة؟ لكننا سنتركها picking حتى يضغط الكابتن "تأكيد الاستلام" مرة أخرى.
+                // لكن الأفضل أن ننتقل إلى delivering تلقائياً بعد التحقق، أو نتركها picking ونعرض زر "بدء التوصيل".
+                // سنعدل دالة driverPickup لتكون "بدء التوصيل" وتغير الحالة إلى delivering.
+                // لكننا نريد أن تكون العملية: استلام ← تأكيد الرمز ← يصبح الطلب في حالة picking (تم الاستلام) ثم يضغط "تأكيد التسليم" لإنهاء التوصيل.
+                // سنقوم بتعديل عرض الأزرار: بعد التحقق سيختفي زر "استلام" ويظهر زر "بدء التوصيل" أو "تأكيد التسليم".
+                // لكننا سنقوم بتحديث الواجهة مباشرة.
                 await refreshDriverViews();
             } catch (e) {
                 showNotification('فشل في تأكيد الاستلام', 'error');
+                console.error(e);
             }
         }
 
+        // تعديل دالة driverPickup لتكون بدء التوصيل (تغيير الحالة إلى delivering)
+        async function driverPickup(orderId) {
+            // هذه الدالة أصبحت غير مستخدمة مباشرة، ولكن يمكن استخدامها كـ "بدء التوصيل"
+            try {
+                await updateOrderStatus(orderId, 'delivering', { pickedUpAt: new Date().toISOString() });
+                showNotification(`✅ بدأت توصيل الطلب #${orderId}`);
+                await refreshDriverViews();
+            } catch (e) {
+                showNotification('فشل في بدء التوصيل', 'error');
+            }
+        }
+
+        // تعديل دالة driverDeliver لتكون تأكيد التسليم النهائي
         async function driverDeliver(orderId) {
             try {
                 await updateOrderStatus(orderId, 'completed', { completedAt: new Date().toISOString() });
@@ -2207,6 +2355,10 @@
             }
         }
 
+        // تعديل دالة driverAccept لإزالة التحقق المباشر واستخدام النافذة المنبثقة
+        // تم استبدال driverAccept بـ openDriverVerifyModal
+
+        // تحديث دالة refreshDriverViews
         async function refreshDriverViews() {
             const allOrders = await getOrders();
             channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -2215,6 +2367,7 @@
             updateDriverStats();
         }
 
+        // تعديل filterDriverOrders
         function filterDriverOrders(filter) {
             driverFilter = filter;
             document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
@@ -2222,6 +2375,7 @@
             displayDriverOrders();
         }
 
+        // تحديث الإحصائيات
         function updateDriverStats() {
             if (!currentDriverUser) return;
             document.getElementById('dAvailable').textContent = '...';
@@ -2239,6 +2393,7 @@
             }).catch(() => {});
         }
 
+        // دالة تبديل حالة الاتصال
         function toggleDriverStatus() {
             driverOnline = !driverOnline;
             localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
@@ -2361,7 +2516,7 @@
         function showAdminAddForm(type) {
             document.getElementById('adminFormContainer').style.display = 'block';
             document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '➕ إضافة مطعم' :
-            '➕ إضافة كابتن';
+                '➕ إضافة كابتن';
             document.getElementById('adminEditId').value = '';
             document.getElementById('adminUsername').value = '';
             document.getElementById('adminDisplayName').value = '';
@@ -2417,7 +2572,7 @@
                 if (!found) return;
                 document.getElementById('adminFormContainer').style.display = 'block';
                 document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '✏️ تعديل مطعم' :
-                '✏️ تعديل كابتن';
+                    '✏️ تعديل كابتن';
                 document.getElementById('adminEditId').value = username;
                 document.getElementById('adminUsername').value = found.username;
                 document.getElementById('adminDisplayName').value = found.displayName;
@@ -2451,7 +2606,7 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات (مع إضافة ORDER_REJECTED)
+        //  الاستماع للتحديثات
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
@@ -2476,21 +2631,14 @@
                 }
             }
 
-            // ===== إشعار رفض الطلب للعميل =====
             if (event.data.type === 'ORDER_REJECTED') {
                 const order = event.data.order;
-                // إذا كانت صفحة العميل مفتوحة، نعرض إشعاراً
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     showNotification(`⚠️ تم رفض طلبك #${order.id} من قبل المطعم`, 'error');
-                    // تحديث قائمة الطلبات وتتبع الطلب إذا كان مفتوحاً
                     if (customerTrackingId == order.id) {
                         showCustomerTracking(order.id);
                         updateCustomerTrackingSteps('cancelled');
                     }
-                }
-                // تحديث واجهة العميل إذا كانت مفتوحة (طلباتي)
-                if (document.getElementById('customerPage').classList.contains('active')) {
-                    // يمكن تحديث القائمة إذا كانت مفتوحة
                 }
             }
 
@@ -2500,6 +2648,7 @@
                         const order = event.data.orders.find(o => o.id === customerTrackingId);
                         if (order) {
                             updateCustomerTrackingSteps(order.status);
+                            document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                             if (order.driverAssigned && order.status !== 'cancelled') {
                                 document.getElementById('customerDriverInfo').style.display = 'block';
                                 document.getElementById('cDriverName').textContent = order.driverName || '-';

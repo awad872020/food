@@ -827,6 +827,7 @@
             <div id="customerVerificationCode" style="margin:0.5rem 0;">
                 <span style="color:#636e72;">رمز تأكيد التسليم: </span>
                 <span class="verification-code" id="trackingCodeDisplay">----</span>
+                <p style="font-size:0.8rem;color:#636e72;">(أعط هذا الرمز للكابتن عند استلام الطلب)</p>
             </div>
             <div class="tracking-steps">
                 <div class="tracking-step" id="cstep1"><div class="step-icon">✅</div><span>تم الطلب</span></div>
@@ -969,7 +970,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن (تم تعديل النصوص إلى "تسليم الطلب")
+    شاشة الكابتن - تم تعديل مكان إدخال الكود إلى مرحلة "delivering" (بعد الاستلام من المطعم)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -992,7 +993,7 @@
         </div>
 
         <div id="driverReadySection" class="status-section" style="display:none;">
-            <h3>📦 طلبات جاهزة للتسليم</h3>
+            <h3>📦 طلبات جاهزة للاستلام من المطعم</h3>
             <div class="mini-grid" id="driverReadyGrid"></div>
         </div>
         <div id="driverPickingSection" class="status-section" style="display:none;">
@@ -1000,7 +1001,7 @@
             <div class="mini-grid" id="driverPickingGrid"></div>
         </div>
         <div id="driverDeliveringSection" class="status-section" style="display:none;">
-            <h3>🛵 طلبات قيد التوصيل</h3>
+            <h3>🛵 طلبات قيد التوصيل (انتظر رمز العميل)</h3>
             <div class="mini-grid" id="driverDeliveringGrid"></div>
         </div>
         <div id="driverCompletedSection" class="status-section" style="display:none;">
@@ -1029,12 +1030,12 @@
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
 
-        <!-- ===== نافذة إدخال رمز التحقق لتأكيد التسليم (تم تغيير النصوص) ===== -->
+        <!-- ===== نافذة إدخال رمز التحقق (تظهر فقط في مرحلة التوصيل) ===== -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverVerifyModal()">&times;</button>
                 <h2>🔐 تأكيد تسليم الطلب</h2>
-                <p>أدخل رمز التحقق المكون من 4 أرقام الذي حصلت عليه من العميل لتأكيد تسليم الطلب:</p>
+                <p>اطلب من العميل رمز التحقق المكون من 4 أرقام، ثم أدخله هنا لتأكيد التسليم:</p>
                 <input type="text" id="driverVerifyCode" maxlength="4" placeholder="أدخل الرمز" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;font-size:1.5rem;text-align:center;letter-spacing:8px;margin:1rem 0;">
                 <div style="display:flex;gap:1rem;">
                     <button class="btn btn-success" onclick="confirmDriverDelivery()" style="flex:1;">تأكيد التسليم ✅</button>
@@ -1564,7 +1565,6 @@
                 if (!order) return;
                 document.getElementById('customerTracking').style.display = 'block';
                 document.getElementById('trackingOrderId').textContent = `#${orderId}`;
-                // عرض رمز التحقق
                 document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                 updateCustomerTrackingSteps(order.status);
                 const msgDiv = document.getElementById('customerTrackingMessage');
@@ -1586,7 +1586,7 @@
         }
 
         function updateCustomerTrackingSteps(status) {
-            const map = { pending: 1, preparing: 2, ready_for_pickup: 2, picking: 2, delivering: 3, completed: 4,
+            const map = { pending: 1, preparing: 2, ready_for_pickup: 2, picking: 3, delivering: 3, completed: 4,
             cancelled: -1 };
             const cur = map[status] || 1;
             for (let i = 1; i <= 4; i++) {
@@ -1994,7 +1994,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - تم تغيير النصوص إلى "تسليم الطلب"
+        //  الكابتن (Driver) - تعديل مسار التحقق إلى مرحلة التوصيل
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2130,16 +2130,16 @@
                     let actions = '';
                     if (o.status === 'ready_for_pickup') {
                         actions = `
-                            <button class="btn btn-success" onclick="openDriverVerifyModal(${o.id})">تسليم الطلب 📦</button>
+                            <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام من المطعم 📦</button>
                             <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
                         `;
                     } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
                         actions = `
-                            <span style="color:#ffa502;">⏳ في انتظار تأكيد التسليم</span>
+                            <span style="color:#ffa502;">⏳ جارٍ الاستلام</span>
                         `;
                     } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
                         actions = `
-                            <button class="btn btn-success" onclick="driverDeliver(${o.id})">تأكيد التسليم ✅</button>
+                            <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم بالرمز 🔐</button>
                             <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
                         `;
                     } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
@@ -2156,7 +2156,7 @@
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">المجموع شامل رسوم التوصيل: ${o.total} شيكل</div>
-                        ${o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز تأكيد التسليم المطلوب: <strong>${o.verificationCode}</strong></div>` : ''}
+                        ${o.status === 'delivering' && o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز التأكيد: <strong style="color:#ff6b35;">اطلبه من العميل</strong></div>` : ''}
                         <div class="order-actions">${actions}</div>
                     `;
                     grid.appendChild(card);
@@ -2199,7 +2199,7 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <button class="btn btn-success" onclick="openDriverVerifyModal(${o.id})">تسليم 📦</button>
+                                <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام 📦</button>
                                 <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
                             </div>
                         </div>
@@ -2218,7 +2218,7 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <span style="color:#ffa502;">⏳ في انتظار التأكيد</span>
+                                <span style="color:#ffa502;">⏳ جارٍ الاستلام</span>
                             </div>
                         </div>
                     `).join('');
@@ -2236,7 +2236,7 @@
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-actions">
-                                <button class="btn btn-success" onclick="driverDeliver(${o.id})">تسليم ✅</button>
+                                <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم 🔐</button>
                                 <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
                             </div>
                         </div>
@@ -2263,12 +2263,70 @@
             }
         }
 
-        // ===== نافذة التحقق (تم تغيير النصوص) =====
+        // ===== دالة استلام الطلب من المطعم =====
+        async function driverPickupFromRestaurant(orderId) {
+            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
+            try {
+                const orders = await getOrders();
+                const order = orders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'ready_for_pickup') {
+                    showNotification('الطلب ليس في حالة جاهزة للاستلام', 'warning');
+                    return;
+                }
+                // تأكيد أن الكابتن لم يتم تعيينه بعد أو أن هذا الكابتن هو المسؤول
+                if (order.driverAssigned && order.driverId !== currentDriverUser.username) {
+                    showNotification('⚠️ هذا الطلب تم تعيينه لكابتن آخر', 'warning');
+                    return;
+                }
+                // تحديث الحالة إلى picking (تم الاستلام من المطعم)
+                await updateOrderStatus(orderId, 'picking', {
+                    driverId: currentDriverUser.username,
+                    driverAssigned: true,
+                    driverName: currentDriverUser.displayName,
+                    driverPhone: '0590000000',
+                    pickedUpAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
+                // بعد الاستلام، ننتقل إلى حالة delivering تلقائياً (نبدأ التوصيل)
+                await updateOrderStatus(orderId, 'delivering', {
+                    startedDeliveryAt: new Date().toISOString()
+                });
+                showNotification(`🛵 بدأت توصيل الطلب #${orderId} إلى العميل`);
+                await refreshDriverViews();
+            } catch (e) {
+                showNotification('فشل في استلام الطلب', 'error');
+                console.error(e);
+            }
+        }
+
+        // ===== نافذة التحقق لتأكيد التسليم (في مرحلة delivering) =====
         function openDriverVerifyModal(orderId) {
-            pendingVerifyOrderId = orderId;
-            document.getElementById('driverVerifyCode').value = '';
-            document.getElementById('driverVerifyError').style.display = 'none';
-            document.getElementById('driverVerifyModal').style.display = 'block';
+            // التحقق من أن الطلب في حالة delivering وأن الكابتن هو المسؤول
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'delivering') {
+                    showNotification('الطلب ليس في حالة توصيل', 'warning');
+                    return;
+                }
+                if (order.driverId !== currentDriverUser.username) {
+                    showNotification('هذا الطلب ليس من مهامك', 'error');
+                    return;
+                }
+                pendingVerifyOrderId = orderId;
+                document.getElementById('driverVerifyCode').value = '';
+                document.getElementById('driverVerifyError').style.display = 'none';
+                document.getElementById('driverVerifyModal').style.display = 'block';
+            }).catch(() => {
+                showNotification('حدث خطأ', 'error');
+            });
         }
 
         function closeDriverVerifyModal() {
@@ -2276,7 +2334,7 @@
             pendingVerifyOrderId = null;
         }
 
-        // دالة تأكيد التسليم (تم تغيير الاسم)
+        // ===== تأكيد التسليم بإدخال الرمز =====
         async function confirmDriverDelivery() {
             const code = document.getElementById('driverVerifyCode').value.trim();
             if (!code || code.length !== 4) {
@@ -2295,8 +2353,13 @@
                     showNotification('الطلب غير موجود', 'error');
                     return;
                 }
-                if (order.status !== 'ready_for_pickup') {
-                    showNotification('الطلب ليس في حالة جاهزة للتسليم', 'warning');
+                if (order.status !== 'delivering') {
+                    showNotification('الطلب ليس في حالة توصيل', 'warning');
+                    closeDriverVerifyModal();
+                    return;
+                }
+                if (order.driverId !== currentDriverUser.username) {
+                    showNotification('هذا الطلب ليس من مهامك', 'error');
                     closeDriverVerifyModal();
                     return;
                 }
@@ -2306,36 +2369,20 @@
                     document.getElementById('driverVerifyError').style.display = 'block';
                     return;
                 }
-                // الرمز صحيح: نكمل عملية التسليم (ننتقل إلى حالة delivering أو completed مباشرة؟)
-                // سنقوم بتحديث الحالة إلى delivering (تم الاستلام) ثم يمكن الكابتن تأكيد التسليم النهائي.
-                await updateOrderStatus(pendingVerifyOrderId, 'delivering', {
-                    driverId: currentDriverUser.username,
-                    driverAssigned: true,
-                    driverName: currentDriverUser.displayName,
-                    driverPhone: '0590000000',
-                    pickedUpAt: new Date().toISOString()
+                // الرمز صحيح: إتمام التسليم
+                await updateOrderStatus(pendingVerifyOrderId, 'completed', {
+                    completedAt: new Date().toISOString()
                 });
-                showNotification(`✅ تم تأكيد تسليم الطلب #${pendingVerifyOrderId} بواسطة ${currentDriverUser.displayName}`);
+                driverStatsData.completedOrders += 1;
+                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
+                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
+                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
+                showNotification(`✅ تم تسليم الطلب #${pendingVerifyOrderId} بنجاح (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
                 closeDriverVerifyModal();
                 await refreshDriverViews();
             } catch (e) {
                 showNotification('فشل في تأكيد التسليم', 'error');
                 console.error(e);
-            }
-        }
-
-        // دالة تأكيد التسليم النهائي (تغيير الحالة إلى completed)
-        async function driverDeliver(orderId) {
-            try {
-                await updateOrderStatus(orderId, 'completed', { completedAt: new Date().toISOString() });
-                driverStatsData.completedOrders += 1;
-                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
-                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
-                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
-                showNotification(`✅ تم توصيل الطلب #${orderId} (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
-                await refreshDriverViews();
-            } catch (e) {
-                showNotification('فشل في تأكيد التسليم', 'error');
             }
         }
 
@@ -2601,8 +2648,8 @@
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     const order = event.data.order;
                     playDriverSound();
-                    showNotification(`📢 طلب جاهز للتسليم #${order.id} من ${order.restaurantName}`, 'success');
-                    sendDesktopNotification('📢 طلب جاهز للتسليم', `طلب #${order.id} من ${order.restaurantName}`);
+                    showNotification(`📢 طلب جاهز للاستلام #${order.id} من ${order.restaurantName}`, 'success');
+                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
                     displayDriverOrders();
                     displayDriverStatusSections();
                 }

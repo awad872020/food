@@ -940,7 +940,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript - نسخة الخادم الخلفي
+    JavaScript - نسخة الخادم الخلفي (مع تعديل إشعار الكابتن)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1559,12 +1559,17 @@
             }
         }
 
+        // ====== التعديل الأساسي: إرسال إشعار مخصص للكابتن عند جاهزية الطلب ======
         async function restaurantReady(orderId) {
             try {
                 await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
                 showNotification(`📦 الطلب #${orderId} جاهز للاستلام`);
                 displayRestaurantOrders();
                 const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                // إرسال إشعار مخصص للكابتن (يتم التعامل معه في channel.onmessage)
+                channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                // إرسال تحديث عام للقوائم
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 showNotification('فشل في تحديث الطلب', 'error');
@@ -1645,15 +1650,16 @@
         }
 
         function logoutDriver() {
+            if (currentDriverUser) {
+                localStorage.setItem(`driver_online_${currentDriverUser.username}`, JSON.stringify(driverOnline));
+            }
             currentDriverUser = null;
             localStorage.removeItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION);
             document.getElementById('driverDashboard').style.display = 'none';
             document.getElementById('driverLoginPage').style.display = 'flex';
             document.getElementById('driverPassword').value = '';
-            localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
         }
 
-        // ======= الدالة المعدلة: قبول الطلب مباشرة لأول كابتن يضغط =======
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -1716,11 +1722,9 @@
             }
         }
 
-        // دالة القبول المباشر: الكابتن الذي يضغط أولاً يحصل على الطلب
         async function driverAccept(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
-                // نأخذ الطلب الحالي من الخادم للتأكد من أنه لا يزال متاحاً
                 const orders = await getOrders();
                 const idx = orders.findIndex(o => o.id === orderId);
                 if (idx === -1) {
@@ -1728,15 +1732,11 @@
                     return;
                 }
                 const order = orders[idx];
-                // التحقق من أن الطلب لا يزال في حالة ready_for_pickup ولم يتم تعيين كابتن له
                 if (order.status !== 'ready_for_pickup' || order.driverAssigned) {
                     showNotification('⚠️ هذا الطلب تم قبوله من كابتن آخر أو غير متاح', 'warning');
-                    // تحديث القائمة لإزالة الطلب من الواجهة
                     displayDriverOrders();
                     return;
                 }
-
-                // قبول الطلب لهذا الكابتن
                 await updateOrderStatus(orderId, 'picking', {
                     driverId: currentDriverUser.username,
                     driverAssigned: true,
@@ -2015,9 +2015,10 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات المشتركة
+        //  الاستماع للتحديثات المشتركة (مع إضافة نوع NEW_READY_ORDER)
         // =================================================================
         channel.onmessage = function(event) {
+            // تحديث القوائم العامة
             if (event.data.type === 'ORDERS_UPDATED') {
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     if (customerTrackingId) {
@@ -2041,6 +2042,19 @@
                     displayDriverOrders();
                 }
             }
+
+            // ====== معالجة إشعار الطلب الجديد للكابتن ======
+            if (event.data.type === 'NEW_READY_ORDER') {
+                // فقط إذا كانت صفحة الكابتن مفتوحة ونشطة
+                if (document.getElementById('driverPage').classList.contains('active')) {
+                    const order = event.data.order;
+                    // عرض إشعار منبثق للكابتن
+                    showNotification(
+                        `🚀 طلب جديد جاهز للتوصيل من ${order.restaurantName} إلى ${order.customerName} (طلب #${order.id})`,
+                        'success'
+                    );
+                }
+            }
         };
 
         // =================================================================
@@ -2049,7 +2063,7 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي');
+        console.log('🍔 نظام توصيل الطعام - نسخة الخادم الخلفي (مع إشعار الكابتن)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

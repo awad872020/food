@@ -769,7 +769,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة المطعم
+    شاشة المطعم (مع إضافة فلتر التاريخ)
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -791,6 +791,14 @@
         </div>
 
         <div class="orders-section">
+            <!-- ====== إضافة فلتر التاريخ ====== -->
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
+                <label style="font-weight:bold;">📅 تصفية حسب التاريخ:</label>
+                <input type="date" id="restaurantDateFilter" onchange="filterRestaurantOrdersByDate()" style="padding:0.4rem;border-radius:8px;border:1px solid #ddd;">
+                <button class="btn btn-primary" onclick="filterRestaurantOrdersByDate()">عرض</button>
+                <button class="btn btn-outline" onclick="clearRestaurantDateFilter()">إلغاء التصفية</button>
+            </div>
+
             <div class="orders-header">
                 <h2>📋 الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
@@ -940,7 +948,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript - نسخة الخادم الخلفي (مع أصوات تنبيه)
+    JavaScript - نسخة الخادم الخلفي (مع فلتر التاريخ والصوت)
     ============================================================ -->
     <script>
         // =================================================================
@@ -969,7 +977,6 @@
         //  دوال الاتصال بالخادم
         // =================================================================
 
-        // ----- الطلبات -----
         async function getOrders() {
             const res = await fetch(`${API_BASE}/orders`);
             if (!res.ok) throw new Error('فشل في جلب الطلبات');
@@ -996,7 +1003,6 @@
             return await res.json();
         }
 
-        // ----- المستخدمين (للأدمن) -----
         async function getUsers() {
             const res = await fetch(`${API_BASE}/users`);
             if (!res.ok) throw new Error('فشل في جلب المستخدمين');
@@ -1013,7 +1019,6 @@
             return await res.json();
         }
 
-        // ----- تسجيل دخول الأدمن -----
         async function adminLoginAPI(username, password) {
             const res = await fetch(`${API_BASE}/admin/login`, {
                 method: 'POST',
@@ -1070,7 +1075,7 @@
         }
 
         // =================================================================
-        //  Notification API (إشعارات سطح المكتب)
+        //  Notification API (سطح المكتب)
         // =================================================================
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
@@ -1082,16 +1087,13 @@
                 return;
             }
             if (Notification.permission === 'denied') {
-                showNotification('❌ تم رفض الإشعارات مسبقاً. يمكنك تغيير الإعدادات من المتصفح.', 'error');
+                showNotification('❌ تم رفض الإشعارات مسبقاً.', 'error');
                 return;
             }
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     showNotification('✅ تم تفعيل الإشعارات بنجاح!', 'success');
-                    new Notification('🔔 نظام التوصيل', {
-                        body: 'سيتم تنبيهك عند وجود طلب جديد جاهز للتوصيل.',
-                        icon: '🍔'
-                    });
+                    new Notification('🔔 نظام التوصيل', { body: 'سيتم تنبيهك عند وجود طلب جديد.', icon: '🍔' });
                 } else {
                     showNotification('❌ لم يتم تفعيل الإشعارات', 'error');
                 }
@@ -1104,20 +1106,17 @@
                 new Notification(title, { body, icon: '🚀' });
             } else if (Notification.permission === 'default') {
                 Notification.requestPermission().then(perm => {
-                    if (perm === 'granted') {
-                        new Notification(title, { body, icon: '🚀' });
-                    }
+                    if (perm === 'granted') new Notification(title, { body, icon: '🚀' });
                 });
             }
         }
 
         // =================================================================
-        //  🔊 أصوات التنبيه باستخدام Web Audio API
+        //  🔊 أصوات التنبيه
         // =================================================================
         function playRestaurantSound() {
             try {
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
-                // نغمة مزدوجة (تنبيه المطعم)
                 [0, 0.2].forEach(delay => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
@@ -1130,13 +1129,12 @@
                     osc.start(ctx.currentTime + delay);
                     osc.stop(ctx.currentTime + delay + 0.3);
                 });
-            } catch (e) { /* تجاهل */ }
+            } catch (e) { /* ignore */ }
         }
 
         function playDriverSound() {
             try {
                 const ctx = new(window.AudioContext || window.webkitAudioContext)();
-                // نغمة عالية (تنبيه الكابتن)
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
@@ -1147,7 +1145,7 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + 0.25);
-            } catch (e) { /* تجاهل */ }
+            } catch (e) { /* ignore */ }
         }
 
         // =================================================================
@@ -1373,8 +1371,6 @@
                 showNotification(`✅ تم تأكيد طلب #${order.id}`);
                 showCustomerTracking(order.id);
                 startCustomerTracking(order.id);
-
-                // إرسال إشعار الطلب الجديد للمطعم (مع الصوت)
                 channel.postMessage({ type: 'NEW_ORDER', order: order });
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -1477,10 +1473,11 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant)
+        //  المطعم (Restaurant) - مع إضافة فلتر التاريخ
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
+        let restaurantDateFilter = null; // جديد
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
@@ -1545,6 +1542,7 @@
             document.getElementById('restaurantPassword').value = '';
         }
 
+        // الدالة المعدلة لتطبيق فلتر التاريخ
         async function displayRestaurantOrders() {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1552,12 +1550,28 @@
             try {
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                // ---- فلتر التاريخ ----
+                if (restaurantDateFilter) {
+                    const start = new Date(restaurantDateFilter);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(restaurantDateFilter);
+                    end.setHours(23, 59, 59, 999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                // ---- فلتر الحالة ----
                 if (restaurantFilter !== 'all') orders = orders.filter(o => o.status === restaurantFilter);
+
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 if (!orders.length) {
                     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
                     return;
                 }
+
                 orders.forEach(o => {
                     const card = document.createElement('div');
                     card.className = `order-card ${o.status}`;
@@ -1596,6 +1610,23 @@
             }
         }
 
+        // دوال فلتر التاريخ
+        function filterRestaurantOrdersByDate() {
+            const dateInput = document.getElementById('restaurantDateFilter');
+            if (dateInput.value) {
+                restaurantDateFilter = new Date(dateInput.value);
+                displayRestaurantOrders();
+            } else {
+                clearRestaurantDateFilter();
+            }
+        }
+
+        function clearRestaurantDateFilter() {
+            restaurantDateFilter = null;
+            document.getElementById('restaurantDateFilter').value = '';
+            displayRestaurantOrders();
+        }
+
         function updateRestaurantStats(orders) {
             if (!orders) orders = [];
             document.getElementById('rTotalOrders').textContent = orders.length;
@@ -1627,6 +1658,7 @@
             }
         }
 
+        // دالة الرفض: تغير الحالة إلى cancelled ويبقى الطلب
         async function restaurantReject(orderId) {
             if (!confirm('تأكيد رفض الطلب؟')) return;
             try {
@@ -1647,7 +1679,6 @@
                 displayRestaurantOrders();
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
-                // إرسال إشعار للكابتن (مع الصوت)
                 channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
@@ -2094,38 +2125,33 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات المشتركة + تشغيل الأصوات
+        //  الاستماع للتحديثات المشتركة
         // =================================================================
         channel.onmessage = function(event) {
-            // --- 1. معالجة الطلب الجديد (للمطعم) ---
+            // طلب جديد للمطعم
             if (event.data.type === 'NEW_ORDER') {
                 const order = event.data.order;
-                // التأكد من أن صفحة المطعم نشطة والمستخدم هو المطعم المستهدف
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     if (currentRestaurantUser.displayName === order.restaurantName) {
-                        // 🔔 تشغيل صوت خاص بالمطعم
                         playRestaurantSound();
                         showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
-                        // تحديث الإحصائيات واللوحة فوراً
                         displayRestaurantOrders();
                     }
                 }
             }
 
-            // --- 2. معالجة الطلب الجاهز (للكابتن) ---
+            // طلب جاهز للكابتن
             if (event.data.type === 'NEW_READY_ORDER') {
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     const order = event.data.order;
-                    // 🔔 تشغيل صوت خاص بالكابتن
                     playDriverSound();
                     showNotification(`📢 طلب جاهز #${order.id} من ${order.restaurantName}`, 'success');
                     sendDesktopNotification('📢 طلب جاهز للتوصيل', `طلب #${order.id} من ${order.restaurantName}`);
-                    // تحديث قائمة الطلبات
                     displayDriverOrders();
                 }
             }
 
-            // --- 3. التحديث العام للقوائم ---
+            // تحديث عام
             if (event.data.type === 'ORDERS_UPDATED') {
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     if (customerTrackingId) {
@@ -2157,7 +2183,7 @@
         checkServer();
         navigateTo('home');
 
-        console.log('🍔 نظام توصيل الطعام - مع أصوات تنبيه للمطعم والكابتن');
+        console.log('🍔 نظام توصيل الطعام - مع سجل الطلبات وتاريخ + أصوات');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
     </script>

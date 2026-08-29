@@ -84,6 +84,30 @@
             background: #e2e6ea;
         }
 
+        /* زر الرجوع إلى الرئيسية */
+        .back-home-btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: 0.3s;
+        }
+        .back-home-btn:hover {
+            background: #5a4bd1;
+            transform: scale(1.05);
+        }
+        .back-home-btn .arrow {
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
@@ -744,6 +768,13 @@
                 bottom: 15px;
                 left: 15px;
             }
+            .back-home-btn .arrow {
+                font-size: 1rem;
+            }
+            .back-home-btn {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.85rem;
+            }
         }
         @media (max-width: 480px) {
             .stats-container {
@@ -782,19 +813,22 @@
         </div>
     </div>
 
+    <!-- ===== زر الأدمن المصغر ===== -->
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    شاشة العميل
+    شاشة العميل (مع زر رجوع)
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
             <div class="logo"><span style="font-size:2rem;">🍔</span><h1>اطلب طعامك</h1></div>
             <div class="user-badge">
+                <button class="back-home-btn" onclick="navigateTo('home')">
+                    <span class="arrow">←</span> الرئيسية
+                </button>
                 <button class="btn btn-outline" onclick="showCustomerOrders()">📋 طلباتي</button>
                 <button class="btn btn-outline" onclick="toggleCustomerCart()">🛒 السلة <span id="customerCartCount" style="background:#ff6b35;color:white;border-radius:50%;padding:0 8px;">0</span></button>
                 <button class="btn btn-primary" onclick="showCustomerLogin()">👤 حسابي</button>
-                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
 
@@ -896,15 +930,17 @@
     </div>
 
     <!-- ============================================================
-    شاشة المطعم
+    شاشة المطعم (مع زر رجوع)
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
             <div class="logo"><h1>📋 لوحة المطعم</h1><span class="badge" id="restaurantBadge">🍽️</span></div>
             <div class="user-badge">
+                <button class="back-home-btn" onclick="navigateTo('home')">
+                    <span class="arrow">←</span> الرئيسية
+                </button>
                 <button class="btn btn-primary" onclick="showRestaurantNotifications()">🔔 <span id="restaurantNotifBadge" style="background:red;color:white;border-radius:50%;padding:0 8px;">0</span></button>
                 <button class="logout-btn" onclick="logoutRestaurant()">تسجيل خروج</button>
-                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
 
@@ -970,16 +1006,18 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن - تم تعديل مكان إدخال الكود إلى مرحلة "delivering" (بعد الاستلام من المطعم)
+    شاشة الكابتن (مع زر رجوع)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
             <div class="logo"><h1>🛵 كابتن التوصيل</h1><span class="badge" id="driverBadge">🚗</span></div>
             <div class="user-badge">
+                <button class="back-home-btn" onclick="navigateTo('home')">
+                    <span class="arrow">←</span> الرئيسية
+                </button>
                 <button class="btn btn-success" id="driverStatusBtn" onclick="toggleDriverStatus()">🟢 متصل</button>
                 <button class="btn btn-info" onclick="requestNotificationPermission()">🔔 تفعيل الإشعارات</button>
                 <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
-                <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
             </div>
         </div>
 
@@ -1030,7 +1068,7 @@
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
 
-        <!-- ===== نافذة إدخال رمز التحقق (تظهر فقط في مرحلة التوصيل) ===== -->
+        <!-- نافذة إدخال رمز التحقق -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverVerifyModal()">&times;</button>
@@ -1063,7 +1101,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الأدمن
+    شاشة الأدمن (مع زر رجوع)
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1082,8 +1120,10 @@
             <div class="header-bar">
                 <div class="logo"><h1>👑 لوحة التحكم - الأدمن</h1></div>
                 <div class="user-badge">
+                    <button class="back-home-btn" onclick="navigateTo('home')">
+                        <span class="arrow">←</span> الرئيسية
+                    </button>
                     <button class="logout-btn" onclick="logoutAdmin()">تسجيل خروج</button>
-                    <button class="logout-btn" onclick="navigateTo('home')">🏠</button>
                 </div>
             </div>
             <div style="padding:1.5rem 5%;">
@@ -1203,7 +1243,6 @@
             });
         }
 
-        // توليد رمز عشوائي 4 أرقام
         function generateVerificationCode() {
             return Math.floor(1000 + Math.random() * 9000).toString();
         }
@@ -1225,7 +1264,7 @@
         }
 
         // =================================================================
-        //  التنقل
+        //  التنقل (مع إخفاء الرئيسية تلقائياً)
         // =================================================================
         function navigateTo(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1525,7 +1564,7 @@
             e.preventDefault();
             const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
             const total = itemsTotal + CONFIG.DELIVERY_FEE;
-            const verificationCode = generateVerificationCode(); // توليد رمز عشوائي
+            const verificationCode = generateVerificationCode();
             const orderData = {
                 restaurantId: customerCart[0].restaurantId,
                 restaurantName: customerCart[0].restaurantName,
@@ -1541,7 +1580,7 @@
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 driverAssigned: false,
-                verificationCode: verificationCode // تخزين الرمز
+                verificationCode: verificationCode
             };
             try {
                 const order = await createOrder(orderData);
@@ -1994,7 +2033,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - تعديل مسار التحقق إلى مرحلة التوصيل
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2263,7 +2302,6 @@
             }
         }
 
-        // ===== دالة استلام الطلب من المطعم =====
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2277,12 +2315,10 @@
                     showNotification('الطلب ليس في حالة جاهزة للاستلام', 'warning');
                     return;
                 }
-                // تأكيد أن الكابتن لم يتم تعيينه بعد أو أن هذا الكابتن هو المسؤول
                 if (order.driverAssigned && order.driverId !== currentDriverUser.username) {
                     showNotification('⚠️ هذا الطلب تم تعيينه لكابتن آخر', 'warning');
                     return;
                 }
-                // تحديث الحالة إلى picking (تم الاستلام من المطعم)
                 await updateOrderStatus(orderId, 'picking', {
                     driverId: currentDriverUser.username,
                     driverAssigned: true,
@@ -2291,7 +2327,6 @@
                     pickedUpAt: new Date().toISOString()
                 });
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
-                // بعد الاستلام، ننتقل إلى حالة delivering تلقائياً (نبدأ التوصيل)
                 await updateOrderStatus(orderId, 'delivering', {
                     startedDeliveryAt: new Date().toISOString()
                 });
@@ -2303,9 +2338,7 @@
             }
         }
 
-        // ===== نافذة التحقق لتأكيد التسليم (في مرحلة delivering) =====
         function openDriverVerifyModal(orderId) {
-            // التحقق من أن الطلب في حالة delivering وأن الكابتن هو المسؤول
             getOrders().then(orders => {
                 const order = orders.find(o => o.id === orderId);
                 if (!order) {
@@ -2334,7 +2367,6 @@
             pendingVerifyOrderId = null;
         }
 
-        // ===== تأكيد التسليم بإدخال الرمز =====
         async function confirmDriverDelivery() {
             const code = document.getElementById('driverVerifyCode').value.trim();
             if (!code || code.length !== 4) {
@@ -2363,13 +2395,11 @@
                     closeDriverVerifyModal();
                     return;
                 }
-                // التحقق من الرمز
                 if (order.verificationCode !== code) {
                     document.getElementById('driverVerifyError').textContent = '⚠️ الرمز غير صحيح، حاول مرة أخرى';
                     document.getElementById('driverVerifyError').style.display = 'block';
                     return;
                 }
-                // الرمز صحيح: إتمام التسليم
                 await updateOrderStatus(pendingVerifyOrderId, 'completed', {
                     completedAt: new Date().toISOString()
                 });

@@ -903,7 +903,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة المطعم
+    صفحة المطعم - تم نقل الإحصائيات إلى أسفل جدول الطلبات
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -916,14 +916,9 @@
                 <button class="logout-btn" onclick="logoutRestaurant()">تسجيل خروج</button>
             </div>
         </div>
-        <div class="stats-container" id="restaurantStats">
-            <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
-            <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
-            <div class="stat-card"><div class="icon">👨‍🍳</div><div class="value" id="rPreparingOrders">0</div><div class="label">تحضير</div></div>
-            <div class="stat-card"><div class="icon">📦</div><div class="value" id="rReadyOrders">0</div><div class="label">جاهزة</div></div>
-            <div class="stat-card"><div class="icon">✅</div><div class="value" id="rCompletedOrders">0</div><div class="label">مكتملة</div></div>
-            <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
-        </div>
+
+        <!-- تم إزالة stats-container من هنا -->
+
         <div id="restaurantPreparingSection" class="status-section" style="display:none;">
             <h3>👨‍🍳 الطلبات قيد التحضير</h3>
             <div class="mini-grid" id="restaurantPreparingGrid"></div>
@@ -940,6 +935,7 @@
             <h3>🛵 الطلبات قيد التوصيل</h3>
             <div class="mini-grid" id="restaurantDeliveringGrid"></div>
         </div>
+
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -947,6 +943,7 @@
                 <button class="btn btn-primary" onclick="filterRestaurantOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearRestaurantDateFilter()">إلغاء التصفية</button>
             </div>
+
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
@@ -959,8 +956,22 @@
                     <button class="filter-btn" data-filter="completed" onclick="filterRestaurantOrders('completed')">مكتملة</button>
                 </div>
             </div>
+
             <div class="orders-grid" id="restaurantOrdersGrid"></div>
+
+            <!-- تم نقل الإحصائيات إلى هنا (أسفل جدول الطلبات) -->
+            <div class="stats-container" id="restaurantStats">
+                <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
+                <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
+                <div class="stat-card"><div class="icon">👨‍🍳</div><div class="value" id="rPreparingOrders">0</div><div class="label">تحضير</div></div>
+                <div class="stat-card"><div class="icon">📦</div><div class="value" id="rReadyOrders">0</div><div class="label">جاهزة</div></div>
+                <div class="stat-card"><div class="icon">✅</div><div class="value" id="rCompletedOrders">0</div><div class="label">مكتملة</div></div>
+                <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
+            </div>
+            <!-- انتهاء نقل الإحصائيات -->
+
         </div>
+
         <div id="restaurantLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🍽️</div>
@@ -976,6 +987,7 @@
             </div>
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
+
         <!-- مودال تأكيد استلام الكابتن -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
@@ -995,7 +1007,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن
+    صفحة الكابتن (نفسها)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1084,7 +1096,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الأدمن
+    صفحة الأدمن (نفسها)
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1140,7 +1152,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل
+    الجافاسكريبت (نفسه تماماً، لا تغيير)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1398,7 +1410,6 @@
                     }
                 }).catch(() => {});
             }
-            // تحديث العميل كل 5 ثوانٍ (للتتبع)
             startAutoRefresh('customer', refreshCustomerData, 5000);
         }
 
@@ -1831,7 +1842,6 @@
                 const allOrders = await getOrders();
                 const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // مقارنة الطلبات الجديدة (pending)
                 const newPending = myOrders.filter(o => o.status === 'pending');
                 const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
                 if (newPending.length > oldPending.length) {
@@ -3072,7 +3082,6 @@
             }
         }
 
-        // تفعيل السياق الصوتي عند أول نقرة في الصفحة
         document.addEventListener('click', () => {
             const ctx = getAudioContext();
             if (ctx.state === 'suspended') ctx.resume();

@@ -1048,7 +1048,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن (معدلة لعرض تفاصيل السعر مع رسوم التوصيل وعلامة ✅ للمكتملة)
+    صفحة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1199,7 +1199,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تعديلات عرض السعر في الكابتن)
+    الجافاسكريبت الكامل (مع تحديث تلقائي للعميل)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1459,6 +1459,7 @@
                     }
                     break;
                 case 'customer':
+                    refreshCustomerData();
                     break;
                 default:
                     break;
@@ -1466,7 +1467,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer)
+        //  العميل (Customer) - مع تحديث تلقائي
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1519,6 +1520,42 @@
                     }
                 }).catch(() => {});
             }
+            // بدء التحديث التلقائي للعميل
+            startAutoRefresh('customer', refreshCustomerData);
+        }
+
+        // دالة تحديث بيانات العميل (تُستدعى كل 10 ثوانٍ)
+        function refreshCustomerData() {
+            // تحديث التتبع إذا كان موجوداً
+            if (customerTrackingId) {
+                getOrders().then(orders => {
+                    const order = orders.find(o => o.id === customerTrackingId);
+                    if (order) {
+                        updateCustomerTrackingSteps(order.status);
+                        document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
+                        const msgDiv = document.getElementById('customerTrackingMessage');
+                        if (order.status === 'cancelled') {
+                            msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                            msgDiv.style.color = '#ff4757';
+                        } else {
+                            msgDiv.innerHTML = '';
+                        }
+                        if (order.driverAssigned && order.status !== 'cancelled') {
+                            document.getElementById('customerDriverInfo').style.display = 'block';
+                            document.getElementById('cDriverName').textContent = order.driverName || '-';
+                            document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
+                            document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime || '15 دقيقة';
+                        } else {
+                            document.getElementById('customerDriverInfo').style.display = 'none';
+                        }
+                        if (['completed', 'cancelled'].includes(order.status)) {
+                            // إذا انتهى الطلب، يمكن إيقاف التحديث لكننا نتركه للمتابعة
+                        }
+                    }
+                }).catch(() => {});
+            }
+            // (اختياري) يمكن تحديث قائمة المطاعم إذا أردت
+            // displayCustomerRestaurants();
         }
 
         function displayCustomerRestaurants() {
@@ -1765,6 +1802,7 @@
             localStorage.setItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID, orderId);
             if (customerTrackingInterval) clearInterval(customerTrackingInterval);
             customerTrackingId = orderId;
+            // التحديث التلقائي الآن يُدار بواسطة refreshCustomerData المكرر، لكننا نبقي هذا المؤقت للتعامل مع حالات الانتهاء
             customerTrackingInterval = setInterval(async () => {
                 try {
                     const orders = await getOrders();
@@ -1836,7 +1874,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - تم إزالة رسوم التوصيل سابقاً
+        //  المطعم (Restaurant)
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -2012,7 +2050,7 @@
             displayRestaurantOrders();
         }
 
-        // ---- عرض الأقسام الفرعية (بدون تعديل) ----
+        // ---- عرض الأقسام الفرعية ----
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             try {
@@ -2149,7 +2187,7 @@
             }
         }
 
-        // ---- دوال المطعم (تأكيد الاستلام) ----
+        // ---- دوال المطعم ----
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2317,7 +2355,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - معدل لعرض تفاصيل السعر مع رسوم التوصيل
+        //  الكابتن (Driver) - مع تفاصيل السعر
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2479,7 +2517,6 @@
                         actions = `<span style="color:#636e72;">-</span>`;
                     }
 
-                    // حساب تفاصيل السعر
                     const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
                     const totalPrice = o.total || (itemsTotal + deliveryFee);
@@ -2505,7 +2542,7 @@
             }
         }
 
-        // ---- عرض الأقسام الفرعية مع تفاصيل السعر وعلامة ✅ للمكتملة ----
+        // ---- عرض الأقسام الفرعية مع تفاصيل السعر ----
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
             try {
@@ -2622,7 +2659,7 @@
                     }).join('');
                 }
 
-                // completed (مع علامة ✅)
+                // completed
                 const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
@@ -2655,7 +2692,7 @@
             }
         }
 
-        // ---- دوال الكابتن (الاستلام والتسليم) ----
+        // ---- دوال الكابتن ----
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2832,7 +2869,7 @@
         }
 
         // =================================================================
-        //  الأدمن (Admin) - لم يتغير
+        //  الأدمن (Admin)
         // =================================================================
         let adminLoggedIn = false;
 

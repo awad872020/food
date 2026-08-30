@@ -115,7 +115,7 @@
         }
 
         /* ============================================================
-           الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
+           الصفحة الرئيسية
            ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -199,7 +199,7 @@
             color: #c62828;
         }
 
-        /* زر الأدمن المصغر (أصغر) */
+        /* زر الأدمن المصغر */
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -222,6 +222,66 @@
         .admin-mini-btn:hover {
             transform: scale(1.1);
             background: #5a4bd1;
+        }
+
+        /* ============================================================
+           الإشعارات (تحسين للجوال)
+           ============================================================ */
+        .notification {
+            position: fixed;
+            top: 12px;
+            left: 5%;
+            right: 5%;
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 14px 40px 14px 20px;
+            border-radius: 14px;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            z-index: 9999;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            animation: slideIn 0.4s ease-out;
+            box-sizing: border-box;
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .notification.success {
+            background: #00b894;
+        }
+        .notification.error {
+            background: #ff4757;
+        }
+        .notification.warning {
+            background: #ffa502;
+        }
+        .notification .close-btn {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: rgba(255,255,255,0.8);
+            transition: 0.2s;
+            line-height: 1;
+            background: none;
+            border: none;
+            padding: 0 4px;
+        }
+        .notification .close-btn:hover {
+            color: #fff;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         /* ============================================================
@@ -259,7 +319,8 @@
             gap: 1rem;
         }
         .login-form input,
-        .login-form select {
+        .login-form select,
+        .login-form textarea {
             padding: 0.8rem;
             border: 2px solid #ddd;
             border-radius: 10px;
@@ -268,7 +329,8 @@
             transition: 0.3s;
         }
         .login-form input:focus,
-        .login-form select:focus {
+        .login-form select:focus,
+        .login-form textarea:focus {
             border-color: #ff6b35;
         }
         .login-form button {
@@ -292,7 +354,6 @@
             display: none;
         }
 
-        /* الهيدر */
         .header-bar {
             background: white;
             padding: 1rem 5%;
@@ -342,7 +403,6 @@
             background: #ee5a24;
         }
 
-        /* الإحصائيات */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -369,7 +429,6 @@
             font-size: 0.8rem;
         }
 
-        /* الطلبات */
         .orders-section {
             padding: 1rem 5% 2rem;
         }
@@ -516,36 +575,14 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-        .status-pending {
-            background: #fff3e0;
-            color: #ffa502;
-        }
-        .status-preparing {
-            background: #e3f2fd;
-            color: #1e90ff;
-        }
-        .status-ready_for_pickup {
-            background: #e8f5e9;
-            color: #00b894;
-        }
-        .status-picking {
-            background: #fff3e0;
-            color: #ffa502;
-        }
-        .status-delivering {
-            background: #f3e5f5;
-            color: #9c27b0;
-        }
-        .status-completed {
-            background: #e8f5e9;
-            color: #00b894;
-        }
-        .status-cancelled {
-            background: #ffebee;
-            color: #ff4757;
-        }
+        .status-pending { background: #fff3e0; color: #ffa502; }
+        .status-preparing { background: #e3f2fd; color: #1e90ff; }
+        .status-ready_for_pickup { background: #e8f5e9; color: #00b894; }
+        .status-picking { background: #fff3e0; color: #ffa502; }
+        .status-delivering { background: #f3e5f5; color: #9c27b0; }
+        .status-completed { background: #e8f5e9; color: #00b894; }
+        .status-cancelled { background: #ffebee; color: #ff4757; }
 
-        /* التتبع */
         .tracking-steps {
             display: flex;
             justify-content: space-between;
@@ -604,7 +641,6 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
         }
 
-        /* النوافذ المنبثقة */
         .modal {
             display: none;
             position: fixed;
@@ -639,60 +675,12 @@
             color: #ff6b35;
         }
 
-        /* الإشعارات */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 3000;
-            animation: slideIn 0.3s ease-out;
-            max-width: 90%;
-        }
-        .notification.success {
-            background: #00b894;
-        }
-        .notification.error {
-            background: #ff4757;
-        }
-        .notification.warning {
-            background: #ffa502;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* جداول الأدمن */
-        .admin-users-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        .admin-users-table th,
-        .admin-users-table td {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        .admin-users-table th {
-            background: #f0f0f0;
-        }
-        .admin-users-table .btn {
-            padding: 0.2rem 0.6rem;
-            font-size: 0.8rem;
-        }
-
-        /* الأقسام الخاصة بالحالات */
         .status-section {
             background: white;
             border-radius: 15px;
             padding: 1rem 1.5rem;
             margin: 1rem 5%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         .status-section h3 {
             margin-bottom: 1rem;
@@ -751,9 +739,25 @@
             margin: 0.5rem 0;
         }
 
-        /* ============================================================
-           التجاوب
-           ============================================================ */
+        .admin-users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .admin-users-table th,
+        .admin-users-table td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .admin-users-table th {
+            background: #f0f0f0;
+        }
+        .admin-users-table .btn {
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -809,7 +813,7 @@
 <body>
 
     <!-- ============================================================
-    الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
+    الصفحة الرئيسية
     ============================================================ -->
     <div id="homePage" class="page active">
         <div class="container">
@@ -833,7 +837,7 @@
         </div>
     </div>
 
-    <!-- ===== زر الأدمن المصغر ===== -->
+    <!-- زر الأدمن المصغر -->
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
@@ -1024,7 +1028,6 @@
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
 
-        <!-- مودال تأكيد استلام الكابتن (جديد) -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantPickupModal()">&times;</button>
@@ -1105,7 +1108,6 @@
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
 
-        <!-- نافذة إدخال رمز التحقق -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverVerifyModal()">&times;</button>
@@ -1216,6 +1218,17 @@
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
+        //  طلب إذن الإشعارات تلقائياً
+        // =================================================================
+        function autoRequestNotification() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    console.log('📢 إذن الإشعارات:', perm);
+                });
+            }
+        }
+
+        // =================================================================
         //  دوال الخادم
         // =================================================================
         async function getOrders() {
@@ -1285,57 +1298,41 @@
         }
 
         // =================================================================
-        //  التحقق من الخادم
-        // =================================================================
-        async function checkServer() {
-            const statusEl = document.getElementById('serverStatus');
-            try {
-                await getOrders();
-                statusEl.textContent = '✅ الخادم متصل وجاهز';
-                statusEl.className = 'server-status';
-            } catch (e) {
-                statusEl.textContent = '❌ لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم (node server.js)';
-                statusEl.className = 'server-status error';
-                console.error('❌ خطأ في الاتصال بالخادم:', e);
-            }
-        }
-
-        // =================================================================
-        //  التنقل
-        // =================================================================
-        function navigateTo(page) {
-            // إيقاف جميع التحديثات التلقائية عند الانتقال
-            stopAutoRefresh('customer');
-            stopAutoRefresh('restaurant');
-            stopAutoRefresh('driver');
-            stopAutoRefresh('admin');
-
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            if (page === 'home') {
-                document.getElementById('homePage').classList.add('active');
-                return;
-            }
-            const homePage = document.getElementById('homePage');
-            if (homePage) homePage.classList.remove('active');
-            const target = document.getElementById(page + 'Page');
-            if (target) {
-                target.classList.add('active');
-                if (page === 'customer') initCustomer();
-                else if (page === 'restaurant') initRestaurant();
-                else if (page === 'driver') initDriver();
-                else if (page === 'admin') initAdmin();
-            }
-        }
-
-        // =================================================================
-        //  إشعارات
+        //  الإشعارات (تحسين للجوال)
         // =================================================================
         function showNotification(msg, type = 'success') {
+            // إزالة أي إشعار سابق
+            const oldNotif = document.querySelector('.notification');
+            if (oldNotif) oldNotif.remove();
+
             const div = document.createElement('div');
             div.className = `notification ${type}`;
             div.textContent = msg;
+
+            // زر إغلاق
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'close-btn';
+            closeBtn.innerHTML = '✕';
+            closeBtn.setAttribute('aria-label', 'إغلاق الإشعار');
+            closeBtn.onclick = function(e) {
+                e.stopPropagation();
+                div.remove();
+            };
+            div.appendChild(closeBtn);
+
             document.body.appendChild(div);
-            setTimeout(() => div.remove(), 4000);
+
+            // إخفاء تلقائي بعد 4 ثوانٍ
+            const timer = setTimeout(() => {
+                if (div.parentNode) div.remove();
+            }, 4000);
+
+            div.addEventListener('click', function(e) {
+                if (e.target !== closeBtn) {
+                    clearTimeout(timer);
+                    div.remove();
+                }
+            });
         }
 
         function requestNotificationPermission() {
@@ -1360,6 +1357,7 @@
                 }
             });
         }
+
         function sendDesktopNotification(title, body) {
             if (!('Notification' in window)) return;
             if (Notification.permission === 'granted') {
@@ -1405,6 +1403,49 @@
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + 0.25);
             } catch (e) { /* ignore */ }
+        }
+
+        // =================================================================
+        //  التحقق من الخادم
+        // =================================================================
+        async function checkServer() {
+            const statusEl = document.getElementById('serverStatus');
+            try {
+                await getOrders();
+                statusEl.textContent = '✅ الخادم متصل وجاهز';
+                statusEl.className = 'server-status';
+            } catch (e) {
+                statusEl.textContent = '❌ لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم (node server.js)';
+                statusEl.className = 'server-status error';
+                console.error('❌ خطأ في الاتصال بالخادم:', e);
+            }
+        }
+
+        // =================================================================
+        //  التنقل
+        // =================================================================
+        function navigateTo(page) {
+            // إيقاف جميع التحديثات التلقائية عند الانتقال
+            stopAutoRefresh('customer');
+            stopAutoRefresh('restaurant');
+            stopAutoRefresh('driver');
+            stopAutoRefresh('admin');
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            if (page === 'home') {
+                document.getElementById('homePage').classList.add('active');
+                return;
+            }
+            const homePage = document.getElementById('homePage');
+            if (homePage) homePage.classList.remove('active');
+            const target = document.getElementById(page + 'Page');
+            if (target) {
+                target.classList.add('active');
+                if (page === 'customer') initCustomer();
+                else if (page === 'restaurant') initRestaurant();
+                else if (page === 'driver') initDriver();
+                else if (page === 'admin') initAdmin();
+            }
         }
 
         // =================================================================
@@ -1455,8 +1496,6 @@
                     }
                     break;
                 case 'customer':
-                    // اختياري: يمكن تفعيل تحديث قائمة المطاعم أو التتبع
-                    // displayCustomerRestaurants();
                     break;
                 default:
                     break;
@@ -1517,8 +1556,6 @@
                     }
                 }).catch(() => {});
             }
-            // يمكن تفعيل التحديث التلقائي للعميل (اختياري)
-            // startAutoRefresh('customer', () => refreshAllData('customer'));
         }
 
         function displayCustomerRestaurants() {
@@ -1763,6 +1800,13 @@
 
         function startCustomerTracking(orderId) {
             localStorage.setItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID, orderId);
+            // حفظ الحالة الأولية لتجنب الإشعارات المكررة
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    localStorage.setItem('last_customer_order_status_' + orderId, order.status);
+                }
+            }).catch(() => {});
             if (customerTrackingInterval) clearInterval(customerTrackingInterval);
             customerTrackingId = orderId;
             customerTrackingInterval = setInterval(async () => {
@@ -1841,7 +1885,7 @@
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
         let restaurantDateFilter = null;
-        let pendingPickupOrderId = null; // متغير لتخزين رقم الطلب المنتظر تأكيد استلامه
+        let pendingPickupOrderId = null;
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
@@ -1955,19 +1999,11 @@
                         else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
                         else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     }
-                    // إضافة تفاصيل السعر
-                    const priceDetails = `
-                        <div style="font-size:0.95rem; color:#2d3436; margin:0.3rem 0;">
-                            <span>سعر المنتجات: <strong>${o.itemsTotal || 0}</strong> شيكل</span>
-                            <span style="margin-right:1rem;">+ رسوم التوصيل: <strong>${o.deliveryFee || CONFIG.DELIVERY_FEE}</strong> شيكل</span>
-                        </div>
-                    `;
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                         <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                        ${priceDetails}
-                        <div class="order-total">المجموع الكلي: ${o.total} شيكل</div>
+                        <div class="order-total">المجموع: ${o.total} شيكل</div>
                         <div class="payment-method">💳 ${o.paymentMethod}</div>
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2033,7 +2069,7 @@
                     });
                 }
 
-                // ========== الطلبات قيد التحضير ==========
+                // الطلبات قيد التحضير
                 const preparing = orders.filter(o => o.status === 'preparing');
                 const prepGrid = document.getElementById('restaurantPreparingGrid');
                 const prepSection = document.getElementById('restaurantPreparingSection');
@@ -2048,9 +2084,6 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
-                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
-                                </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
                                 </div>
@@ -2059,7 +2092,7 @@
                     }).join('');
                 }
 
-                // ========== الطلبات الجاهزة ==========
+                // الطلبات الجاهزة
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2074,9 +2107,6 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
-                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
-                                </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
                                     <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
@@ -2086,7 +2116,7 @@
                     }).join('');
                 }
 
-                // ========== الطلبات قيد التوصيل ==========
+                // الطلبات قيد التوصيل
                 const delivering = orders.filter(o => o.status === 'picking' || o.status === 'delivering');
                 const delGrid = document.getElementById('restaurantDeliveringGrid');
                 const delSection = document.getElementById('restaurantDeliveringSection');
@@ -2101,9 +2131,6 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
-                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
-                                </div>
                                 <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
                             </div>
                         `;
@@ -2114,7 +2141,6 @@
             }
         }
 
-        // ===== دوال تأكيد استلام الكابتن من المطعم (جديد) =====
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2446,7 +2472,7 @@
                     });
                 }
 
-                // الطلبات الجاهزة
+                // جاهزة
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('driverReadyGrid');
                 const readySection = document.getElementById('driverReadySection');
@@ -2891,35 +2917,48 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات
+        //  الاستماع للتحديثات (مع إشعارات النظام)
         // =================================================================
         channel.onmessage = function(event) {
-            if (event.data.type === 'NEW_ORDER') {
-                const order = event.data.order;
+            const data = event.data;
+
+            // ---- طلب جديد (للمطعم) ----
+            if (data.type === 'NEW_ORDER') {
+                const order = data.order;
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     if (currentRestaurantUser.displayName === order.restaurantName) {
                         playRestaurantSound();
                         showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
+                        sendDesktopNotification(
+                            '🍔 طلب جديد!',
+                            `طلب #${order.id} من ${order.customerName} في ${order.restaurantName}`
+                        );
                         refreshRestaurantViews();
                     }
                 }
             }
 
-            if (event.data.type === 'NEW_READY_ORDER') {
-                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
-                    const order = event.data.order;
+            // ---- طلب جاهز (للكابتن) ----
+            if (data.type === 'NEW_READY_ORDER') {
+                const order = data.order;
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser && driverOnline) {
                     playDriverSound();
                     showNotification(`📢 طلب جاهز للاستلام #${order.id} من ${order.restaurantName}`, 'success');
-                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
+                    sendDesktopNotification(
+                        '📦 طلب جاهز!',
+                        `طلب #${order.id} من ${order.restaurantName} جاهز للاستلام`
+                    );
                     displayDriverOrders();
                     displayDriverStatusSections();
                 }
             }
 
-            if (event.data.type === 'ORDER_REJECTED') {
-                const order = event.data.order;
+            // ---- رفض الطلب (للعميل) ----
+            if (data.type === 'ORDER_REJECTED') {
+                const order = data.order;
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     showNotification(`⚠️ تم رفض طلبك #${order.id} من قبل المطعم`, 'error');
+                    sendDesktopNotification('❌ تم رفض الطلب', `طلبك #${order.id} تم رفضه`);
                     if (customerTrackingId == order.id) {
                         showCustomerTracking(order.id);
                         updateCustomerTrackingSteps('cancelled');
@@ -2927,25 +2966,11 @@
                 }
             }
 
-            if (event.data.type === 'ORDERS_UPDATED') {
-                if (document.getElementById('customerPage').classList.contains('active')) {
-                    if (customerTrackingId) {
-                        const order = event.data.orders.find(o => o.id === customerTrackingId);
-                        if (order) {
-                            updateCustomerTrackingSteps(order.status);
-                            document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
-                            if (order.driverAssigned && order.status !== 'cancelled') {
-                                document.getElementById('customerDriverInfo').style.display = 'block';
-                                document.getElementById('cDriverName').textContent = order.driverName || '-';
-                                document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
-                                document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime ||
-                                    '15 دقيقة';
-                            } else {
-                                document.getElementById('customerDriverInfo').style.display = 'none';
-                            }
-                        }
-                    }
-                }
+            // ---- تحديث شامل للطلبات (لجميع الأطراف مع إشعارات للعميل) ----
+            if (data.type === 'ORDERS_UPDATED') {
+                const allOrders = data.orders;
+
+                // تحديث واجهات المطعم والكابتن
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     displayRestaurantOrders();
                     displayRestaurantStatusSections();
@@ -2954,6 +2979,42 @@
                     displayDriverOrders();
                     displayDriverStatusSections();
                 }
+
+                // إشعارات للعميل عند تغير حالة طلبه المتتبع
+                if (document.getElementById('customerPage').classList.contains('active') && customerTrackingId) {
+                    const order = allOrders.find(o => o.id === customerTrackingId);
+                    if (order) {
+                        const oldStatus = localStorage.getItem('last_customer_order_status_' + customerTrackingId);
+                        if (oldStatus && oldStatus !== order.status) {
+                            let msg = '';
+                            switch (order.status) {
+                                case 'preparing':   msg = '⏳ طلبك قيد التحضير'; break;
+                                case 'ready_for_pickup': msg = '📦 طلبك جاهز للاستلام'; break;
+                                case 'delivering':  msg = '🛵 طلبك في طريقه إليك'; break;
+                                case 'completed':   msg = '✅ تم توصيل طلبك بنجاح!'; break;
+                                case 'cancelled':   msg = '❌ تم إلغاء طلبك'; break;
+                            }
+                            if (msg) {
+                                const type = order.status === 'cancelled' ? 'error' : 'success';
+                                showNotification(msg, type);
+                                sendDesktopNotification('🔄 تحديث الطلب', msg);
+                            }
+                        }
+                        localStorage.setItem('last_customer_order_status_' + customerTrackingId, order.status);
+
+                        // تحديث واجهة التتبع
+                        updateCustomerTrackingSteps(order.status);
+                        document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
+                        if (order.driverAssigned && order.status !== 'cancelled') {
+                            document.getElementById('customerDriverInfo').style.display = 'block';
+                            document.getElementById('cDriverName').textContent = order.driverName || '-';
+                            document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
+                            document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime || '15 دقيقة';
+                        } else {
+                            document.getElementById('customerDriverInfo').style.display = 'none';
+                        }
+                    }
+                }
             }
         };
 
@@ -2961,11 +3022,13 @@
         //  التهيئة
         // =================================================================
         checkServer();
+        autoRequestNotification(); // طلب إذن الإشعارات تلقائياً
         navigateTo('home');
 
-        console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
+        console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة كاملة معدلة)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
+        console.log('✅ تم تفعيل إشعارات النظام عند استقبال رسائل BroadcastChannel');
     </script>
 </body>
 </html>

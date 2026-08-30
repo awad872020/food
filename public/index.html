@@ -1278,6 +1278,12 @@
         //  التنقل
         // =================================================================
         function navigateTo(page) {
+            // إيقاف جميع التحديثات التلقائية عند الانتقال
+            stopAutoRefresh('customer');
+            stopAutoRefresh('restaurant');
+            stopAutoRefresh('driver');
+            stopAutoRefresh('admin');
+
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             if (page === 'home') {
                 document.getElementById('homePage').classList.add('active');
@@ -1376,6 +1382,62 @@
         }
 
         // =================================================================
+        //  التحديث التلقائي (Auto Refresh)
+        // =================================================================
+        let refreshIntervals = {
+            customer: null,
+            restaurant: null,
+            driver: null,
+            admin: null
+        };
+
+        function stopAutoRefresh(page) {
+            if (refreshIntervals[page]) {
+                clearInterval(refreshIntervals[page]);
+                refreshIntervals[page] = null;
+                console.log(`🛑 تم إيقاف التحديث التلقائي للصفحة: ${page}`);
+            }
+        }
+
+        function startAutoRefresh(page, refreshFunction, intervalMs = 10000) {
+            stopAutoRefresh(page);
+            refreshIntervals[page] = setInterval(() => {
+                console.log(`🔄 تحديث تلقائي للصفحة: ${page}`);
+                refreshFunction();
+            }, intervalMs);
+            console.log(`✅ بدأ التحديث التلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
+        }
+
+        function refreshAllData(page) {
+            switch (page) {
+                case 'restaurant':
+                    if (currentRestaurantUser) {
+                        displayRestaurantOrders();
+                        displayRestaurantStatusSections();
+                    }
+                    break;
+                case 'driver':
+                    if (currentDriverUser) {
+                        displayDriverOrders();
+                        displayDriverStatusSections();
+                        updateDriverStats();
+                    }
+                    break;
+                case 'admin':
+                    if (adminLoggedIn) {
+                        renderAdminUsers();
+                    }
+                    break;
+                case 'customer':
+                    // اختياري: يمكن تفعيل تحديث قائمة المطاعم أو التتبع
+                    // displayCustomerRestaurants();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // =================================================================
         //  العميل (Customer)
         // =================================================================
         let customerCart = [];
@@ -1384,7 +1446,6 @@
         let customerTrackingInterval = null;
         let customerTrackingId = null;
 
-        // ======== تم تعديل المطعم الأول هنا ========
         const customerRestaurants = [
             { 
                 id: 1, 
@@ -1430,6 +1491,8 @@
                     }
                 }).catch(() => {});
             }
+            // يمكن تفعيل التحديث التلقائي للعميل (اختياري)
+            // startAutoRefresh('customer', () => refreshAllData('customer'));
         }
 
         function displayCustomerRestaurants() {
@@ -1758,10 +1821,12 @@
             if (saved) {
                 currentRestaurantUser = saved;
                 showRestaurantDashboard();
+                startAutoRefresh('restaurant', () => refreshAllData('restaurant'));
             } else {
                 document.getElementById('restaurantLoginPage').style.display = 'flex';
                 document.getElementById('restaurantDashboard').style.display = 'none';
                 populateRestaurantSelect();
+                stopAutoRefresh('restaurant');
             }
         }
 
@@ -1796,6 +1861,7 @@
                 currentRestaurantUser = found;
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
+                startAutoRefresh('restaurant', () => refreshAllData('restaurant'));
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -1815,6 +1881,7 @@
             document.getElementById('restaurantDashboard').style.display = 'none';
             document.getElementById('restaurantLoginPage').style.display = 'flex';
             document.getElementById('restaurantPassword').value = '';
+            stopAutoRefresh('restaurant');
         }
 
         async function displayRestaurantOrders() {
@@ -2071,10 +2138,12 @@
             if (saved) {
                 currentDriverUser = saved;
                 showDriverDashboard();
+                startAutoRefresh('driver', () => refreshAllData('driver'));
             } else {
                 document.getElementById('driverLoginPage').style.display = 'flex';
                 document.getElementById('driverDashboard').style.display = 'none';
                 populateDriverSelect();
+                stopAutoRefresh('driver');
             }
         }
 
@@ -2111,6 +2180,7 @@
                 const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
+                startAutoRefresh('driver', () => refreshAllData('driver'));
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2137,6 +2207,7 @@
             document.getElementById('driverDashboard').style.display = 'none';
             document.getElementById('driverLoginPage').style.display = 'flex';
             document.getElementById('driverPassword').value = '';
+            stopAutoRefresh('driver');
         }
 
         function filterDriverOrdersByDate() {
@@ -2513,6 +2584,7 @@
             document.getElementById('adminLoginUser').value = '';
             document.getElementById('adminLoginPass').value = '';
             document.getElementById('adminLoginError').style.display = 'none';
+            stopAutoRefresh('admin');
         }
 
         async function adminLogin(e) {
@@ -2542,12 +2614,14 @@
             document.getElementById('adminLoginUser').value = '';
             document.getElementById('adminLoginPass').value = '';
             showNotification('تم تسجيل الخروج من لوحة الأدمن');
+            stopAutoRefresh('admin');
         }
 
         function showAdminDashboard() {
             document.getElementById('adminLoginPage').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
             renderAdminUsers();
+            startAutoRefresh('admin', () => refreshAllData('admin'));
         }
 
         async function renderAdminUsers() {

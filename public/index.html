@@ -1029,7 +1029,7 @@
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
 
-        <!-- مودال تأكيد استلام الكابتن (معدل) -->
+        <!-- مودال تأكيد استلام الكابتن -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantPickupModal()">&times;</button>
@@ -1048,7 +1048,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن
+    صفحة الكابتن (معدلة لعرض تفاصيل السعر مع رسوم التوصيل وعلامة ✅ للمكتملة)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1199,7 +1199,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع التعديلات المطلوبة)
+    الجافاسكريبت الكامل (مع تعديلات عرض السعر في الكابتن)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1836,7 +1836,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع تعديلات تأكيد الاستلام
+        //  المطعم (Restaurant) - تم إزالة رسوم التوصيل سابقاً
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1911,7 +1911,6 @@
             stopAutoRefresh('restaurant');
         }
 
-        // ---- عرض جميع الطلبات (بدون رسوم التوصيل) ----
         async function displayRestaurantOrders() {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1998,7 +1997,6 @@
             document.getElementById('rPreparingOrders').textContent = orders.filter(o => o.status === 'preparing').length;
             document.getElementById('rReadyOrders').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
             document.getElementById('rCompletedOrders').textContent = orders.filter(o => o.status === 'completed').length;
-            // الإيرادات من المنتجات فقط
             const rev = orders.filter(o => o.status === 'completed').reduce((s, o) => {
                 const total = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 return s + total;
@@ -2014,7 +2012,7 @@
             displayRestaurantOrders();
         }
 
-        // ---- عرض الأقسام الفرعية (مع إضافة قسم picking) ----
+        // ---- عرض الأقسام الفرعية (بدون تعديل) ----
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             try {
@@ -2032,7 +2030,7 @@
                     });
                 }
 
-                // ========== قيد التحضير ==========
+                // preparing
                 const preparing = orders.filter(o => o.status === 'preparing');
                 const prepGrid = document.getElementById('restaurantPreparingGrid');
                 const prepSection = document.getElementById('restaurantPreparingSection');
@@ -2066,7 +2064,7 @@
                     }).join('');
                 }
 
-                // ========== جاهزة ==========
+                // ready
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2094,7 +2092,7 @@
                     }).join('');
                 }
 
-                // ========== قيد الاستلام (picking) ==========
+                // picking
                 const picking = orders.filter(o => o.status === 'picking');
                 const pickGrid = document.getElementById('restaurantPickingGrid');
                 const pickSection = document.getElementById('restaurantPickingSection');
@@ -2122,7 +2120,7 @@
                     }).join('');
                 }
 
-                // ========== قيد التوصيل ==========
+                // delivering
                 const delivering = orders.filter(o => o.status === 'delivering');
                 const delGrid = document.getElementById('restaurantDeliveringGrid');
                 const delSection = document.getElementById('restaurantDeliveringSection');
@@ -2151,7 +2149,7 @@
             }
         }
 
-        // ---- دوال تأكيد استلام الكابتن (المطعم) ----
+        // ---- دوال المطعم (تأكيد الاستلام) ----
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2175,7 +2173,6 @@
             pendingPickupOrderId = null;
         }
 
-        // تأكيد الاستلام من المطعم (مع اختيار كابتن)
         async function confirmRestaurantPickup() {
             const select = document.getElementById('restaurantPickupDriverSelect');
             const driverUsername = select.value;
@@ -2195,7 +2192,6 @@
                     showNotification('الكابتن غير موجود', 'error');
                     return;
                 }
-                // تحديث الحالة إلى delivering مع تعيين بيانات الكابتن
                 await updateOrderStatus(pendingPickupOrderId, 'delivering', {
                     driverId: driver.username,
                     driverName: driver.displayName,
@@ -2218,10 +2214,8 @@
             }
         }
 
-        // تأكيد الاستلام مباشرة (لحالة picking)
         async function confirmRestaurantPickupDirect(orderId) {
             try {
-                // نأخذ الطلب الحالي
                 const allOrders = await getOrders();
                 const order = allOrders.find(o => o.id === orderId);
                 if (!order) {
@@ -2236,7 +2230,6 @@
                     showNotification('لا يوجد كابتن معين لهذا الطلب', 'error');
                     return;
                 }
-                // تحديث إلى delivering
                 await updateOrderStatus(orderId, 'delivering', {
                     startedDeliveryAt: new Date().toISOString()
                 });
@@ -2324,7 +2317,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - معدل: الاستلام من المطعم يغير إلى picking فقط
+        //  الكابتن (Driver) - معدل لعرض تفاصيل السعر مع رسوم التوصيل
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2428,6 +2421,7 @@
             displayDriverStatusSections();
         }
 
+        // ---- عرض الطلبات مع تفاصيل السعر ----
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -2478,19 +2472,28 @@
                             <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
                         `;
                     } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
-                        actions = `<span style="color:#00b894;">✅ تم التسليم</span>`;
+                        actions = `<span style="color:#00b894;">✅ تم التسليم ✅</span>`;
                     } else if (o.status === 'cancelled') {
                         actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     } else {
                         actions = `<span style="color:#636e72;">-</span>`;
                     }
 
+                    // حساب تفاصيل السعر
+                    const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                    const totalPrice = o.total || (itemsTotal + deliveryFee);
+
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                         <div><strong>${o.restaurantName}</strong> → ${o.customerName} (📞 ${o.phone})</div>
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                        <div class="order-total">المجموع شامل رسوم التوصيل: ${o.total} شيكل</div>
+                        <div style="font-size:0.95rem; color:#2d3436; margin:0.3rem 0;">
+                            <span>سعر المنتجات: <strong>${itemsTotal}</strong> شيكل</span>
+                            <span style="margin-right:1rem;">+ رسوم التوصيل: <strong>${deliveryFee}</strong> شيكل</span>
+                        </div>
+                        <div class="order-total">المجموع الكلي: ${totalPrice} شيكل</div>
                         ${o.status === 'delivering' && o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز التأكيد: <strong style="color:#ff6b35;">اطلبه من العميل</strong></div>` : ''}
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2502,6 +2505,7 @@
             }
         }
 
+        // ---- عرض الأقسام الفرعية مع تفاصيل السعر وعلامة ✅ للمكتملة ----
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
             try {
@@ -2530,17 +2534,28 @@
                     readySection.style.display = 'none';
                 } else {
                     readySection.style.display = 'block';
-                    readyGrid.innerHTML = ready.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#00b894;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
-                            <div class="mini-actions">
-                                <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام 📦</button>
-                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                    readyGrid.innerHTML = ready.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام 📦</button>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
                 // picking
@@ -2551,17 +2566,28 @@
                     pickSection.style.display = 'none';
                 } else {
                     pickSection.style.display = 'block';
-                    pickGrid.innerHTML = picking.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#ffa502;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
-                            <div class="mini-actions">
-                                <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
-                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                    pickGrid.innerHTML = picking.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#ffa502;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
                 // delivering
@@ -2572,20 +2598,31 @@
                     delSection.style.display = 'none';
                 } else {
                     delSection.style.display = 'block';
-                    delGrid.innerHTML = delivering.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#9c27b0;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
-                            <div class="mini-actions">
-                                <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم 🔐</button>
-                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                    delGrid.innerHTML = delivering.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#9c27b0;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم 🔐</button>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
-                // completed
+                // completed (مع علامة ✅)
                 const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
@@ -2593,21 +2630,32 @@
                     compSection.style.display = 'none';
                 } else {
                     compSection.style.display = 'block';
-                    compGrid.innerHTML = completed.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#00b894;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
-                            <div class="mini-details">✅ تم التسليم</div>
-                        </div>
-                    `).join('');
+                    compGrid.innerHTML = completed.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-details">✅ تم التسليم ✅</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
             } catch (e) {
                 showNotification('فشل في تحديث أقسام الكابتن', 'error');
             }
         }
 
-        // ---- تعديل دالة استلام الكابتن من المطعم (تغير إلى picking فقط) ----
+        // ---- دوال الكابتن (الاستلام والتسليم) ----
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2625,7 +2673,6 @@
                     showNotification('⚠️ هذا الطلب تم تعيينه لكابتن آخر', 'warning');
                     return;
                 }
-                // تغيير الحالة إلى picking فقط
                 await updateOrderStatus(orderId, 'picking', {
                     driverId: currentDriverUser.username,
                     driverAssigned: true,
@@ -2636,7 +2683,6 @@
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
                 showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
                 await refreshDriverViews();
-                // إعلام المطعم بأن الكابتن قد استلم الطلب (للتأكيد)
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {

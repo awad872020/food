@@ -721,6 +721,15 @@
             font-size: 0.9rem;
             color: #555;
         }
+        .mini-order-card .mini-items {
+            font-size: 0.85rem;
+            color: #333;
+            background: #fff;
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            margin: 0.3rem 0;
+            border: 1px solid #eee;
+        }
         .mini-order-card .mini-actions {
             margin-top: 0.5rem;
             display: flex;
@@ -1998,6 +2007,7 @@
                     });
                 }
 
+                // ========== الطلبات قيد التحضير ==========
                 const preparing = orders.filter(o => o.status === 'preparing');
                 const prepGrid = document.getElementById('restaurantPreparingGrid');
                 const prepSection = document.getElementById('restaurantPreparingSection');
@@ -2005,17 +2015,23 @@
                     prepSection.style.display = 'none';
                 } else {
                     prepSection.style.display = 'block';
-                    prepGrid.innerHTML = preparing.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#1e90ff;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-actions">
-                                <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
+                    prepGrid.innerHTML = preparing.map(o => {
+                        // عرض عناصر الطلب بشكل مختصر
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#1e90ff;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
+                // ========== الطلبات الجاهزة ==========
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2023,17 +2039,22 @@
                     readySection.style.display = 'none';
                 } else {
                     readySection.style.display = 'block';
-                    readyGrid.innerHTML = ready.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#00b894;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-actions">
-                                <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
+                    readyGrid.innerHTML = ready.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
+                // ========== الطلبات قيد التوصيل ==========
                 const delivering = orders.filter(o => o.status === 'picking' || o.status === 'delivering');
                 const delGrid = document.getElementById('restaurantDeliveringGrid');
                 const delSection = document.getElementById('restaurantDeliveringSection');
@@ -2041,13 +2062,17 @@
                     delSection.style.display = 'none';
                 } else {
                     delSection.style.display = 'block';
-                    delGrid.innerHTML = delivering.map(o => `
-                        <div class="mini-order-card" style="border-right-color:#ff9f1c;">
-                            <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
-                            <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
-                            <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
-                        </div>
-                    `).join('');
+                    delGrid.innerHTML = delivering.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#ff9f1c;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
             } catch (e) {
                 showNotification('فشل في تحديث الأقسام', 'error');
@@ -2321,6 +2346,7 @@
                     });
                 }
 
+                // الطلبات الجاهزة (موجودة فقط للكابتن)
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('driverReadyGrid');
                 const readySection = document.getElementById('driverReadySection');
@@ -2332,6 +2358,7 @@
                         <div class="mini-order-card" style="border-right-color:#00b894;">
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
                             <div class="mini-actions">
                                 <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام 📦</button>
                                 <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
@@ -2340,6 +2367,7 @@
                     `).join('');
                 }
 
+                // قيد الاستلام
                 const picking = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username);
                 const pickGrid = document.getElementById('driverPickingGrid');
                 const pickSection = document.getElementById('driverPickingSection');
@@ -2351,6 +2379,7 @@
                         <div class="mini-order-card" style="border-right-color:#ffa502;">
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
                             <div class="mini-actions">
                                 <span style="color:#ffa502;">⏳ جارٍ الاستلام</span>
                             </div>
@@ -2358,6 +2387,7 @@
                     `).join('');
                 }
 
+                // قيد التوصيل
                 const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
                 const delGrid = document.getElementById('driverDeliveringGrid');
                 const delSection = document.getElementById('driverDeliveringSection');
@@ -2369,6 +2399,7 @@
                         <div class="mini-order-card" style="border-right-color:#9c27b0;">
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
                             <div class="mini-actions">
                                 <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم 🔐</button>
                                 <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
@@ -2377,6 +2408,7 @@
                     `).join('');
                 }
 
+                // المكتملة
                 const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
@@ -2388,6 +2420,7 @@
                         <div class="mini-order-card" style="border-right-color:#00b894;">
                             <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                            <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
                             <div class="mini-details">✅ تم التسليم</div>
                         </div>
                     `).join('');

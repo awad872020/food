@@ -981,6 +981,10 @@
             <h3>📦 الطلبات الجاهزة (في انتظار الكابتن)</h3>
             <div class="mini-grid" id="restaurantReadyGrid"></div>
         </div>
+        <div id="restaurantPickingSection" class="status-section" style="display:none;">
+            <h3>🏪 طلبات قيد الاستلام من قبل الكابتن (في انتظار تأكيد المطعم)</h3>
+            <div class="mini-grid" id="restaurantPickingGrid"></div>
+        </div>
         <div id="restaurantDeliveringSection" class="status-section" style="display:none;">
             <h3>🛵 الطلبات قيد التوصيل</h3>
             <div class="mini-grid" id="restaurantDeliveringGrid"></div>
@@ -1001,6 +1005,7 @@
                     <button class="filter-btn" data-filter="pending" onclick="filterRestaurantOrders('pending')">جديدة</button>
                     <button class="filter-btn" data-filter="preparing" onclick="filterRestaurantOrders('preparing')">تحضير</button>
                     <button class="filter-btn" data-filter="ready_for_pickup" onclick="filterRestaurantOrders('ready_for_pickup')">جاهزة</button>
+                    <button class="filter-btn" data-filter="picking" onclick="filterRestaurantOrders('picking')">استلام</button>
                     <button class="filter-btn" data-filter="delivering" onclick="filterRestaurantOrders('delivering')">توصيل</button>
                     <button class="filter-btn" data-filter="completed" onclick="filterRestaurantOrders('completed')">مكتملة</button>
                 </div>
@@ -1024,12 +1029,12 @@
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
 
-        <!-- مودال تأكيد استلام الكابتن -->
+        <!-- مودال تأكيد استلام الكابتن (معدل) -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantPickupModal()">&times;</button>
                 <h2>تأكيد استلام الطلب</h2>
-                <p>اختر الكابتن الذي استلم الطلب:</p>
+                <p>اختر الكابتن الذي استلم الطلب (إذا لم يكن معيناً):</p>
                 <select id="restaurantPickupDriverSelect" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;margin:1rem 0;">
                     <option value="">-- اختر كابتن --</option>
                 </select>
@@ -1072,7 +1077,7 @@
             <div class="mini-grid" id="driverReadyGrid"></div>
         </div>
         <div id="driverPickingSection" class="status-section" style="display:none;">
-            <h3>🏪 طلبات قيد الاستلام</h3>
+            <h3>🏪 طلبات قيد الاستلام (في انتظار تأكيد المطعم)</h3>
             <div class="mini-grid" id="driverPickingGrid"></div>
         </div>
         <div id="driverDeliveringSection" class="status-section" style="display:none;">
@@ -1194,7 +1199,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تعديلات إزالة رسوم التوصيل من المطعم)
+    الجافاسكريبت الكامل (مع التعديلات المطلوبة)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1831,7 +1836,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - تم إزالة رسوم التوصيل من العرض والإحصائيات
+        //  المطعم (Restaurant) - مع تعديلات تأكيد الاستلام
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1906,7 +1911,7 @@
             stopAutoRefresh('restaurant');
         }
 
-        // ---- عرض جميع الطلبات (تم إزالة رسوم التوصيل) ----
+        // ---- عرض جميع الطلبات (بدون رسوم التوصيل) ----
         async function displayRestaurantOrders() {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1946,12 +1951,11 @@
                     } else {
                         if (o.status === 'preparing') actions = `<span style="color:#1e90ff;">👨‍🍳 قيد التحضير</span>`;
                         else if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
-                        else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 الكابتن يستلم</span>`;
+                        else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام (بانتظار تأكيد المطعم)</span>`;
                         else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
                         else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
                         else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     }
-                    // حساب إجمالي المنتجات فقط
                     const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
@@ -1994,7 +1998,7 @@
             document.getElementById('rPreparingOrders').textContent = orders.filter(o => o.status === 'preparing').length;
             document.getElementById('rReadyOrders').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
             document.getElementById('rCompletedOrders').textContent = orders.filter(o => o.status === 'completed').length;
-            // الإيرادات = مجموع أسعار المنتجات فقط (بدون التوصيل)
+            // الإيرادات من المنتجات فقط
             const rev = orders.filter(o => o.status === 'completed').reduce((s, o) => {
                 const total = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 return s + total;
@@ -2010,7 +2014,7 @@
             displayRestaurantOrders();
         }
 
-        // ---- عرض الأقسام الفرعية (قيد التحضير، جاهزة، قيد التوصيل) مع إزالة رسوم التوصيل ----
+        // ---- عرض الأقسام الفرعية (مع إضافة قسم picking) ----
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             try {
@@ -2028,7 +2032,7 @@
                     });
                 }
 
-                // ========== الطلبات قيد التحضير ==========
+                // ========== قيد التحضير ==========
                 const preparing = orders.filter(o => o.status === 'preparing');
                 const prepGrid = document.getElementById('restaurantPreparingGrid');
                 const prepSection = document.getElementById('restaurantPreparingSection');
@@ -2062,7 +2066,7 @@
                     }).join('');
                 }
 
-                // ========== الطلبات الجاهزة (تم إزالة رسوم التوصيل) ==========
+                // ========== جاهزة ==========
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2090,8 +2094,36 @@
                     }).join('');
                 }
 
-                // ========== الطلبات قيد التوصيل (تم إزالة رسوم التوصيل) ==========
-                const delivering = orders.filter(o => o.status === 'picking' || o.status === 'delivering');
+                // ========== قيد الاستلام (picking) ==========
+                const picking = orders.filter(o => o.status === 'picking');
+                const pickGrid = document.getElementById('restaurantPickingGrid');
+                const pickSection = document.getElementById('restaurantPickingSection');
+                if (picking.length === 0) {
+                    pickSection.style.display = 'none';
+                } else {
+                    pickSection.style.display = 'block';
+                    pickGrid.innerHTML = picking.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#ffa502;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
+                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                </div>
+                                <div class="mini-details">🚗 الكابتن: ${o.driverName || 'غير معين'}</div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="confirmRestaurantPickupDirect(${o.id})">تأكيد الاستلام ✅</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // ========== قيد التوصيل ==========
+                const delivering = orders.filter(o => o.status === 'delivering');
                 const delGrid = document.getElementById('restaurantDeliveringGrid');
                 const delSection = document.getElementById('restaurantDeliveringSection');
                 if (delivering.length === 0) {
@@ -2102,7 +2134,7 @@
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
                         const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                         return `
-                            <div class="mini-order-card" style="border-right-color:#ff9f1c;">
+                            <div class="mini-order-card" style="border-right-color:#9c27b0;">
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
@@ -2119,7 +2151,7 @@
             }
         }
 
-        // ===== دوال تأكيد استلام الكابتن من المطعم =====
+        // ---- دوال تأكيد استلام الكابتن (المطعم) ----
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2143,6 +2175,7 @@
             pendingPickupOrderId = null;
         }
 
+        // تأكيد الاستلام من المطعم (مع اختيار كابتن)
         async function confirmRestaurantPickup() {
             const select = document.getElementById('restaurantPickupDriverSelect');
             const driverUsername = select.value;
@@ -2162,6 +2195,7 @@
                     showNotification('الكابتن غير موجود', 'error');
                     return;
                 }
+                // تحديث الحالة إلى delivering مع تعيين بيانات الكابتن
                 await updateOrderStatus(pendingPickupOrderId, 'delivering', {
                     driverId: driver.username,
                     driverName: driver.displayName,
@@ -2178,6 +2212,42 @@
                     channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
                 }
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+                console.error(e);
+            }
+        }
+
+        // تأكيد الاستلام مباشرة (لحالة picking)
+        async function confirmRestaurantPickupDirect(orderId) {
+            try {
+                // نأخذ الطلب الحالي
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'picking') {
+                    showNotification('الطلب ليس في حالة استلام', 'warning');
+                    return;
+                }
+                if (!order.driverId) {
+                    showNotification('لا يوجد كابتن معين لهذا الطلب', 'error');
+                    return;
+                }
+                // تحديث إلى delivering
+                await updateOrderStatus(orderId, 'delivering', {
+                    startedDeliveryAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم تأكيد استلام الطلب #${orderId} بواسطة ${order.driverName}`);
+                await refreshRestaurantViews();
+                const allOrders2 = await getOrders();
+                const order2 = allOrders2.find(o => o.id === orderId);
+                if (order2) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order2 });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders2 });
             } catch (e) {
                 showNotification('فشل في تأكيد الاستلام', 'error');
                 console.error(e);
@@ -2254,7 +2324,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - لم يتغير
+        //  الكابتن (Driver) - معدل: الاستلام من المطعم يغير إلى picking فقط
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2399,7 +2469,8 @@
                         `;
                     } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
                         actions = `
-                            <span style="color:#ffa502;">⏳ جارٍ الاستلام</span>
+                            <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
                         `;
                     } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
                         actions = `
@@ -2451,6 +2522,7 @@
                     });
                 }
 
+                // ready
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('driverReadyGrid');
                 const readySection = document.getElementById('driverReadySection');
@@ -2471,6 +2543,7 @@
                     `).join('');
                 }
 
+                // picking
                 const picking = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username);
                 const pickGrid = document.getElementById('driverPickingGrid');
                 const pickSection = document.getElementById('driverPickingSection');
@@ -2484,12 +2557,14 @@
                             <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                             <div class="mini-items">📋 ${o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ')}</div>
                             <div class="mini-actions">
-                                <span style="color:#ffa502;">⏳ جارٍ الاستلام</span>
+                                <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
+                                <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
                             </div>
                         </div>
                     `).join('');
                 }
 
+                // delivering
                 const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
                 const delGrid = document.getElementById('driverDeliveringGrid');
                 const delSection = document.getElementById('driverDeliveringSection');
@@ -2510,6 +2585,7 @@
                     `).join('');
                 }
 
+                // completed
                 const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
@@ -2531,6 +2607,7 @@
             }
         }
 
+        // ---- تعديل دالة استلام الكابتن من المطعم (تغير إلى picking فقط) ----
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2548,6 +2625,7 @@
                     showNotification('⚠️ هذا الطلب تم تعيينه لكابتن آخر', 'warning');
                     return;
                 }
+                // تغيير الحالة إلى picking فقط
                 await updateOrderStatus(orderId, 'picking', {
                     driverId: currentDriverUser.username,
                     driverAssigned: true,
@@ -2556,11 +2634,11 @@
                     pickedUpAt: new Date().toISOString()
                 });
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
-                await updateOrderStatus(orderId, 'delivering', {
-                    startedDeliveryAt: new Date().toISOString()
-                });
-                showNotification(`🛵 بدأت توصيل الطلب #${orderId} إلى العميل`);
+                showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
                 await refreshDriverViews();
+                // إعلام المطعم بأن الكابتن قد استلم الطلب (للتأكيد)
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 showNotification('فشل في استلام الطلب', 'error');
                 console.error(e);

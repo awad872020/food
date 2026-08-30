@@ -1278,16 +1278,26 @@
         //  التنقل
         // =================================================================
         function navigateTo(page) {
+            // إخفاء جميع الصفحات
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
             if (page === 'home') {
+                // إظهار الصفحة الرئيسية فقط
                 document.getElementById('homePage').classList.add('active');
                 return;
             }
+
+            // إخفاء الصفحة الرئيسية صراحة (للتأكيد)
             const homePage = document.getElementById('homePage');
-            if (homePage) homePage.classList.remove('active');
+            if (homePage) {
+                homePage.classList.remove('active');
+            }
+
+            // إظهار الصفحة المطلوبة
             const target = document.getElementById(page + 'Page');
             if (target) {
                 target.classList.add('active');
+                // تهيئة الصفحة
                 if (page === 'customer') initCustomer();
                 else if (page === 'restaurant') initRestaurant();
                 else if (page === 'driver') initDriver();

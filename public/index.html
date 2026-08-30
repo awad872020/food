@@ -119,22 +119,22 @@
            ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: block;           /* ليست flex */
-            padding: 40px 20px;       /* مسافة حول الحاوية */
-            text-align: center;       /* توسيط النصوص */
+            display: block;
+            padding: 40px 20px;
+            text-align: center;
         }
         #homePage .container {
-            max-width: 600px;          /* عرض أصغر */
+            max-width: 600px;
             width: 100%;
             background: white;
             border-radius: 20px;
-            padding: 20px;            /* حشوة أقل */
+            padding: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin: 0 auto;           /* توسيط أفقي */
+            margin: 0 auto;
             text-align: center;
         }
         #homePage h1 {
-            font-size: 2rem;          /* خط أصغر */
+            font-size: 2rem;
             color: #2d3436;
             margin-bottom: 10px;
         }
@@ -1278,26 +1278,16 @@
         //  التنقل
         // =================================================================
         function navigateTo(page) {
-            // إخفاء جميع الصفحات
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
             if (page === 'home') {
-                // إظهار الصفحة الرئيسية فقط
                 document.getElementById('homePage').classList.add('active');
                 return;
             }
-
-            // إخفاء الصفحة الرئيسية صراحة (للتأكيد)
             const homePage = document.getElementById('homePage');
-            if (homePage) {
-                homePage.classList.remove('active');
-            }
-
-            // إظهار الصفحة المطلوبة
+            if (homePage) homePage.classList.remove('active');
             const target = document.getElementById(page + 'Page');
             if (target) {
                 target.classList.add('active');
-                // تهيئة الصفحة
                 if (page === 'customer') initCustomer();
                 else if (page === 'restaurant') initRestaurant();
                 else if (page === 'driver') initDriver();
@@ -1394,10 +1384,24 @@
         let customerTrackingInterval = null;
         let customerTrackingId = null;
 
+        // ======== تم تعديل المطعم الأول هنا ========
         const customerRestaurants = [
-            { id: 1, name: 'مطعم شاورما', emoji: '🥙', cuisine: 'شاورما ووجبات سريعة', category: 'shawarma', rating: 4.5,
-                menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18,
-                    desc: 'مع طحينة' }, { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }] },
+            { 
+                id: 1, 
+                name: 'مطعم اجعل لحد حوش', 
+                emoji: '🥩', 
+                cuisine: 'شاورما ومشاوي', 
+                category: 'shawarma', 
+                rating: 4.5,
+                menu: [
+                    { id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' },
+                    { id: 2, name: 'شاورما لحم', price: 18, desc: 'مع طحينة' },
+                    { id: 10, name: 'كباب', price: 25, desc: 'لحم مفروم مشوي' },
+                    { id: 11, name: 'شيش طاووق', price: 22, desc: 'دجاج متبل' },
+                    { id: 12, name: 'ريش مشوي', price: 30, desc: 'لحم غنم' },
+                    { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }
+                ] 
+            },
             { id: 2, name: 'مطعم بيتزا', emoji: '🍕', cuisine: 'بيتزا وإيطالي', category: 'pizza', rating: 4.7,
                 menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28,
                     desc: 'فلفل ومشروم' }] },

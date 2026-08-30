@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -922,6 +921,7 @@
             </div>
         </div>
 
+        <!-- نافذة إتمام الطلب مع زر GPS -->
         <div class="modal" id="customerCheckoutModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerCheckout()">&times;</button>
@@ -929,7 +929,11 @@
                 <form class="login-form" onsubmit="customerSubmitOrder(event)">
                     <input type="text" placeholder="الاسم الكامل" required>
                     <input type="tel" placeholder="رقم الجوال" required>
-                    <textarea placeholder="العنوان بالتفصيل" required style="padding:0.8rem;border-radius:10px;border:2px solid #ddd;min-height:80px;"></textarea>
+                    <!-- حقل العنوان مع زر تحديد الموقع -->
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <textarea id="customerAddress" placeholder="العنوان بالتفصيل" required style="flex:1;padding:0.8rem;border-radius:10px;border:2px solid #ddd;min-height:80px;"></textarea>
+                        <button type="button" class="btn btn-info" onclick="getLocationFromGPS(event)" style="height:80px; align-self:stretch;">📍</button>
+                    </div>
                     <select required>
                         <option value="">طريقة الدفع</option>
                         <option value="cash">الدفع عند الاستلام 💵</option>
@@ -1702,24 +1706,64 @@
             const form = document.querySelector('#customerCheckoutModal form');
             form[0].value = customerUser.name;
             form[1].value = customerUser.phone;
-            form[2].value = customerUser.address;
+            // ملء العنوان من بيانات العميل المحفوظة
+            document.getElementById('customerAddress').value = customerUser.address || '';
         }
 
         function closeCustomerCheckout() {
             document.getElementById('customerCheckoutModal').style.display = 'none';
         }
 
+        // دالة جلب العنوان عبر GPS (باستخدام Nominatim)
+        async function getLocationFromGPS(event) {
+            const btn = event.target;
+            if (!navigator.geolocation) {
+                showNotification('⚠️ متصفحك لا يدعم تحديد الموقع', 'error');
+                return;
+            }
+            btn.textContent = '⏳ جاري...';
+            btn.disabled = true;
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+                const { latitude, longitude } = position.coords;
+                // استدعاء خدمة Nominatim لعكس الجيو كودينغ
+                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data && data.display_name) {
+                    document.getElementById('customerAddress').value = data.display_name;
+                    showNotification('✅ تم تحديد العنوان بنجاح', 'success');
+                } else {
+                    showNotification('⚠️ لم نتمكن من تحديد العنوان، حاول يدوياً', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showNotification('⚠️ فشل في تحديد الموقع، تأكد من تفعيل GPS', 'error');
+            } finally {
+                btn.textContent = '📍';
+                btn.disabled = false;
+            }
+        }
+
         async function customerSubmitOrder(e) {
             e.preventDefault();
+            const name = e.target[0].value;
+            const phone = e.target[1].value;
+            const address = document.getElementById('customerAddress').value; // استخدام الحقل المعدل
             const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
             const total = itemsTotal + CONFIG.DELIVERY_FEE;
             const verificationCode = generateVerificationCode();
             const orderData = {
                 restaurantId: customerCart[0].restaurantId,
                 restaurantName: customerCart[0].restaurantName,
-                customerName: e.target[0].value,
-                phone: e.target[1].value,
-                address: e.target[2].value,
+                customerName: name,
+                phone: phone,
+                address: address,
                 items: customerCart.map(i => ({ ...i })),
                 itemsTotal,
                 total,

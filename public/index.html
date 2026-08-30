@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -2354,7 +2353,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مع تفاصيل السعر
+        //  الكابتن (Driver) - مع تفاصيل السعر وتغيير الحالة تلقائياً
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2362,6 +2361,19 @@
         let driverOnline = true;
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
         let pendingVerifyOrderId = null;
+
+        // ---- دالة مساعدة لتغيير حالة الكابتن ----
+        function setDriverStatus(online) {
+            if (!currentDriverUser) return;
+            driverOnline = online;
+            localStorage.setItem(`driver_online_${currentDriverUser.username}`, JSON.stringify(driverOnline));
+            updateDriverStatusUI();
+            if (online) {
+                showNotification('🟢 تم تغيير حالتك إلى متصل، يمكنك استلام طلبات جديدة', 'success');
+            } else {
+                showNotification('🔴 تم تغيير حالتك إلى غير متصل أثناء التوصيل', 'warning');
+            }
+        }
 
         function initDriver() {
             const saved = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION) || 'null');
@@ -2718,6 +2730,10 @@
                 });
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
                 showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
+                
+                // تغيير الحالة إلى غير متصل
+                setDriverStatus(false);
+                
                 await refreshDriverViews();
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -2797,6 +2813,10 @@
                 driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
                 localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
                 showNotification(`✅ تم تسليم الطلب #${pendingVerifyOrderId} بنجاح (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
+                
+                // تغيير الحالة إلى متصل
+                setDriverStatus(true);
+                
                 closeDriverVerifyModal();
                 await refreshDriverViews();
             } catch (e) {

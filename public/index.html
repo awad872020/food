@@ -1023,6 +1023,23 @@
             </div>
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
+
+        <!-- مودال تأكيد استلام الكابتن (جديد) -->
+        <div class="modal" id="restaurantPickupModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeRestaurantPickupModal()">&times;</button>
+                <h2>تأكيد استلام الطلب</h2>
+                <p>اختر الكابتن الذي استلم الطلب:</p>
+                <select id="restaurantPickupDriverSelect" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;margin:1rem 0;">
+                    <option value="">-- اختر كابتن --</option>
+                </select>
+                <div style="display:flex;gap:1rem;">
+                    <button class="btn btn-success" onclick="confirmRestaurantPickup()" style="flex:1;">تأكيد الاستلام ✅</button>
+                    <button class="btn btn-danger" onclick="closeRestaurantPickupModal()" style="flex:1;">إلغاء</button>
+                </div>
+                <div id="restaurantPickupError" style="color:#ff4757;margin-top:0.5rem;display:none;">⚠️ يرجى اختيار كابتن</div>
+            </div>
+        </div>
     </div>
 
     <!-- ============================================================
@@ -1824,6 +1841,7 @@
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
         let restaurantDateFilter = null;
+        let pendingPickupOrderId = null; // متغير لتخزين رقم الطلب المنتظر تأكيد استلامه
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
@@ -2016,7 +2034,6 @@
                 } else {
                     prepSection.style.display = 'block';
                     prepGrid.innerHTML = preparing.map(o => {
-                        // عرض عناصر الطلب بشكل مختصر
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
                         return `
                             <div class="mini-order-card" style="border-right-color:#1e90ff;">
@@ -2031,7 +2048,7 @@
                     }).join('');
                 }
 
-                // ========== الطلبات الجاهزة ==========
+                // ========== الطلبات الجاهزة (تم إضافة زر تأكيد استلام الكابتن) ==========
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2047,6 +2064,7 @@
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
                                     <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
                                 </div>
                             </div>
@@ -2076,6 +2094,71 @@
                 }
             } catch (e) {
                 showNotification('فشل في تحديث الأقسام', 'error');
+            }
+        }
+
+        // ===== دوال تأكيد استلام الكابتن من المطعم (جديد) =====
+        function openRestaurantPickupModal(orderId) {
+            pendingPickupOrderId = orderId;
+            const select = document.getElementById('restaurantPickupDriverSelect');
+            select.innerHTML = '<option value="">-- اختر كابتن --</option>';
+            getUsers().then(users => {
+                users.drivers.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.username;
+                    opt.textContent = d.displayName + (d.extra ? ` (${d.extra})` : '');
+                    select.appendChild(opt);
+                });
+                document.getElementById('restaurantPickupError').style.display = 'none';
+                document.getElementById('restaurantPickupModal').style.display = 'block';
+            }).catch(() => {
+                showNotification('فشل في تحميل قائمة الكباتن', 'error');
+            });
+        }
+
+        function closeRestaurantPickupModal() {
+            document.getElementById('restaurantPickupModal').style.display = 'none';
+            pendingPickupOrderId = null;
+        }
+
+        async function confirmRestaurantPickup() {
+            const select = document.getElementById('restaurantPickupDriverSelect');
+            const driverUsername = select.value;
+            if (!driverUsername) {
+                document.getElementById('restaurantPickupError').style.display = 'block';
+                return;
+            }
+            document.getElementById('restaurantPickupError').style.display = 'none';
+            if (!pendingPickupOrderId) {
+                showNotification('خطأ: لم يتم تحديد طلب', 'error');
+                return;
+            }
+            try {
+                const users = await getUsers();
+                const driver = users.drivers.find(d => d.username === driverUsername);
+                if (!driver) {
+                    showNotification('الكابتن غير موجود', 'error');
+                    return;
+                }
+                await updateOrderStatus(pendingPickupOrderId, 'delivering', {
+                    driverId: driver.username,
+                    driverName: driver.displayName,
+                    driverAssigned: true,
+                    driverPhone: '0590000000',
+                    startedDeliveryAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم تأكيد استلام الطلب #${pendingPickupOrderId} بواسطة ${driver.displayName}`);
+                closeRestaurantPickupModal();
+                await refreshRestaurantViews();
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === pendingPickupOrderId);
+                if (order) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+                console.error(e);
             }
         }
 
@@ -2346,7 +2429,7 @@
                     });
                 }
 
-                // الطلبات الجاهزة (موجودة فقط للكابتن)
+                // الطلبات الجاهزة
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('driverReadyGrid');
                 const readySection = document.getElementById('driverReadySection');

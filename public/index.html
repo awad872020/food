@@ -20,11 +20,11 @@
             min-height: 100vh;
         }
         .page {
-            display: none;      /* جميع الصفحات مخفية افتراضياً */
+            display: none;
             padding-bottom: 80px;
         }
         .page.active {
-            display: block;     /* فقط الصفحة النشطة تظهر */
+            display: block;
         }
 
         /* ============================================================
@@ -115,11 +115,10 @@
         }
 
         /* ============================================================
-           الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
+           الصفحة الرئيسية
            ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            /* تم حذف display: block; */
             padding: 40px 20px;
             text-align: center;
         }
@@ -199,7 +198,6 @@
             color: #c62828;
         }
 
-        /* زر الأدمن المصغر (أصغر) */
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -225,7 +223,7 @@
         }
 
         /* ============================================================
-           باقي الأنماط (العميل، المطعم، الكابتن، الأدمن)
+           باقي الأنماط
            ============================================================ */
         .login-page {
             display: flex;
@@ -292,7 +290,6 @@
             display: none;
         }
 
-        /* الهيدر */
         .header-bar {
             background: white;
             padding: 1rem 5%;
@@ -342,7 +339,6 @@
             background: #ee5a24;
         }
 
-        /* الإحصائيات */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -369,7 +365,6 @@
             font-size: 0.8rem;
         }
 
-        /* الطلبات */
         .orders-section {
             padding: 1rem 5% 2rem;
         }
@@ -545,7 +540,6 @@
             color: #ff4757;
         }
 
-        /* التتبع */
         .tracking-steps {
             display: flex;
             justify-content: space-between;
@@ -604,7 +598,6 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
         }
 
-        /* النوافذ المنبثقة */
         .modal {
             display: none;
             position: fixed;
@@ -639,7 +632,6 @@
             color: #ff6b35;
         }
 
-        /* الإشعارات */
         .notification {
             position: fixed;
             top: 20px;
@@ -666,7 +658,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* جداول الأدمن */
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
@@ -686,7 +677,6 @@
             font-size: 0.8rem;
         }
 
-        /* الأقسام الخاصة بالحالات */
         .status-section {
             background: white;
             border-radius: 15px;
@@ -751,9 +741,6 @@
             margin: 0.5rem 0;
         }
 
-        /* ============================================================
-           التجاوب
-           ============================================================ */
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -809,18 +796,7 @@
 <body>
 
     <!-- ============================================================
-    ملفات صوتية للتشغيل عند الطلبات الجديدة (ضع الملفات بجانب الصفحة)
-    ============================================================ -->
-    <audio id="restaurantSound" preload="auto" style="display:none;">
-        <source src="notification.mp3" type="audio/mpeg">
-        <!-- في حال عدم وجود الملف، سيتم استخدام الصوت الاحتياطي -->
-    </audio>
-    <audio id="driverSound" preload="auto" style="display:none;">
-        <source src="driver_notification.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- ============================================================
-    الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
+    الصفحة الرئيسية
     ============================================================ -->
     <div id="homePage" class="page active">
         <div class="container">
@@ -844,7 +820,6 @@
         </div>
     </div>
 
-    <!-- ===== زر الأدمن المصغر ===== -->
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
@@ -1210,7 +1185,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تحديث تلقائي للعميل)
+    الجافاسكريبت الكامل
     ============================================================ -->
     <script>
         // =================================================================
@@ -1230,6 +1205,56 @@
             }
         };
         const channel = new BroadcastChannel('food_delivery_channel');
+
+        // =================================================================
+        //  Web Audio API - نظام الصوت المحسّن
+        // =================================================================
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function playRestaurantSound() {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+            try {
+                const now = ctx.currentTime;
+                [0, 0.15].forEach(delay => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 600;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.2, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.3);
+                });
+            } catch (e) { /* silent fail */ }
+        }
+
+        function playDriverSound() {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+            try {
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 1000;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } catch (e) { /* silent fail */ }
+        }
 
         // =================================================================
         //  دوال الخادم
@@ -1286,58 +1311,12 @@
         function formatDate(dateStr) {
             const d = new Date(dateStr);
             return d.toLocaleDateString('en-GB', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             });
         }
-
         function generateVerificationCode() {
             return Math.floor(1000 + Math.random() * 9000).toString();
-        }
-
-        // =================================================================
-        //  التحقق من الخادم
-        // =================================================================
-        async function checkServer() {
-            const statusEl = document.getElementById('serverStatus');
-            try {
-                await getOrders();
-                statusEl.textContent = '✅ الخادم متصل وجاهز';
-                statusEl.className = 'server-status';
-            } catch (e) {
-                statusEl.textContent = '❌ لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم (node server.js)';
-                statusEl.className = 'server-status error';
-                console.error('❌ خطأ في الاتصال بالخادم:', e);
-            }
-        }
-
-        // =================================================================
-        //  التنقل
-        // =================================================================
-        function navigateTo(page) {
-            stopAutoRefresh('customer');
-            stopAutoRefresh('restaurant');
-            stopAutoRefresh('driver');
-            stopAutoRefresh('admin');
-
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            if (page === 'home') {
-                document.getElementById('homePage').classList.add('active');
-                return;
-            }
-            const target = document.getElementById(page + 'Page');
-            if (target) {
-                target.classList.add('active');
-                if (page === 'customer') initCustomer();
-                else if (page === 'restaurant') initRestaurant();
-                else if (page === 'driver') initDriver();
-                else if (page === 'admin') initAdmin();
-            }
         }
 
         // =================================================================
@@ -1385,120 +1364,45 @@
         }
 
         // =================================================================
-        //  أصوات محسّنة بملفات صوتية احترافية مع احتياطي
+        //  التنقل
         // =================================================================
-        function playRestaurantSound() {
-            const audio = document.getElementById('restaurantSound');
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(() => playRestaurantFallback());
-            } else {
-                playRestaurantFallback();
+        function navigateTo(page) {
+            stopAutoRefresh('customer');
+            stopAutoRefresh('restaurant');
+            stopAutoRefresh('driver');
+            stopAutoRefresh('admin');
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            if (page === 'home') {
+                document.getElementById('homePage').classList.add('active');
+                return;
+            }
+            const target = document.getElementById(page + 'Page');
+            if (target) {
+                target.classList.add('active');
+                if (page === 'customer') initCustomer();
+                else if (page === 'restaurant') initRestaurant();
+                else if (page === 'driver') initDriver();
+                else if (page === 'admin') initAdmin();
             }
         }
 
-        function playDriverSound() {
-            const audio = document.getElementById('driverSound');
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(() => playDriverFallback());
-            } else {
-                playDriverFallback();
-            }
-        }
-
-        // أصوات احتياطية باستخدام Web Audio API (كما كانت سابقاً)
-        function playRestaurantFallback() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                [0, 0.2].forEach(delay => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.frequency.value = 600;
-                    osc.type = 'sine';
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime + delay);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
-                    osc.start(ctx.currentTime + delay);
-                    osc.stop(ctx.currentTime + delay + 0.3);
-                });
-            } catch (e) { /* ignore */ }
-        }
-
-        function playDriverFallback() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 1000;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.25);
-            } catch (e) { /* ignore */ }
-        }
-
-        // =================================================================
-        //  التحديث التلقائي (Auto Refresh)
-        // =================================================================
-        let refreshIntervals = {
-            customer: null,
-            restaurant: null,
-            driver: null,
-            admin: null
-        };
+        let refreshIntervals = { customer: null, restaurant: null, driver: null, admin: null };
 
         function stopAutoRefresh(page) {
             if (refreshIntervals[page]) {
                 clearInterval(refreshIntervals[page]);
                 refreshIntervals[page] = null;
-                console.log(`🛑 تم إيقاف التحديث التلقائي للصفحة: ${page}`);
             }
         }
 
         function startAutoRefresh(page, refreshFunction, intervalMs = 10000) {
             stopAutoRefresh(page);
-            refreshIntervals[page] = setInterval(() => {
-                console.log(`🔄 تحديث تلقائي للصفحة: ${page}`);
-                refreshFunction();
-            }, intervalMs);
-            console.log(`✅ بدأ التحديث التلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
-        }
-
-        function refreshAllData(page) {
-            switch (page) {
-                case 'restaurant':
-                    if (currentRestaurantUser) {
-                        displayRestaurantOrders();
-                        displayRestaurantStatusSections();
-                    }
-                    break;
-                case 'driver':
-                    if (currentDriverUser) {
-                        displayDriverOrders();
-                        displayDriverStatusSections();
-                        updateDriverStats();
-                    }
-                    break;
-                case 'admin':
-                    if (adminLoggedIn) {
-                        renderAdminUsers();
-                    }
-                    break;
-                case 'customer':
-                    refreshCustomerData();
-                    break;
-                default:
-                    break;
-            }
+            refreshIntervals[page] = setInterval(refreshFunction, intervalMs);
         }
 
         // =================================================================
-        //  العميل (Customer) - مع تحديث تلقائي
+        //  العميل (Customer)
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1507,31 +1411,14 @@
         let customerTrackingId = null;
 
         const customerRestaurants = [
-            { 
-                id: 1, 
-                name: 'مطعم اجعل لحد حوش', 
-                emoji: '🥩', 
-                cuisine: 'شاورما ومشاوي', 
-                category: 'shawarma', 
-                rating: 4.5,
-                menu: [
-                    { id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' },
-                    { id: 2, name: 'شاورما لحم', price: 18, desc: 'مع طحينة' },
-                    { id: 10, name: 'كباب', price: 25, desc: 'لحم مفروم مشوي' },
-                    { id: 11, name: 'شيش طاووق', price: 22, desc: 'دجاج متبل' },
-                    { id: 12, name: 'ريش مشوي', price: 30, desc: 'لحم غنم' },
-                    { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }
-                ] 
-            },
+            { id: 1, name: 'مطعم اجعل لحد حوش', emoji: '🥩', cuisine: 'شاورما ومشاوي', category: 'shawarma', rating: 4.5,
+                menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18, desc: 'مع طحينة' }, { id: 10, name: 'كباب', price: 25, desc: 'لحم مفروم مشوي' }, { id: 11, name: 'شيش طاووق', price: 22, desc: 'دجاج متبل' }, { id: 12, name: 'ريش مشوي', price: 30, desc: 'لحم غنم' }, { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }] },
             { id: 2, name: 'مطعم بيتزا', emoji: '🍕', cuisine: 'بيتزا وإيطالي', category: 'pizza', rating: 4.7,
-                menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28,
-                    desc: 'فلفل ومشروم' }] },
+                menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28, desc: 'فلفل ومشروم' }] },
             { id: 3, name: 'مطعم بروست', emoji: '🍗', cuisine: 'بروست ومقليات', category: 'broast', rating: 4.8,
-                menu: [{ id: 6, name: 'بروست دجاج', price: 35, desc: '8 قطع' }, { id: 7, name: 'أجنحة', price: 25,
-                    desc: '6 قطع' }] },
+                menu: [{ id: 6, name: 'بروست دجاج', price: 35, desc: '8 قطع' }, { id: 7, name: 'أجنحة', price: 25, desc: '6 قطع' }] },
             { id: 4, name: 'مطعم الشرق الأوسط', emoji: '🧆', cuisine: 'مأكولات عربية', category: 'arabic', rating: 4.6,
-                menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20,
-                    desc: 'مع لحم' }] }
+                menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20, desc: 'مع لحم' }] }
         ];
 
         function initCustomer() {
@@ -1551,13 +1438,10 @@
                     }
                 }).catch(() => {});
             }
-            // بدء التحديث التلقائي للعميل
             startAutoRefresh('customer', refreshCustomerData);
         }
 
-        // دالة تحديث بيانات العميل (تُستدعى كل 10 ثوانٍ)
         function refreshCustomerData() {
-            // تحديث التتبع إذا كان موجوداً
             if (customerTrackingId) {
                 getOrders().then(orders => {
                     const order = orders.find(o => o.id === customerTrackingId);
@@ -1580,13 +1464,13 @@
                             document.getElementById('customerDriverInfo').style.display = 'none';
                         }
                         if (['completed', 'cancelled'].includes(order.status)) {
-                            // إذا انتهى الطلب، يمكن إيقاف التحديث لكننا نتركه للمتابعة
+                            clearInterval(customerTrackingInterval);
+                            localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
+                            if (order.status === 'completed') showNotification(`🎉 طلب #${order.id} تم توصيله!`);
                         }
                     }
                 }).catch(() => {});
             }
-            // (اختياري) يمكن تحديث قائمة المطاعم إذا أردت
-            // displayCustomerRestaurants();
         }
 
         function displayCustomerRestaurants() {
@@ -1833,7 +1717,6 @@
             localStorage.setItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID, orderId);
             if (customerTrackingInterval) clearInterval(customerTrackingInterval);
             customerTrackingId = orderId;
-            // التحديث التلقائي الآن يُدار بواسطة refreshCustomerData المكرر، لكننا نبقي هذا المؤقت للتعامل مع حالات الانتهاء
             customerTrackingInterval = setInterval(async () => {
                 try {
                     const orders = await getOrders();
@@ -1905,19 +1788,20 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant)
+        //  المطعم (Restaurant) مع مقارنة الطلبات
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
         let restaurantDateFilter = null;
         let pendingPickupOrderId = null;
+        let lastRestaurantOrders = [];
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
             if (saved) {
                 currentRestaurantUser = saved;
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', () => refreshAllData('restaurant'));
+                startAutoRefresh('restaurant', refreshRestaurantViews);
             } else {
                 document.getElementById('restaurantLoginPage').style.display = 'flex';
                 document.getElementById('restaurantDashboard').style.display = 'none';
@@ -1957,7 +1841,7 @@
                 currentRestaurantUser = found;
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', () => refreshAllData('restaurant'));
+                startAutoRefresh('restaurant', refreshRestaurantViews);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -1967,8 +1851,8 @@
             document.getElementById('restaurantLoginPage').style.display = 'none';
             document.getElementById('restaurantDashboard').style.display = 'block';
             document.getElementById('restaurantBadge').textContent = `🍽️ ${currentRestaurantUser.displayName}`;
-            displayRestaurantOrders();
-            displayRestaurantStatusSections();
+            lastRestaurantOrders = [];
+            refreshRestaurantViews();
         }
 
         function logoutRestaurant() {
@@ -1978,6 +1862,34 @@
             document.getElementById('restaurantLoginPage').style.display = 'flex';
             document.getElementById('restaurantPassword').value = '';
             stopAutoRefresh('restaurant');
+        }
+
+        async function refreshRestaurantViews() {
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                // مقارنة الطلبات الجديدة (pending)
+                const newPending = myOrders.filter(o => o.status === 'pending');
+                const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
+                if (newPending.length > oldPending.length) {
+                    const lastNew = newPending[newPending.length - 1];
+                    playRestaurantSound();
+                    showNotification(`🔔 طلب جديد #${lastNew.id} من ${lastNew.customerName}!`, 'warning');
+                    if (Notification.permission === 'granted') {
+                        new Notification('طلب جديد', { body: `طلب #${lastNew.id} من ${lastNew.customerName}`, icon: '🍔' });
+                    }
+                }
+
+                lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
+
+                displayRestaurantOrders();
+                displayRestaurantStatusSections();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث المطعم:', e);
+            }
         }
 
         async function displayRestaurantOrders() {
@@ -2081,7 +1993,6 @@
             displayRestaurantOrders();
         }
 
-        // ---- عرض الأقسام الفرعية ----
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             try {
@@ -2375,10 +2286,31 @@
         }
 
         async function refreshRestaurantViews() {
-            const allOrders = await getOrders();
-            channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            displayRestaurantOrders();
-            displayRestaurantStatusSections();
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                // مقارنة الطلبات الجديدة (pending)
+                const newPending = myOrders.filter(o => o.status === 'pending');
+                const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
+                if (newPending.length > oldPending.length) {
+                    const lastNew = newPending[newPending.length - 1];
+                    playRestaurantSound();
+                    showNotification(`🔔 طلب جديد #${lastNew.id} من ${lastNew.customerName}!`, 'warning');
+                    if (Notification.permission === 'granted') {
+                        new Notification('طلب جديد', { body: `طلب #${lastNew.id} من ${lastNew.customerName}`, icon: '🍔' });
+                    }
+                }
+
+                lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
+
+                displayRestaurantOrders();
+                displayRestaurantStatusSections();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث المطعم:', e);
+            }
         }
 
         function showRestaurantNotifications() {
@@ -2386,7 +2318,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مع تفاصيل السعر وتغيير الحالة تلقائياً
+        //  الكابتن (Driver) مع مقارنة الطلبات وتغيير الحالة التلقائي
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2394,8 +2326,9 @@
         let driverOnline = true;
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
         let pendingVerifyOrderId = null;
+        let lastDriverOrders = [];
 
-        // ---- دالة مساعدة لتغيير حالة الكابتن ----
+        // دالة مساعدة لتغيير حالة الكابتن
         function setDriverStatus(online) {
             if (!currentDriverUser) return;
             driverOnline = online;
@@ -2413,7 +2346,7 @@
             if (saved) {
                 currentDriverUser = saved;
                 showDriverDashboard();
-                startAutoRefresh('driver', () => refreshAllData('driver'));
+                startAutoRefresh('driver', refreshDriverViews);
             } else {
                 document.getElementById('driverLoginPage').style.display = 'flex';
                 document.getElementById('driverDashboard').style.display = 'none';
@@ -2455,7 +2388,7 @@
                 const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
-                startAutoRefresh('driver', () => refreshAllData('driver'));
+                startAutoRefresh('driver', refreshDriverViews);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2465,12 +2398,11 @@
             document.getElementById('driverLoginPage').style.display = 'none';
             document.getElementById('driverDashboard').style.display = 'block';
             document.getElementById('driverBadge').textContent = `🚗 ${currentDriverUser.displayName}`;
-            displayDriverOrders();
-            displayDriverStatusSections();
-            updateDriverStats();
             const savedStatus = JSON.parse(localStorage.getItem(`driver_online_${currentDriverUser.username}`) || 'true');
             driverOnline = savedStatus;
             updateDriverStatusUI();
+            lastDriverOrders = [];
+            refreshDriverViews();
         }
 
         function logoutDriver() {
@@ -2485,25 +2417,36 @@
             stopAutoRefresh('driver');
         }
 
-        function filterDriverOrdersByDate() {
-            const dateInput = document.getElementById('driverDateFilter');
-            if (dateInput.value) {
-                driverDateFilter = new Date(dateInput.value);
+        async function refreshDriverViews() {
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                // مقارنة الطلبات الجاهزة للاستلام
+                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup');
+                const oldReady = lastDriverOrders.filter(o => o.status === 'ready_for_pickup');
+                if (newReady.length > oldReady.length) {
+                    const lastNew = newReady[newReady.length - 1];
+                    playDriverSound();
+                    showNotification(`📢 طلب جاهز للاستلام #${lastNew.id} من ${lastNew.restaurantName}`, 'success');
+                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${lastNew.id} من ${lastNew.restaurantName}`);
+                }
+
+                lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
+
                 displayDriverOrders();
                 displayDriverStatusSections();
-            } else {
-                clearDriverDateFilter();
+                updateDriverStats();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث الكابتن:', e);
             }
         }
 
-        function clearDriverDateFilter() {
-            driverDateFilter = null;
-            document.getElementById('driverDateFilter').value = '';
-            displayDriverOrders();
-            displayDriverStatusSections();
-        }
-
-        // ---- عرض الطلبات مع تفاصيل السعر ----
         async function displayDriverOrders() {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
@@ -2586,7 +2529,6 @@
             }
         }
 
-        // ---- عرض الأقسام الفرعية مع تفاصيل السعر ----
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
             try {
@@ -2859,11 +2801,32 @@
         }
 
         async function refreshDriverViews() {
-            const allOrders = await getOrders();
-            channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            displayDriverOrders();
-            displayDriverStatusSections();
-            updateDriverStats();
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup');
+                const oldReady = lastDriverOrders.filter(o => o.status === 'ready_for_pickup');
+                if (newReady.length > oldReady.length) {
+                    const lastNew = newReady[newReady.length - 1];
+                    playDriverSound();
+                    showNotification(`📢 طلب جاهز للاستلام #${lastNew.id} من ${lastNew.restaurantName}`, 'success');
+                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${lastNew.id} من ${lastNew.restaurantName}`);
+                }
+
+                lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
+
+                displayDriverOrders();
+                displayDriverStatusSections();
+                updateDriverStats();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث الكابتن:', e);
+            }
         }
 
         function filterDriverOrders(filter) {
@@ -2968,7 +2931,7 @@
             document.getElementById('adminLoginPage').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
             renderAdminUsers();
-            startAutoRefresh('admin', () => refreshAllData('admin'));
+            startAutoRefresh('admin', renderAdminUsers);
         }
 
         async function renderAdminUsers() {
@@ -3105,75 +3068,54 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات
+        //  الاستماع للتحديثات (BroadcastChannel) للمزامنة الفورية بين علامات التبويب
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
-                const order = event.data.order;
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
-                    if (currentRestaurantUser.displayName === order.restaurantName) {
-                        playRestaurantSound(); // تشغيل صوت المطعم
-                        showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
-                        refreshRestaurantViews();
-                    }
+                    refreshRestaurantViews();
                 }
             }
-
             if (event.data.type === 'NEW_READY_ORDER') {
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
-                    const order = event.data.order;
-                    playDriverSound(); // تشغيل صوت الكابتن
-                    showNotification(`📢 طلب جاهز للاستلام #${order.id} من ${order.restaurantName}`, 'success');
-                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
-                    displayDriverOrders();
-                    displayDriverStatusSections();
+                    refreshDriverViews();
                 }
             }
-
-            if (event.data.type === 'ORDER_REJECTED') {
-                const order = event.data.order;
-                if (document.getElementById('customerPage').classList.contains('active')) {
-                    showNotification(`⚠️ تم رفض طلبك #${order.id} من قبل المطعم`, 'error');
-                    if (customerTrackingId == order.id) {
-                        showCustomerTracking(order.id);
-                        updateCustomerTrackingSteps('cancelled');
-                    }
-                }
-            }
-
             if (event.data.type === 'ORDERS_UPDATED') {
-                if (document.getElementById('customerPage').classList.contains('active')) {
-                    if (customerTrackingId) {
-                        const order = event.data.orders.find(o => o.id === customerTrackingId);
-                        if (order) {
-                            updateCustomerTrackingSteps(order.status);
-                            document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
-                            if (order.driverAssigned && order.status !== 'cancelled') {
-                                document.getElementById('customerDriverInfo').style.display = 'block';
-                                document.getElementById('cDriverName').textContent = order.driverName || '-';
-                                document.getElementById('cDriverPhone').textContent = order.driverPhone || '-';
-                                document.getElementById('cEstimatedTime').textContent = order.estimatedDeliveryTime ||
-                                    '15 دقيقة';
-                            } else {
-                                document.getElementById('customerDriverInfo').style.display = 'none';
-                            }
-                        }
-                    }
-                }
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
-                    displayRestaurantOrders();
-                    displayRestaurantStatusSections();
+                    refreshRestaurantViews();
                 }
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
-                    displayDriverOrders();
-                    displayDriverStatusSections();
+                    refreshDriverViews();
+                }
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    refreshCustomerData();
                 }
             }
         };
 
         // =================================================================
-        //  التهيئة
+        //  التحقق من الخادم والتهيئة
         // =================================================================
+        async function checkServer() {
+            const statusEl = document.getElementById('serverStatus');
+            try {
+                await getOrders();
+                statusEl.textContent = '✅ الخادم متصل وجاهز';
+                statusEl.className = 'server-status';
+            } catch (e) {
+                statusEl.textContent = '❌ لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم (node server.js)';
+                statusEl.className = 'server-status error';
+                console.error('❌ خطأ في الاتصال بالخادم:', e);
+            }
+        }
+
+        // تفعيل السياق الصوتي عند أول نقرة في الصفحة
+        document.addEventListener('click', () => {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+        }, { once: true });
+
         checkServer();
         navigateTo('home');
 

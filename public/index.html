@@ -658,7 +658,7 @@
             border-radius: 15px;
             padding: 1rem 1.5rem;
             margin: 1rem 5%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         .status-section h3 {
             margin-bottom: 1rem;
@@ -903,7 +903,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة المطعم - تم نقل فلتر التاريخ إلى أسفل الإحصائيات
+    صفحة المطعم - مع مودال الطلب الجديد
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -914,6 +914,19 @@
                 </button>
                 <button class="btn btn-primary" onclick="showRestaurantNotifications()">🔔 <span id="restaurantNotifBadge" style="background:red;color:white;border-radius:50%;padding:0 8px;">0</span></button>
                 <button class="logout-btn" onclick="logoutRestaurant()">تسجيل خروج</button>
+            </div>
+        </div>
+
+        <!-- مودال الطلب الجديد للمطعم -->
+        <div class="modal" id="restaurantNewOrderModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeRestaurantNewOrderModal()">&times;</button>
+                <h2>🆕 طلب جديد!</h2>
+                <div id="restaurantNewOrderDetails"></div>
+                <div style="display:flex;gap:1rem;margin-top:1rem;">
+                    <button class="btn btn-success" id="restaurantNewOrderAcceptBtn" onclick="acceptNewOrder()">قبول ✅</button>
+                    <button class="btn btn-danger" id="restaurantNewOrderRejectBtn" onclick="rejectNewOrder()">رفض ❌</button>
+                </div>
             </div>
         </div>
 
@@ -935,8 +948,6 @@
         </div>
 
         <div class="orders-section">
-            <!-- تم حذف فلتر التاريخ من هنا ونقله إلى الأسفل -->
-
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
@@ -952,7 +963,6 @@
 
             <div class="orders-grid" id="restaurantOrdersGrid"></div>
 
-            <!-- الإحصائيات (أسفل الجدول) -->
             <div class="stats-container" id="restaurantStats">
                 <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
                 <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
@@ -962,7 +972,6 @@
                 <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
             </div>
 
-            <!-- فلتر التاريخ (نُقل إلى أسفل الإحصائيات) -->
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
                 <input type="date" id="restaurantDateFilter" onchange="filterRestaurantOrdersByDate()" style="padding:0.4rem;border-radius:8px;border:1px solid #ddd;">
@@ -987,7 +996,6 @@
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
 
-        <!-- مودال تأكيد استلام الكابتن -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantPickupModal()">&times;</button>
@@ -1006,7 +1014,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن
+    صفحة الكابتن - مع مودال الطلب الجاهز
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1018,6 +1026,16 @@
                 <button class="btn btn-success" id="driverStatusBtn" onclick="toggleDriverStatus()">🟢 متصل</button>
                 <button class="btn btn-info" onclick="requestNotificationPermission()">🔔 تفعيل الإشعارات</button>
                 <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
+            </div>
+        </div>
+
+        <!-- مودال الطلب الجاهز للكابتن -->
+        <div class="modal" id="driverNewReadyModal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeDriverNewReadyModal()">&times;</button>
+                <h2>📦 طلب جاهز للاستلام!</h2>
+                <div id="driverNewReadyDetails"></div>
+                <button class="btn btn-success" id="driverNewReadyPickupBtn" onclick="pickupNewReadyOrder()" style="width:100%;margin-top:1rem;">استلام 📦</button>
             </div>
         </div>
 
@@ -1059,7 +1077,6 @@
 
             <div class="orders-grid" id="driverOrdersGrid"></div>
 
-            <!-- إحصائيات الكابتن (أسفل الجدول) -->
             <div class="stats-container" id="driverStats">
                 <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
                 <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
@@ -1070,7 +1087,6 @@
             </div>
         </div>
 
-        <!-- نافذة إدخال رمز التحقق -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverVerifyModal()">&times;</button>
@@ -1371,7 +1387,7 @@
             }
         }
 
-        function startAutoRefresh(page, refreshFunction, intervalMs = 5000) {
+        function startAutoRefresh(page, refreshFunction, intervalMs = 3000) { // تم التغيير إلى 3 ثوانٍ
             stopAutoRefresh(page);
             refreshIntervals[page] = setInterval(() => {
                 console.log(`🔄 تحديث تلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
@@ -1417,7 +1433,7 @@
                     }
                 }).catch(() => {});
             }
-            startAutoRefresh('customer', refreshCustomerData, 5000);
+            startAutoRefresh('customer', refreshCustomerData, 3000);
         }
 
         function refreshCustomerData() {
@@ -1445,7 +1461,6 @@
                         if (['completed', 'cancelled'].includes(order.status)) {
                             clearInterval(customerTrackingInterval);
                             localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
-                            // تم إزالة إشعار التوصيل بناءً على طلب المستخدم
                         }
                     }
                 }).catch(() => {});
@@ -1721,7 +1736,6 @@
                     if (['completed', 'cancelled'].includes(order.status)) {
                         clearInterval(customerTrackingInterval);
                         localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
-                        // تم إزالة إشعار التوصيل بناءً على طلب المستخدم
                     }
                 } catch (e) { /* ignore */ }
             }, 3000);
@@ -1767,20 +1781,23 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant)
+        //  المطعم (Restaurant) - مع مودال الطلب الجديد
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
         let restaurantDateFilter = null;
         let pendingPickupOrderId = null;
         let lastRestaurantOrders = [];
+        // لإدارة الطلبات الجديدة التي تم عرضها في المودال
+        let displayedNewOrderIds = new Set();
+        let pendingNewOrderId = null;
 
         function initRestaurant() {
             const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
             if (saved) {
                 currentRestaurantUser = saved;
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', refreshRestaurantViews, 5000);
+                startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
             } else {
                 document.getElementById('restaurantLoginPage').style.display = 'flex';
                 document.getElementById('restaurantDashboard').style.display = 'none';
@@ -1820,7 +1837,7 @@
                 currentRestaurantUser = found;
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', refreshRestaurantViews, 5000);
+                startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -1841,6 +1858,48 @@
             document.getElementById('restaurantLoginPage').style.display = 'flex';
             document.getElementById('restaurantPassword').value = '';
             stopAutoRefresh('restaurant');
+            displayedNewOrderIds.clear();
+        }
+
+        // عرض الطلب الجديد في مودال
+        function showNewOrderModal(order) {
+            if (displayedNewOrderIds.has(order.id)) return;
+            displayedNewOrderIds.add(order.id);
+            pendingNewOrderId = order.id;
+            const details = document.getElementById('restaurantNewOrderDetails');
+            details.innerHTML = `
+                <p><strong>طلب #${order.id}</strong></p>
+                <p>العميل: ${order.customerName}</p>
+                <p>الهاتف: ${order.phone}</p>
+                <p>العنوان: ${order.address}</p>
+                <p>المطعم: ${order.restaurantName}</p>
+                <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                <p>المجموع: ${order.total} شيكل</p>
+            `;
+            document.getElementById('restaurantNewOrderModal').style.display = 'block';
+            // تشغيل صوت
+            playRestaurantSound();
+            // إشعار سطح المكتب
+            sendDesktopNotification('🆕 طلب جديد', `طلب #${order.id} من ${order.customerName}`);
+        }
+
+        function closeRestaurantNewOrderModal() {
+            document.getElementById('restaurantNewOrderModal').style.display = 'none';
+            pendingNewOrderId = null;
+        }
+
+        function acceptNewOrder() {
+            if (pendingNewOrderId) {
+                restaurantAccept(pendingNewOrderId);
+                closeRestaurantNewOrderModal();
+            }
+        }
+
+        function rejectNewOrder() {
+            if (pendingNewOrderId) {
+                restaurantReject(pendingNewOrderId);
+                closeRestaurantNewOrderModal();
+            }
         }
 
         async function refreshRestaurantViews() {
@@ -1849,19 +1908,16 @@
                 const allOrders = await getOrders();
                 const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                const newPending = myOrders.filter(o => o.status === 'pending');
-                const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
-                if (newPending.length > oldPending.length) {
+                // التحقق من الطلبات الجديدة (pending) التي لم تُعرض بعد
+                const newPending = myOrders.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
+                if (newPending.length > 0) {
+                    // عرض أحدث طلب (أو كلهم، لكننا نعرض واحداً تلو الآخر)
                     const lastNew = newPending[newPending.length - 1];
-                    playRestaurantSound();
-                    showNotification(`🔔 طلب جديد #${lastNew.id} من ${lastNew.customerName}!`, 'warning');
-                    if (Notification.permission === 'granted') {
-                        new Notification('طلب جديد', { body: `طلب #${lastNew.id} من ${lastNew.customerName}`, icon: '🍔' });
-                    }
+                    showNewOrderModal(lastNew);
                 }
 
+                // تحديث الإحصائيات وعرض القوائم
                 lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
-
                 displayRestaurantOrders();
                 displayRestaurantStatusSections();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -2263,39 +2319,12 @@
             }
         }
 
-        async function refreshRestaurantViews() {
-            if (!currentRestaurantUser) return;
-            try {
-                const allOrders = await getOrders();
-                const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
-
-                const newPending = myOrders.filter(o => o.status === 'pending');
-                const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
-                if (newPending.length > oldPending.length) {
-                    const lastNew = newPending[newPending.length - 1];
-                    playRestaurantSound();
-                    showNotification(`🔔 طلب جديد #${lastNew.id} من ${lastNew.customerName}!`, 'warning');
-                    if (Notification.permission === 'granted') {
-                        new Notification('طلب جديد', { body: `طلب #${lastNew.id} من ${lastNew.customerName}`, icon: '🍔' });
-                    }
-                }
-
-                lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
-
-                displayRestaurantOrders();
-                displayRestaurantStatusSections();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            } catch (e) {
-                console.error('خطأ في تحديث المطعم:', e);
-            }
-        }
-
         function showRestaurantNotifications() {
             showNotification('🔔 تحقق من الطلبات الجديدة في اللوحة');
         }
 
         // =================================================================
-        //  الكابتن (Driver)
+        //  الكابتن (Driver) - مع مودال الطلب الجاهز
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2304,6 +2333,9 @@
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
         let pendingVerifyOrderId = null;
         let lastDriverOrders = [];
+        // لإدارة الطلبات الجاهزة التي تم عرضها في المودال
+        let displayedReadyOrderIds = new Set();
+        let pendingReadyOrderId = null;
 
         function setDriverStatus(online) {
             if (!currentDriverUser) return;
@@ -2322,7 +2354,7 @@
             if (saved) {
                 currentDriverUser = saved;
                 showDriverDashboard();
-                startAutoRefresh('driver', refreshDriverViews, 5000);
+                startAutoRefresh('driver', refreshDriverViews, 3000);
             } else {
                 document.getElementById('driverLoginPage').style.display = 'flex';
                 document.getElementById('driverDashboard').style.display = 'none';
@@ -2364,7 +2396,7 @@
                 const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
-                startAutoRefresh('driver', refreshDriverViews, 5000);
+                startAutoRefresh('driver', refreshDriverViews, 3000);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2391,6 +2423,42 @@
             document.getElementById('driverLoginPage').style.display = 'flex';
             document.getElementById('driverPassword').value = '';
             stopAutoRefresh('driver');
+            displayedReadyOrderIds.clear();
+        }
+
+        // عرض الطلب الجاهز في مودال
+        function showNewReadyOrderModal(order) {
+            if (displayedReadyOrderIds.has(order.id)) return;
+            displayedReadyOrderIds.add(order.id);
+            pendingReadyOrderId = order.id;
+            const details = document.getElementById('driverNewReadyDetails');
+            details.innerHTML = `
+                <p><strong>طلب #${order.id}</strong></p>
+                <p>العميل: ${order.customerName}</p>
+                <p>الهاتف: ${order.phone}</p>
+                <p>العنوان: ${order.address}</p>
+                <p>المطعم: ${order.restaurantName}</p>
+                <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                <p>المجموع: ${order.total} شيكل</p>
+                <p>رسوم التوصيل: ${order.deliveryFee || CONFIG.DELIVERY_FEE} شيكل</p>
+            `;
+            document.getElementById('driverNewReadyModal').style.display = 'block';
+            // تشغيل صوت
+            playDriverSound();
+            // إشعار سطح المكتب
+            sendDesktopNotification('📦 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
+        }
+
+        function closeDriverNewReadyModal() {
+            document.getElementById('driverNewReadyModal').style.display = 'none';
+            pendingReadyOrderId = null;
+        }
+
+        function pickupNewReadyOrder() {
+            if (pendingReadyOrderId) {
+                driverPickupFromRestaurant(pendingReadyOrderId);
+                closeDriverNewReadyModal();
+            }
         }
 
         async function refreshDriverViews() {
@@ -2402,17 +2470,14 @@
                     return o.driverId === currentDriverUser.username;
                 });
 
-                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup');
-                const oldReady = lastDriverOrders.filter(o => o.status === 'ready_for_pickup');
-                if (newReady.length > oldReady.length) {
+                // التحقق من الطلبات الجاهزة الجديدة التي لم تُعرض بعد
+                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
+                if (newReady.length > 0 && driverOnline) {
                     const lastNew = newReady[newReady.length - 1];
-                    playDriverSound();
-                    showNotification(`📢 طلب جاهز للاستلام #${lastNew.id} من ${lastNew.restaurantName}`, 'success');
-                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${lastNew.id} من ${lastNew.restaurantName}`);
+                    showNewReadyOrderModal(lastNew);
                 }
 
                 lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
-
                 displayDriverOrders();
                 displayDriverStatusSections();
                 updateDriverStats();
@@ -2769,35 +2834,6 @@
             }
         }
 
-        async function refreshDriverViews() {
-            if (!currentDriverUser) return;
-            try {
-                const allOrders = await getOrders();
-                const myOrders = allOrders.filter(o => {
-                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
-                    return o.driverId === currentDriverUser.username;
-                });
-
-                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup');
-                const oldReady = lastDriverOrders.filter(o => o.status === 'ready_for_pickup');
-                if (newReady.length > oldReady.length) {
-                    const lastNew = newReady[newReady.length - 1];
-                    playDriverSound();
-                    showNotification(`📢 طلب جاهز للاستلام #${lastNew.id} من ${lastNew.restaurantName}`, 'success');
-                    sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${lastNew.id} من ${lastNew.restaurantName}`);
-                }
-
-                lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
-
-                displayDriverOrders();
-                displayDriverStatusSections();
-                updateDriverStats();
-                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
-            } catch (e) {
-                console.error('خطأ في تحديث الكابتن:', e);
-            }
-        }
-
         function filterDriverOrders(filter) {
             driverFilter = filter;
             document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
@@ -2900,7 +2936,7 @@
             document.getElementById('adminLoginPage').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
             renderAdminUsers();
-            startAutoRefresh('admin', renderAdminUsers, 5000);
+            startAutoRefresh('admin', renderAdminUsers, 3000);
         }
 
         async function renderAdminUsers() {
@@ -3041,13 +3077,23 @@
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
+                // عند استلام طلب جديد، إذا كانت صفحة المطعم مفتوحة، نعرض المودال فوراً
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
-                    refreshRestaurantViews();
+                    const order = event.data.order;
+                    if (order.restaurantName === currentRestaurantUser.displayName) {
+                        showNewOrderModal(order);
+                        refreshRestaurantViews();
+                    }
                 }
             }
             if (event.data.type === 'NEW_READY_ORDER') {
-                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
-                    refreshDriverViews();
+                // عند استلام طلب جاهز، إذا كانت صفحة الكابتن مفتوحة والمستخدم متصل، نعرض المودال فوراً
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser && driverOnline) {
+                    const order = event.data.order;
+                    if (!order.driverId || order.driverId === currentDriverUser.username) {
+                        showNewReadyOrderModal(order);
+                        refreshDriverViews();
+                    }
                 }
             }
             if (event.data.type === 'ORDER_REJECTED') {
@@ -3061,6 +3107,7 @@
                 }
             }
             if (event.data.type === 'ORDERS_UPDATED') {
+                // تحديث تلقائي للصفحات المفتوحة
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     refreshRestaurantViews();
                 }
@@ -3100,7 +3147,8 @@
         console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
-        console.log('🔄 التحديث التلقائي يعمل كل 5 ثوانٍ في صفحات المطعم والكابتن والأدمن');
+        console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
+        console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
     </script>
 </body>
 </html>

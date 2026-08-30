@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
+        /* ============================================================
+           الأنماط العامة
+           ============================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +26,10 @@
         .page.active {
             display: block;
         }
+
+        /* ============================================================
+           الأزرار
+           ============================================================ */
         .btn {
             padding: 0.5rem 1.5rem;
             border: none;
@@ -93,7 +100,7 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 0.95rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.4rem;
             transition: 0.3s;
@@ -107,46 +114,48 @@
             display: inline-block;
         }
 
+        /* ============================================================
+           الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
+           ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            display: block;           /* ليست flex */
+            padding: 40px 20px;       /* مسافة حول الحاوية */
+            text-align: center;       /* توسيط النصوص */
         }
         #homePage .container {
-            max-width: 800px;
+            max-width: 600px;          /* عرض أصغر */
             width: 100%;
             background: white;
             border-radius: 20px;
-            padding: 40px;
+            padding: 20px;            /* حشوة أقل */
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin: 0 auto;           /* توسيط أفقي */
             text-align: center;
         }
         #homePage h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;          /* خط أصغر */
             color: #2d3436;
             margin-bottom: 10px;
         }
         .live-badge {
             background: #00b894;
             color: white;
-            padding: 5px 20px;
+            padding: 4px 15px;
             border-radius: 30px;
             display: inline-block;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .apps-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
         }
         .app-card {
             background: #f8f9fa;
             border-radius: 15px;
-            padding: 25px 10px;
+            padding: 15px 8px;
             text-align: center;
             transition: 0.3s;
             cursor: pointer;
@@ -160,12 +169,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         .app-card .icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 2.2rem;
+            margin-bottom: 6px;
         }
         .app-card .title {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         .app-card.customer {
             border-color: #ff6b35;
@@ -179,15 +188,18 @@
         .server-status {
             background: #e8f5e9;
             border-radius: 10px;
-            padding: 10px;
-            margin: 15px 0;
+            padding: 8px;
+            margin: 10px 0;
             color: #2e7d32;
             font-weight: bold;
+            font-size: 0.9rem;
         }
         .server-status.error {
             background: #ffebee;
             color: #c62828;
         }
+
+        /* زر الأدمن المصغر (أصغر) */
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -197,9 +209,9 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             cursor: pointer;
             transition: 0.3s;
@@ -212,6 +224,9 @@
             background: #5a4bd1;
         }
 
+        /* ============================================================
+           باقي الأنماط (العميل، المطعم، الكابتن، الأدمن)
+           ============================================================ */
         .login-page {
             display: flex;
             justify-content: center;
@@ -277,6 +292,7 @@
             display: none;
         }
 
+        /* الهيدر */
         .header-bar {
             background: white;
             padding: 1rem 5%;
@@ -326,6 +342,7 @@
             background: #ee5a24;
         }
 
+        /* الإحصائيات */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -352,6 +369,7 @@
             font-size: 0.8rem;
         }
 
+        /* الطلبات */
         .orders-section {
             padding: 1rem 5% 2rem;
         }
@@ -425,7 +443,6 @@
             opacity: 0.8;
             background: #fff5f5;
         }
-
         .order-header {
             display: flex;
             justify-content: space-between;
@@ -528,6 +545,7 @@
             color: #ff4757;
         }
 
+        /* التتبع */
         .tracking-steps {
             display: flex;
             justify-content: space-between;
@@ -581,17 +599,12 @@
             color: #ff4757;
         }
         @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 165, 2, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 165, 2, 0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 165, 2, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
         }
 
+        /* النوافذ المنبثقة */
         .modal {
             display: none;
             position: fixed;
@@ -626,6 +639,7 @@
             color: #ff6b35;
         }
 
+        /* الإشعارات */
         .notification {
             position: fixed;
             top: 20px;
@@ -648,16 +662,11 @@
             background: #ffa502;
         }
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
+        /* جداول الأدمن */
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
@@ -677,6 +686,7 @@
             font-size: 0.8rem;
         }
 
+        /* الأقسام الخاصة بالحالات */
         .status-section {
             background: white;
             border-radius: 15px;
@@ -720,7 +730,6 @@
             padding: 0.2rem 0.8rem;
             font-size: 0.8rem;
         }
-
         .verification-code {
             background: #f1f1f1;
             padding: 0.5rem 1rem;
@@ -733,6 +742,9 @@
             margin: 0.5rem 0;
         }
 
+        /* ============================================================
+           التجاوب
+           ============================================================ */
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -761,8 +773,8 @@
                 grid-template-columns: 1fr;
             }
             .admin-mini-btn {
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
                 font-size: 1.2rem;
                 bottom: 15px;
                 left: 15px;
@@ -788,7 +800,7 @@
 <body>
 
     <!-- ============================================================
-    الصفحة الرئيسية
+    الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
     ============================================================ -->
     <div id="homePage" class="page active">
         <div class="container">
@@ -816,7 +828,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    شاشة العميل
+    صفحة العميل
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -929,7 +941,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة المطعم
+    صفحة المطعم
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -1005,7 +1017,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الكابتن
+    صفحة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1100,7 +1112,7 @@
     </div>
 
     <!-- ============================================================
-    شاشة الأدمن
+    صفحة الأدمن
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1156,7 +1168,7 @@
     </div>
 
     <!-- ============================================================
-    JavaScript
+    الجافاسكريبت الكامل
     ============================================================ -->
     <script>
         // =================================================================
@@ -1263,25 +1275,16 @@
         }
 
         // =================================================================
-        //  التنقل - مع إخفاء home page بشكل كامل عند الانتقال إلى أي صفحة أخرى
+        //  التنقل
         // =================================================================
         function navigateTo(page) {
-            // إزالة active عن جميع الصفحات
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-
             if (page === 'home') {
-                // إظهار home page فقط
                 document.getElementById('homePage').classList.add('active');
                 return;
             }
-
-            // إخفاء home page بشكل صريح (في حال وجود أي تداخل)
             const homePage = document.getElementById('homePage');
-            if (homePage) {
-                homePage.classList.remove('active');
-            }
-
-            // إظهار الصفحة المطلوبة
+            if (homePage) homePage.classList.remove('active');
             const target = document.getElementById(page + 'Page');
             if (target) {
                 target.classList.add('active');
@@ -1303,9 +1306,6 @@
             setTimeout(() => div.remove(), 4000);
         }
 
-        // =================================================================
-        //  Notification API
-        // =================================================================
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
                 showNotification('⚠️ متصفحك لا يدعم إشعارات سطح المكتب', 'warning');

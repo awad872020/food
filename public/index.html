@@ -6,7 +6,7 @@
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ============================================================
-           الأنماط العامة
+           الأنماط العامة (نفسها كما هي)
            ============================================================ */
         * {
             margin: 0;
@@ -26,10 +26,6 @@
         .page.active {
             display: block;
         }
-
-        /* ============================================================
-           الأزرار
-           ============================================================ */
         .btn {
             padding: 0.5rem 1.5rem;
             border: none;
@@ -90,7 +86,6 @@
         .btn-light:hover {
             background: #e2e6ea;
         }
-
         .back-home-btn {
             background: #6c5ce7;
             color: white;
@@ -113,10 +108,6 @@
             font-size: 1.2rem;
             display: inline-block;
         }
-
-        /* ============================================================
-           الصفحة الرئيسية
-           ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px 20px;
@@ -197,7 +188,6 @@
             background: #ffebee;
             color: #c62828;
         }
-
         .admin-mini-btn {
             position: fixed;
             bottom: 20px;
@@ -221,10 +211,6 @@
             transform: scale(1.1);
             background: #5a4bd1;
         }
-
-        /* ============================================================
-           باقي الأنماط
-           ============================================================ */
         .login-page {
             display: flex;
             justify-content: center;
@@ -289,7 +275,6 @@
             font-size: 0.9rem;
             display: none;
         }
-
         .header-bar {
             background: white;
             padding: 1rem 5%;
@@ -338,7 +323,6 @@
         .logout-btn:hover {
             background: #ee5a24;
         }
-
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -364,7 +348,6 @@
             color: #636e72;
             font-size: 0.8rem;
         }
-
         .orders-section {
             padding: 1rem 5% 2rem;
         }
@@ -398,7 +381,6 @@
             background: #ff6b35;
             color: white;
         }
-
         .orders-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -503,7 +485,6 @@
             font-size: 0.9rem;
             padding: 0.4rem 0.8rem;
         }
-
         .status-badge {
             display: inline-block;
             padding: 0.2rem 0.8rem;
@@ -539,7 +520,6 @@
             background: #ffebee;
             color: #ff4757;
         }
-
         .tracking-steps {
             display: flex;
             justify-content: space-between;
@@ -597,7 +577,6 @@
             70% { box-shadow: 0 0 0 10px rgba(255, 165, 2, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 165, 2, 0); }
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -631,7 +610,6 @@
         .close-modal:hover {
             color: #ff6b35;
         }
-
         .notification {
             position: fixed;
             top: 20px;
@@ -657,7 +635,6 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
@@ -676,7 +653,6 @@
             padding: 0.2rem 0.6rem;
             font-size: 0.8rem;
         }
-
         .status-section {
             background: white;
             border-radius: 15px;
@@ -740,7 +716,6 @@
             display: inline-block;
             margin: 0.5rem 0;
         }
-
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -823,7 +798,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل
+    صفحة العميل (نفسها)
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -837,7 +812,6 @@
                 <button class="btn btn-primary" onclick="showCustomerLogin()">👤 حسابي</button>
             </div>
         </div>
-
         <div style="padding:1rem 5%;display:flex;gap:1rem;flex-wrap:wrap;background:linear-gradient(135deg,#ff6b35,#ff9f1c);">
             <div style="flex:1;display:flex;background:white;border-radius:30px;padding:0.2rem 1rem;">
                 <input type="text" id="customerSearch" placeholder="ابحث عن مطعم..." onkeyup="filterCustomerRestaurants()" style="flex:1;border:none;outline:none;padding:0.5rem;">
@@ -845,7 +819,6 @@
             </div>
             <button class="btn btn-light" onclick="getCustomerLocation()" style="background:white;border:none;border-radius:30px;padding:0.3rem 1.2rem;">📍 <span id="customerLocationText">أذنا</span></button>
         </div>
-
         <div style="padding:1rem 5%;overflow-x:auto;white-space:nowrap;">
             <div style="display:inline-flex;gap:0.8rem;" id="customerCategories">
                 <button class="btn btn-primary active" data-cat="all" onclick="filterCustomerCategory('all',this)">🍽️ الكل</button>
@@ -855,12 +828,10 @@
                 <button class="btn btn-outline" data-cat="arabic" onclick="filterCustomerCategory('arabic',this)">🧆 عربي</button>
             </div>
         </div>
-
         <div class="orders-section">
             <h2 style="margin-bottom:1.5rem;">المطاعم المتاحة</h2>
             <div class="orders-grid" id="customerRestaurantsGrid"></div>
         </div>
-
         <div id="customerTracking" style="display:none;padding:1.5rem 5%;background:white;margin:1rem 5%;border-radius:15px;">
             <h2>📍 تتبع طلبك</h2>
             <p>طلب رقم: <span id="trackingOrderId">#1001</span></p>
@@ -883,7 +854,6 @@
                 <p>الوقت المتوقع: <span id="cEstimatedTime">-</span></p>
             </div>
         </div>
-
         <div class="modal" id="customerCartModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="toggleCustomerCart()">&times;</button>
@@ -893,7 +863,6 @@
                 <button class="btn btn-success" onclick="customerCheckout()" style="width:100%;margin-top:1rem;">إتمام الطلب</button>
             </div>
         </div>
-
         <div class="modal" id="customerLoginModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerLogin()">&times;</button>
@@ -906,7 +875,6 @@
                 </form>
             </div>
         </div>
-
         <div class="modal" id="customerCheckoutModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerCheckout()">&times;</button>
@@ -925,7 +893,6 @@
                 </form>
             </div>
         </div>
-
         <div class="modal" id="customerOrdersModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeCustomerOrders()">&times;</button>
@@ -949,7 +916,6 @@
                 <button class="logout-btn" onclick="logoutRestaurant()">تسجيل خروج</button>
             </div>
         </div>
-
         <div class="stats-container" id="restaurantStats">
             <div class="stat-card"><div class="icon">📋</div><div class="value" id="rTotalOrders">0</div><div class="label">إجمالي</div></div>
             <div class="stat-card"><div class="icon">⏳</div><div class="value" id="rPendingOrders">0</div><div class="label">جديدة</div></div>
@@ -958,7 +924,6 @@
             <div class="stat-card"><div class="icon">✅</div><div class="value" id="rCompletedOrders">0</div><div class="label">مكتملة</div></div>
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="rRevenue">0</div><div class="label">إيرادات</div></div>
         </div>
-
         <div id="restaurantPreparingSection" class="status-section" style="display:none;">
             <h3>👨‍🍳 الطلبات قيد التحضير</h3>
             <div class="mini-grid" id="restaurantPreparingGrid"></div>
@@ -975,7 +940,6 @@
             <h3>🛵 الطلبات قيد التوصيل</h3>
             <div class="mini-grid" id="restaurantDeliveringGrid"></div>
         </div>
-
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -983,7 +947,6 @@
                 <button class="btn btn-primary" onclick="filterRestaurantOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearRestaurantDateFilter()">إلغاء التصفية</button>
             </div>
-
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="restaurantFilters">
@@ -998,7 +961,6 @@
             </div>
             <div class="orders-grid" id="restaurantOrdersGrid"></div>
         </div>
-
         <div id="restaurantLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🍽️</div>
@@ -1014,7 +976,6 @@
             </div>
         </div>
         <div id="restaurantDashboard" style="display:none;"></div>
-
         <!-- مودال تأكيد استلام الكابتن -->
         <div class="modal" id="restaurantPickupModal">
             <div class="modal-content">
@@ -1048,7 +1009,6 @@
                 <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
             </div>
         </div>
-
         <div class="stats-container" id="driverStats">
             <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
             <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
@@ -1057,7 +1017,6 @@
             <div class="stat-card"><div class="icon">💰</div><div class="value" id="dEarnings">0</div><div class="label">أرباح</div></div>
             <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
         </div>
-
         <div id="driverReadySection" class="status-section" style="display:none;">
             <h3>📦 طلبات جاهزة للاستلام من المطعم</h3>
             <div class="mini-grid" id="driverReadyGrid"></div>
@@ -1074,7 +1033,6 @@
             <h3>✅ الطلبات المكتملة</h3>
             <div class="mini-grid" id="driverCompletedGrid"></div>
         </div>
-
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -1082,7 +1040,6 @@
                 <button class="btn btn-primary" onclick="filterDriverOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearDriverDateFilter()">إلغاء التصفية</button>
             </div>
-
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="driverFilters">
@@ -1095,7 +1052,6 @@
             </div>
             <div class="orders-grid" id="driverOrdersGrid"></div>
         </div>
-
         <!-- نافذة إدخال رمز التحقق -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
@@ -1110,7 +1066,6 @@
                 <div id="driverVerifyError" style="color:#ff4757;margin-top:0.5rem;display:none;">⚠️ الرمز غير صحيح، حاول مرة أخرى</div>
             </div>
         </div>
-
         <div id="driverLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🛵</div>
@@ -1393,12 +1348,17 @@
             if (refreshIntervals[page]) {
                 clearInterval(refreshIntervals[page]);
                 refreshIntervals[page] = null;
+                console.log(`🛑 تم إيقاف التحديث التلقائي للصفحة: ${page}`);
             }
         }
 
-        function startAutoRefresh(page, refreshFunction, intervalMs = 10000) {
+        function startAutoRefresh(page, refreshFunction, intervalMs = 5000) {
             stopAutoRefresh(page);
-            refreshIntervals[page] = setInterval(refreshFunction, intervalMs);
+            refreshIntervals[page] = setInterval(() => {
+                console.log(`🔄 تحديث تلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
+                refreshFunction();
+            }, intervalMs);
+            console.log(`✅ بدأ التحديث التلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
         }
 
         // =================================================================
@@ -1438,7 +1398,8 @@
                     }
                 }).catch(() => {});
             }
-            startAutoRefresh('customer', refreshCustomerData);
+            // تحديث العميل كل 5 ثوانٍ (للتتبع)
+            startAutoRefresh('customer', refreshCustomerData, 5000);
         }
 
         function refreshCustomerData() {
@@ -1788,7 +1749,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) مع مقارنة الطلبات
+        //  المطعم (Restaurant)
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1801,7 +1762,7 @@
             if (saved) {
                 currentRestaurantUser = saved;
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', refreshRestaurantViews);
+                startAutoRefresh('restaurant', refreshRestaurantViews, 5000);
             } else {
                 document.getElementById('restaurantLoginPage').style.display = 'flex';
                 document.getElementById('restaurantDashboard').style.display = 'none';
@@ -1841,7 +1802,7 @@
                 currentRestaurantUser = found;
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
-                startAutoRefresh('restaurant', refreshRestaurantViews);
+                startAutoRefresh('restaurant', refreshRestaurantViews, 5000);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2291,7 +2252,6 @@
                 const allOrders = await getOrders();
                 const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // مقارنة الطلبات الجديدة (pending)
                 const newPending = myOrders.filter(o => o.status === 'pending');
                 const oldPending = lastRestaurantOrders.filter(o => o.status === 'pending');
                 if (newPending.length > oldPending.length) {
@@ -2318,7 +2278,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) مع مقارنة الطلبات وتغيير الحالة التلقائي
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2328,7 +2288,6 @@
         let pendingVerifyOrderId = null;
         let lastDriverOrders = [];
 
-        // دالة مساعدة لتغيير حالة الكابتن
         function setDriverStatus(online) {
             if (!currentDriverUser) return;
             driverOnline = online;
@@ -2346,7 +2305,7 @@
             if (saved) {
                 currentDriverUser = saved;
                 showDriverDashboard();
-                startAutoRefresh('driver', refreshDriverViews);
+                startAutoRefresh('driver', refreshDriverViews, 5000);
             } else {
                 document.getElementById('driverLoginPage').style.display = 'flex';
                 document.getElementById('driverDashboard').style.display = 'none';
@@ -2388,7 +2347,7 @@
                 const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
-                startAutoRefresh('driver', refreshDriverViews);
+                startAutoRefresh('driver', refreshDriverViews, 5000);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2426,7 +2385,6 @@
                     return o.driverId === currentDriverUser.username;
                 });
 
-                // مقارنة الطلبات الجاهزة للاستلام
                 const newReady = myOrders.filter(o => o.status === 'ready_for_pickup');
                 const oldReady = lastDriverOrders.filter(o => o.status === 'ready_for_pickup');
                 if (newReady.length > oldReady.length) {
@@ -2705,10 +2663,7 @@
                 });
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
                 showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
-                
-                // تغيير الحالة إلى غير متصل
                 setDriverStatus(false);
-                
                 await refreshDriverViews();
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -2788,10 +2743,7 @@
                 driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
                 localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
                 showNotification(`✅ تم تسليم الطلب #${pendingVerifyOrderId} بنجاح (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
-                
-                // تغيير الحالة إلى متصل
                 setDriverStatus(true);
-                
                 closeDriverVerifyModal();
                 await refreshDriverViews();
             } catch (e) {
@@ -2931,7 +2883,7 @@
             document.getElementById('adminLoginPage').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'block';
             renderAdminUsers();
-            startAutoRefresh('admin', renderAdminUsers);
+            startAutoRefresh('admin', renderAdminUsers, 5000);
         }
 
         async function renderAdminUsers() {
@@ -3068,7 +3020,7 @@
         }
 
         // =================================================================
-        //  الاستماع للتحديثات (BroadcastChannel) للمزامنة الفورية بين علامات التبويب
+        //  الاستماع للتحديثات (BroadcastChannel)
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
@@ -3132,6 +3084,7 @@
         console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
+        console.log('🔄 التحديث التلقائي يعمل كل 5 ثوانٍ في صفحات المطعم والكابتن والأدمن');
     </script>
 </body>
 </html>

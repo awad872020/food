@@ -1450,7 +1450,7 @@
                         document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                         const msgDiv = document.getElementById('customerTrackingMessage');
                         if (order.status === 'cancelled') {
-                            msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                            msgDiv.innerHTML = '❌ تم الإلغاء لعدم توفر الصنف المطلوب، الرجاء اختيار صنف آخر. شكراً لحسن تفهمكم.';
                             msgDiv.style.color = '#ff4757';
                         } else {
                             msgDiv.innerHTML = '';
@@ -1673,7 +1673,7 @@
                 updateCustomerTrackingSteps(order.status);
                 const msgDiv = document.getElementById('customerTrackingMessage');
                 if (order.status === 'cancelled') {
-                    msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                    msgDiv.innerHTML = '❌ تم الإلغاء لعدم توفر الصنف المطلوب، الرجاء اختيار صنف آخر. شكراً لحسن تفهمكم.';
                     msgDiv.style.color = '#ff4757';
                 } else {
                     msgDiv.innerHTML = '';
@@ -1706,7 +1706,7 @@
             }
             const msgDiv = document.getElementById('customerTrackingMessage');
             if (status === 'cancelled') {
-                msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                msgDiv.innerHTML = '❌ تم الإلغاء لعدم توفر الصنف المطلوب، الرجاء اختيار صنف آخر. شكراً لحسن تفهمكم.';
                 msgDiv.style.color = '#ff4757';
             } else {
                 msgDiv.innerHTML = '';
@@ -1726,7 +1726,7 @@
                     document.getElementById('trackingCodeDisplay').textContent = order.verificationCode || '----';
                     const msgDiv = document.getElementById('customerTrackingMessage');
                     if (order.status === 'cancelled') {
-                        msgDiv.innerHTML = '❌ تم إلغاء الطلب من قبل المطعم';
+                        msgDiv.innerHTML = '❌ تم الإلغاء لعدم توفر الصنف المطلوب، الرجاء اختيار صنف آخر. شكراً لحسن تفهمكم.';
                         msgDiv.style.color = '#ff4757';
                     } else {
                         msgDiv.innerHTML = '';
@@ -1761,7 +1761,7 @@
                             <div class="order-header"><span class="order-id">طلب #${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                             <p>المطعم: ${o.restaurantName}</p>
                             <p>المجموع: ${o.total} شيكل</p>
-                            <p>الحالة: <span class="status-badge status-${o.status}">${o.status === 'cancelled' ? 'ملغي ❌' : o.status}</span></p>
+                            <p>الحالة: <span class="status-badge status-${o.status}">${o.status === 'cancelled' ? 'ملغي ❌ (غير متوفر)' : o.status}</span></p>
                             ${o.verificationCode ? `<p>🔐 رمز تأكيد التسليم: <strong>${o.verificationCode}</strong></p>` : ''}
                             ${o.driverName ? `<p>🚗 الكابتن: ${o.driverName}</p>` : ''}
                             ${o.status !== 'cancelled' ? `<button class="btn btn-primary" onclick="showCustomerTracking(${o.id})">تتبع</button>` : ''}
@@ -3079,6 +3079,16 @@
             if (event.data.type === 'NEW_READY_ORDER') {
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     refreshDriverViews();
+                }
+            }
+            if (event.data.type === 'ORDER_REJECTED') {
+                const order = event.data.order;
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    showNotification(`⚠️ تم إلغاء طلبك #${order.id} (غير متوفر)`, 'error');
+                    if (customerTrackingId == order.id) {
+                        showCustomerTracking(order.id);
+                        updateCustomerTrackingSteps('cancelled');
+                    }
                 }
             }
             if (event.data.type === 'ORDERS_UPDATED') {

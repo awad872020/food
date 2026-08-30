@@ -6,7 +6,7 @@
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ============================================================
-           الأنماط العامة (نفسها كما هي)
+           الأنماط العامة
            ============================================================ */
         * {
             margin: 0;
@@ -917,8 +917,6 @@
             </div>
         </div>
 
-        <!-- تم إزالة stats-container من هنا -->
-
         <div id="restaurantPreparingSection" class="status-section" style="display:none;">
             <h3>👨‍🍳 الطلبات قيد التحضير</h3>
             <div class="mini-grid" id="restaurantPreparingGrid"></div>
@@ -1007,7 +1005,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن (نفسها)
+    صفحة الكابتن - تم نقل إحصائيات الكابتن إلى أسفل جدول الطلبات
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1021,14 +1019,9 @@
                 <button class="logout-btn" onclick="logoutDriver()">تسجيل خروج</button>
             </div>
         </div>
-        <div class="stats-container" id="driverStats">
-            <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
-            <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
-            <div class="stat-card"><div class="icon">🛵</div><div class="value" id="dDelivering">0</div><div class="label">توصيل</div></div>
-            <div class="stat-card"><div class="icon">✅</div><div class="value" id="dCompleted">0</div><div class="label">مسلمة</div></div>
-            <div class="stat-card"><div class="icon">💰</div><div class="value" id="dEarnings">0</div><div class="label">أرباح</div></div>
-            <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
-        </div>
+
+        <!-- تم إزالة stats-container من هنا -->
+
         <div id="driverReadySection" class="status-section" style="display:none;">
             <h3>📦 طلبات جاهزة للاستلام من المطعم</h3>
             <div class="mini-grid" id="driverReadyGrid"></div>
@@ -1045,6 +1038,7 @@
             <h3>✅ الطلبات المكتملة</h3>
             <div class="mini-grid" id="driverCompletedGrid"></div>
         </div>
+
         <div class="orders-section">
             <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;padding:0.5rem 1rem;background:#f8f9fa;border-radius:10px;">
                 <label style="font-weight:bold;">📅 تصفية حسب التاريخ (ميلادي):</label>
@@ -1052,6 +1046,7 @@
                 <button class="btn btn-primary" onclick="filterDriverOrdersByDate()">عرض</button>
                 <button class="btn btn-outline" onclick="clearDriverDateFilter()">إلغاء التصفية</button>
             </div>
+
             <div class="orders-header">
                 <h2>📋 جميع الطلبات</h2>
                 <div class="filter-buttons" id="driverFilters">
@@ -1062,8 +1057,22 @@
                     <button class="filter-btn" data-filter="completed" onclick="filterDriverOrders('completed')">مكتملة</button>
                 </div>
             </div>
+
             <div class="orders-grid" id="driverOrdersGrid"></div>
+
+            <!-- تم نقل إحصائيات الكابتن إلى هنا (أسفل جدول الطلبات) -->
+            <div class="stats-container" id="driverStats">
+                <div class="stat-card"><div class="icon">📦</div><div class="value" id="dAvailable">0</div><div class="label">جاهزة</div></div>
+                <div class="stat-card"><div class="icon">🏪</div><div class="value" id="dPicking">0</div><div class="label">استلام</div></div>
+                <div class="stat-card"><div class="icon">🛵</div><div class="value" id="dDelivering">0</div><div class="label">توصيل</div></div>
+                <div class="stat-card"><div class="icon">✅</div><div class="value" id="dCompleted">0</div><div class="label">مسلمة</div></div>
+                <div class="stat-card"><div class="icon">💰</div><div class="value" id="dEarnings">0</div><div class="label">أرباح</div></div>
+                <div class="stat-card"><div class="icon">⭐</div><div class="value" id="dRating">0.0</div><div class="label">تقييم</div></div>
+            </div>
+            <!-- انتهاء نقل إحصائيات الكابتن -->
+
         </div>
+
         <!-- نافذة إدخال رمز التحقق -->
         <div class="modal" id="driverVerifyModal">
             <div class="modal-content">
@@ -1078,6 +1087,7 @@
                 <div id="driverVerifyError" style="color:#ff4757;margin-top:0.5rem;display:none;">⚠️ الرمز غير صحيح، حاول مرة أخرى</div>
             </div>
         </div>
+
         <div id="driverLoginPage" class="login-page" style="display:flex;">
             <div class="login-box">
                 <div class="logo-big">🛵</div>

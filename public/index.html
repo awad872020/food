@@ -809,6 +809,17 @@
 <body>
 
     <!-- ============================================================
+    ملفات صوتية للتشغيل عند الطلبات الجديدة (ضع الملفات بجانب الصفحة)
+    ============================================================ -->
+    <audio id="restaurantSound" preload="auto" style="display:none;">
+        <source src="notification.mp3" type="audio/mpeg">
+        <!-- في حال عدم وجود الملف، سيتم استخدام الصوت الاحتياطي -->
+    </audio>
+    <audio id="driverSound" preload="auto" style="display:none;">
+        <source src="driver_notification.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ============================================================
     الصفحة الرئيسية (مصغرة - بدون flex وبدون min-height)
     ============================================================ -->
     <div id="homePage" class="page active">
@@ -1374,11 +1385,32 @@
         }
 
         // =================================================================
-        //  أصوات
+        //  أصوات محسّنة بملفات صوتية احترافية مع احتياطي
         // =================================================================
         function playRestaurantSound() {
+            const audio = document.getElementById('restaurantSound');
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(() => playRestaurantFallback());
+            } else {
+                playRestaurantFallback();
+            }
+        }
+
+        function playDriverSound() {
+            const audio = document.getElementById('driverSound');
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(() => playDriverFallback());
+            } else {
+                playDriverFallback();
+            }
+        }
+
+        // أصوات احتياطية باستخدام Web Audio API (كما كانت سابقاً)
+        function playRestaurantFallback() {
             try {
-                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 [0, 0.2].forEach(delay => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
@@ -1393,9 +1425,10 @@
                 });
             } catch (e) { /* ignore */ }
         }
-        function playDriverSound() {
+
+        function playDriverFallback() {
             try {
-                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
@@ -3079,7 +3112,7 @@
                 const order = event.data.order;
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     if (currentRestaurantUser.displayName === order.restaurantName) {
-                        playRestaurantSound();
+                        playRestaurantSound(); // تشغيل صوت المطعم
                         showNotification(`🔔 طلب جديد #${order.id} من ${order.customerName}!`, 'warning');
                         refreshRestaurantViews();
                     }
@@ -3089,7 +3122,7 @@
             if (event.data.type === 'NEW_READY_ORDER') {
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
                     const order = event.data.order;
-                    playDriverSound();
+                    playDriverSound(); // تشغيل صوت الكابتن
                     showNotification(`📢 طلب جاهز للاستلام #${order.id} من ${order.restaurantName}`, 'success');
                     sendDesktopNotification('📢 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
                     displayDriverOrders();

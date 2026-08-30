@@ -1955,11 +1955,19 @@
                         else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
                         else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
                     }
+                    // إضافة تفاصيل السعر
+                    const priceDetails = `
+                        <div style="font-size:0.95rem; color:#2d3436; margin:0.3rem 0;">
+                            <span>سعر المنتجات: <strong>${o.itemsTotal || 0}</strong> شيكل</span>
+                            <span style="margin-right:1rem;">+ رسوم التوصيل: <strong>${o.deliveryFee || CONFIG.DELIVERY_FEE}</strong> شيكل</span>
+                        </div>
+                    `;
                     card.innerHTML = `
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                         <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                        <div class="order-total">المجموع: ${o.total} شيكل</div>
+                        ${priceDetails}
+                        <div class="order-total">المجموع الكلي: ${o.total} شيكل</div>
                         <div class="payment-method">💳 ${o.paymentMethod}</div>
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2040,6 +2048,9 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
+                                </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
                                 </div>
@@ -2048,7 +2059,7 @@
                     }).join('');
                 }
 
-                // ========== الطلبات الجاهزة (تم إضافة زر تأكيد استلام الكابتن) ==========
+                // ========== الطلبات الجاهزة ==========
                 const ready = orders.filter(o => o.status === 'ready_for_pickup');
                 const readyGrid = document.getElementById('restaurantReadyGrid');
                 const readySection = document.getElementById('restaurantReadySection');
@@ -2063,6 +2074,9 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
+                                </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
                                     <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
@@ -2087,6 +2101,9 @@
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    المنتجات: ${o.itemsTotal || 0} + توصيل: ${o.deliveryFee || CONFIG.DELIVERY_FEE} = ${o.total} شيكل
+                                </div>
                                 <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
                             </div>
                         `;

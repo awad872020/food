@@ -20,11 +20,11 @@
             min-height: 100vh;
         }
         .page {
-            display: none;
+            display: none;      /* جميع الصفحات مخفية افتراضياً */
             padding-bottom: 80px;
         }
         .page.active {
-            display: block;
+            display: block;     /* فقط الصفحة النشطة تظهر */
         }
 
         /* ============================================================
@@ -119,7 +119,7 @@
            ============================================================ */
         #homePage {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: block;
+            /* تم حذف display: block; */
             padding: 40px 20px;
             text-align: center;
         }
@@ -1319,8 +1319,6 @@
                 document.getElementById('homePage').classList.add('active');
                 return;
             }
-            const homePage = document.getElementById('homePage');
-            if (homePage) homePage.classList.remove('active');
             const target = document.getElementById(page + 'Page');
             if (target) {
                 target.classList.add('active');

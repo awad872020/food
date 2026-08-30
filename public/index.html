@@ -798,7 +798,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل (نفسها)
+    صفحة العميل
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -1106,7 +1106,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الأدمن (نفسها)
+    صفحة الأدمن
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1162,7 +1162,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت (نفسه تماماً، لا تغيير)
+    الجافاسكريبت الكامل
     ============================================================ -->
     <script>
         // =================================================================
@@ -1448,7 +1448,7 @@
                         if (['completed', 'cancelled'].includes(order.status)) {
                             clearInterval(customerTrackingInterval);
                             localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
-                            if (order.status === 'completed') showNotification(`🎉 طلب #${order.id} تم توصيله!`);
+                            // تم إزالة إشعار التوصيل بناءً على طلب المستخدم
                         }
                     }
                 }).catch(() => {});
@@ -1724,7 +1724,7 @@
                     if (['completed', 'cancelled'].includes(order.status)) {
                         clearInterval(customerTrackingInterval);
                         localStorage.removeItem(CONFIG.STORAGE_KEYS.TRACKING_ORDER_ID);
-                        if (order.status === 'completed') showNotification(`🎉 طلب #${orderId} تم توصيله!`);
+                        // تم إزالة إشعار التوصيل بناءً على طلب المستخدم
                     }
                 } catch (e) { /* ignore */ }
             }, 3000);

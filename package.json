@@ -1,7 +1,7 @@
 {
   "name": "food-delivery-backend",
   "version": "1.0.0",
-  "description": "äÙÇã ÊæÕíá ÇáØÚÇã - ÎÇÏã Îáİí",
+  "description": "Ù†Ø¸Ø§Ù… ØªÙˆØµÙŠÙ„ Ø§Ù„Ø·Ø¹Ø§Ù… - Ø®Ø§Ø¯Ù… Ø®Ù„ÙÙŠ",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "firebase-admin": "^12.6.0"
   }
 }

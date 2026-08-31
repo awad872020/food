@@ -1353,6 +1353,25 @@
             }
         }
 
+        // إشعارات Push حقيقية (Firebase Cloud Messaging) عن طريق تطبيق الأندرويد
+        // بتشتغل بس لما الموقع مفتوح جوه تطبيق الأندرويد (AndroidBridge موجود)؛
+        // لو مفتوح بمتصفح عادي، بتتجاهل بهدوء بدون أي خطأ.
+        async function registerFcmTokenIfNeeded(role, username) {
+            try {
+                if (!window.AndroidBridge || typeof window.AndroidBridge.getFcmToken !== 'function') return;
+                const token = window.AndroidBridge.getFcmToken();
+                if (!token) return;
+                await fetch(`${API_BASE}/notifications/register-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, username, token })
+                });
+            } catch (e) {
+                // ما منوقف أي شي بالواجهة إذا فشل تسجيل التوكن
+                console.warn('فشل تسجيل توكن الإشعارات:', e);
+            }
+        }
+
         // =================================================================
         //  التنقل
         // =================================================================
@@ -1798,6 +1817,7 @@
                 currentRestaurantUser = saved;
                 showRestaurantDashboard();
                 startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
+                registerFcmTokenIfNeeded('restaurant', saved.username);
             } else {
                 document.getElementById('restaurantLoginPage').style.display = 'flex';
                 document.getElementById('restaurantDashboard').style.display = 'none';
@@ -1838,6 +1858,7 @@
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
                 startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
+                registerFcmTokenIfNeeded('restaurant', found.username);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }
@@ -2267,6 +2288,8 @@
                 const order = allOrders.find(o => o.id === orderId);
                 if (order && order.status === 'ready_for_pickup') {
                     channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                    // إشعار Push حقيقي يوصل حتى لو تطبيق الكابتن مقفول (مش بس المتصفح المفتوح حالياً)
+                    fetch(`${API_BASE}/orders/${orderId}/notify-driver`, { method: 'POST' }).catch(() => {});
                     showNotification(`🔔 تم إرسال إشعار جديد للكابتن للطلب #${orderId}`);
                 } else {
                     showNotification('⚠️ الطلب ليس في حالة جاهزة', 'warning');
@@ -2355,6 +2378,7 @@
                 currentDriverUser = saved;
                 showDriverDashboard();
                 startAutoRefresh('driver', refreshDriverViews, 3000);
+                registerFcmTokenIfNeeded('driver', saved.username);
             } else {
                 document.getElementById('driverLoginPage').style.display = 'flex';
                 document.getElementById('driverDashboard').style.display = 'none';
@@ -2397,6 +2421,7 @@
                 if (stats) driverStatsData = stats;
                 showDriverDashboard();
                 startAutoRefresh('driver', refreshDriverViews, 3000);
+                registerFcmTokenIfNeeded('driver', found.username);
             } catch (e) {
                 showNotification('فشل في تسجيل الدخول', 'error');
             }

@@ -1177,7 +1177,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تعديلات إظهار السعر بدون توصيل)
+    الجافاسكريبت الكامل (مع تعديلات إظهار السعر بدون توصيل وحذف العبارة)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1893,7 +1893,6 @@
                 <p>المطعم: ${order.restaurantName}</p>
                 <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                 <p>المجموع (بدون توصيل): ${order.itemsTotal || order.items.reduce((s,i) => s + i.price*i.quantity, 0)} شيكل</p>
-                <p style="color:#636e72;font-size:0.9rem;">(رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)</p>
             `;
             document.getElementById('restaurantNewOrderModal').style.display = 'block';
             playRestaurantSound();
@@ -2000,7 +1999,6 @@
                         <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div class="order-total">إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل</div>
-                        <div style="font-size:0.8rem;color:#636e72;text-align:left;margin-bottom:0.5rem;">(رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)</div>
                         <div class="payment-method">💳 ${o.paymentMethod}</div>
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2102,9 +2100,6 @@
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
                                     المجموع الكلي للمنتجات (بدون توصيل): ${displayTotal} شيكل
                                 </div>
-                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
-                                    (رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)
-                                </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
                                 </div>
@@ -2131,9 +2126,6 @@
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
                                     إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
-                                </div>
-                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
-                                    (لا يشمل رسوم التوصيل)
                                 </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
@@ -2163,9 +2155,6 @@
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
                                     إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
                                 </div>
-                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
-                                    (لا يشمل رسوم التوصيل)
-                                </div>
                                 <div class="mini-details">🚗 الكابتن: ${o.driverName || 'غير معين'}</div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="confirmRestaurantPickupDirect(${o.id})">تأكيد الاستلام ✅</button>
@@ -2193,9 +2182,6 @@
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
                                     إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
-                                </div>
-                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
-                                    (لا يشمل رسوم التوصيل)
                                 </div>
                                 <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
                             </div>
@@ -3208,6 +3194,7 @@
         console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
         console.log('✅ تم حل مشكلة تكرار الطلبات (عند اختيار "الكل" تظهر القائمة، وعند اختيار فلتر محدد تظهر الأقسام)');
         console.log('✅ تم توضيح أن سعر المنتجات المعروض في المطعم لا يشمل رسوم التوصيل');
+        console.log('✅ تم حذف العبارة "رسوم التوصيل 7 شيكل تضاف للعميل" من جميع الأماكن');
     </script>
 </body>
 </html>

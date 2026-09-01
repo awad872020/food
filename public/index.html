@@ -243,7 +243,8 @@
             gap: 1rem;
         }
         .login-form input,
-        .login-form select {
+        .login-form select,
+        .login-form textarea {
             padding: 0.8rem;
             border: 2px solid #ddd;
             border-radius: 10px;
@@ -252,7 +253,8 @@
             transition: 0.3s;
         }
         .login-form input:focus,
-        .login-form select:focus {
+        .login-form select:focus,
+        .login-form textarea:focus {
             border-color: #ff6b35;
         }
         .login-form button {
@@ -1175,7 +1177,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل
+    الجافاسكريبت الكامل (مع تعديلات منع التكرار)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1353,9 +1355,7 @@
             }
         }
 
-        // إشعارات Push حقيقية (Firebase Cloud Messaging) عن طريق تطبيق الأندرويد
-        // بتشتغل بس لما الموقع مفتوح جوه تطبيق الأندرويد (AndroidBridge موجود)؛
-        // لو مفتوح بمتصفح عادي، بتتجاهل بهدوء بدون أي خطأ.
+        // إشعارات Push حقيقية
         async function registerFcmTokenIfNeeded(role, username) {
             try {
                 if (!window.AndroidBridge || typeof window.AndroidBridge.getFcmToken !== 'function') return;
@@ -1367,7 +1367,6 @@
                     body: JSON.stringify({ role, username, token })
                 });
             } catch (e) {
-                // ما منوقف أي شي بالواجهة إذا فشل تسجيل التوكن
                 console.warn('فشل تسجيل توكن الإشعارات:', e);
             }
         }
@@ -1406,7 +1405,7 @@
             }
         }
 
-        function startAutoRefresh(page, refreshFunction, intervalMs = 3000) { // تم التغيير إلى 3 ثوانٍ
+        function startAutoRefresh(page, refreshFunction, intervalMs = 3000) {
             stopAutoRefresh(page);
             refreshIntervals[page] = setInterval(() => {
                 console.log(`🔄 تحديث تلقائي للصفحة: ${page} (كل ${intervalMs/1000} ثانية)`);
@@ -1807,7 +1806,6 @@
         let restaurantDateFilter = null;
         let pendingPickupOrderId = null;
         let lastRestaurantOrders = [];
-        // لإدارة الطلبات الجديدة التي تم عرضها في المودال
         let displayedNewOrderIds = new Set();
         let pendingNewOrderId = null;
 
@@ -1882,7 +1880,6 @@
             displayedNewOrderIds.clear();
         }
 
-        // عرض الطلب الجديد في مودال
         function showNewOrderModal(order) {
             if (displayedNewOrderIds.has(order.id)) return;
             displayedNewOrderIds.add(order.id);
@@ -1898,9 +1895,7 @@
                 <p>المجموع: ${order.total} شيكل</p>
             `;
             document.getElementById('restaurantNewOrderModal').style.display = 'block';
-            // تشغيل صوت
             playRestaurantSound();
-            // إشعار سطح المكتب
             sendDesktopNotification('🆕 طلب جديد', `طلب #${order.id} من ${order.customerName}`);
         }
 
@@ -1929,15 +1924,12 @@
                 const allOrders = await getOrders();
                 const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
 
-                // التحقق من الطلبات الجديدة (pending) التي لم تُعرض بعد
                 const newPending = myOrders.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
                 if (newPending.length > 0) {
-                    // عرض أحدث طلب (أو كلهم، لكننا نعرض واحداً تلو الآخر)
                     const lastNew = newPending[newPending.length - 1];
                     showNewOrderModal(lastNew);
                 }
 
-                // تحديث الإحصائيات وعرض القوائم
                 lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
                 displayRestaurantOrders();
                 displayRestaurantStatusSections();
@@ -1966,9 +1958,20 @@
                     });
                 }
 
-                if (restaurantFilter !== 'all') orders = orders.filter(o => o.status === restaurantFilter);
+                if (restaurantFilter !== 'all') {
+                    orders = orders.filter(o => o.status === restaurantFilter);
+                }
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // إخفاء أو إظهار القائمة بناءً على الفلتر
+                if (restaurantFilter !== 'all') {
+                    grid.style.display = 'none';
+                    return;
+                } else {
+                    grid.style.display = 'grid';
+                }
+
                 if (!orders.length) {
                     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
                     return;
@@ -2046,10 +2049,21 @@
             document.querySelectorAll('#restaurantFilters .filter-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`#restaurantFilters [data-filter="${filter}"]`).classList.add('active');
             displayRestaurantOrders();
+            displayRestaurantStatusSections();
         }
 
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
+            
+            // إذا كان الفلتر "الكل"، نخفي جميع الأقسام الفرعية
+            if (restaurantFilter === 'all') {
+                document.getElementById('restaurantPreparingSection').style.display = 'none';
+                document.getElementById('restaurantReadySection').style.display = 'none';
+                document.getElementById('restaurantPickingSection').style.display = 'none';
+                document.getElementById('restaurantDeliveringSection').style.display = 'none';
+                return;
+            }
+
             try {
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
@@ -2288,7 +2302,6 @@
                 const order = allOrders.find(o => o.id === orderId);
                 if (order && order.status === 'ready_for_pickup') {
                     channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
-                    // إشعار Push حقيقي يوصل حتى لو تطبيق الكابتن مقفول (مش بس المتصفح المفتوح حالياً)
                     fetch(`${API_BASE}/orders/${orderId}/notify-driver`, { method: 'POST' }).catch(() => {});
                     showNotification(`🔔 تم إرسال إشعار جديد للكابتن للطلب #${orderId}`);
                 } else {
@@ -2356,7 +2369,6 @@
         let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
         let pendingVerifyOrderId = null;
         let lastDriverOrders = [];
-        // لإدارة الطلبات الجاهزة التي تم عرضها في المودال
         let displayedReadyOrderIds = new Set();
         let pendingReadyOrderId = null;
 
@@ -2451,7 +2463,6 @@
             displayedReadyOrderIds.clear();
         }
 
-        // عرض الطلب الجاهز في مودال
         function showNewReadyOrderModal(order) {
             if (displayedReadyOrderIds.has(order.id)) return;
             displayedReadyOrderIds.add(order.id);
@@ -2468,9 +2479,7 @@
                 <p>رسوم التوصيل: ${order.deliveryFee || CONFIG.DELIVERY_FEE} شيكل</p>
             `;
             document.getElementById('driverNewReadyModal').style.display = 'block';
-            // تشغيل صوت
             playDriverSound();
-            // إشعار سطح المكتب
             sendDesktopNotification('📦 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
         }
 
@@ -2495,7 +2504,6 @@
                     return o.driverId === currentDriverUser.username;
                 });
 
-                // التحقق من الطلبات الجاهزة الجديدة التي لم تُعرض بعد
                 const newReady = myOrders.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
                 if (newReady.length > 0 && driverOnline) {
                     const lastNew = newReady[newReady.length - 1];
@@ -2537,6 +2545,15 @@
                 if (driverFilter !== 'all') orders = orders.filter(o => o.status === driverFilter);
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // إخفاء أو إظهار القائمة بناءً على الفلتر
+                if (driverFilter !== 'all') {
+                    grid.style.display = 'none';
+                    return;
+                } else {
+                    grid.style.display = 'grid';
+                }
+
                 if (!orders.length) {
                     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
                     return;
@@ -2596,6 +2613,16 @@
 
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
+            
+            // إذا كان الفلتر "الكل"، نخفي جميع الأقسام الفرعية
+            if (driverFilter === 'all') {
+                document.getElementById('driverReadySection').style.display = 'none';
+                document.getElementById('driverPickingSection').style.display = 'none';
+                document.getElementById('driverDeliveringSection').style.display = 'none';
+                document.getElementById('driverCompletedSection').style.display = 'none';
+                return;
+            }
+
             try {
                 const allOrders = await getOrders();
                 let orders = allOrders.filter(o => {
@@ -2864,6 +2891,7 @@
             document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`#driverFilters [data-filter="${filter}"]`).classList.add('active');
             displayDriverOrders();
+            displayDriverStatusSections();
         }
 
         function updateDriverStats() {
@@ -3102,7 +3130,6 @@
         // =================================================================
         channel.onmessage = function(event) {
             if (event.data.type === 'NEW_ORDER') {
-                // عند استلام طلب جديد، إذا كانت صفحة المطعم مفتوحة، نعرض المودال فوراً
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     const order = event.data.order;
                     if (order.restaurantName === currentRestaurantUser.displayName) {
@@ -3112,7 +3139,6 @@
                 }
             }
             if (event.data.type === 'NEW_READY_ORDER') {
-                // عند استلام طلب جاهز، إذا كانت صفحة الكابتن مفتوحة والمستخدم متصل، نعرض المودال فوراً
                 if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser && driverOnline) {
                     const order = event.data.order;
                     if (!order.driverId || order.driverId === currentDriverUser.username) {
@@ -3132,7 +3158,6 @@
                 }
             }
             if (event.data.type === 'ORDERS_UPDATED') {
-                // تحديث تلقائي للصفحات المفتوحة
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     refreshRestaurantViews();
                 }
@@ -3174,6 +3199,7 @@
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
         console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
+        console.log('✅ تم حل مشكلة تكرار الطلبات (عند اختيار "الكل" تظهر القائمة، وعند اختيار فلتر محدد تظهر الأقسام)');
     </script>
 </body>
 </html>

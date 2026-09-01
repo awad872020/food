@@ -6,7 +6,7 @@
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ============================================================
-           الأنماط العامة
+           الأنماط العامة (نفس الكود السابق، لم يتغير)
            ============================================================ */
         * {
             margin: 0;
@@ -800,7 +800,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل
+    صفحة العميل (نفس الكود السابق)
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -905,7 +905,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة المطعم - مع مودال الطلب الجديد
+    صفحة المطعم (مع تعديل منع التكرار)
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -1016,7 +1016,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن - مع مودال الطلب الجاهز
+    صفحة الكابتن (مع تعديل منع التكرار)
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1121,7 +1121,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الأدمن
+    صفحة الأدمن (نفس الكود السابق)
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1177,7 +1177,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تعديلات إظهار السعر بدون توصيل وحذف العبارة)
+    الجافاسكريبت الكامل (مع إضافة دالة uniqueOrders وتطبيقها)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1312,6 +1312,19 @@
         }
 
         // =================================================================
+        //  دالة إزالة التكرارات من مصفوفة الطلبات (بناءً على id)
+        // =================================================================
+        function uniqueOrders(orders) {
+            const seen = new Set();
+            return orders.filter(order => {
+                const key = order.id;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        // =================================================================
         //  إشعارات
         // =================================================================
         function showNotification(msg, type = 'success') {
@@ -1415,7 +1428,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer)
+        //  العميل (Customer) - نفس الكود السابق
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1799,7 +1812,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع مودال الطلب الجديد وإظهار السعر بدون توصيل
+        //  المطعم (Restaurant) - مع تطبيق uniqueOrders
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1923,29 +1936,38 @@
             try {
                 const allOrders = await getOrders();
                 const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                // إزالة التكرارات
+                const unique = uniqueOrders(myOrders);
 
-                const newPending = myOrders.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
+                const newPending = unique.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
                 if (newPending.length > 0) {
                     const lastNew = newPending[newPending.length - 1];
                     showNewOrderModal(lastNew);
                 }
 
-                lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
-                displayRestaurantOrders();
-                displayRestaurantStatusSections();
+                lastRestaurantOrders = JSON.parse(JSON.stringify(unique));
+                displayRestaurantOrders(unique);
+                displayRestaurantStatusSections(unique);
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 console.error('خطأ في تحديث المطعم:', e);
             }
         }
 
-        async function displayRestaurantOrders() {
+        // تعديل دوال العرض لتقبل مصفوفة الطلبات (اختياري)
+        async function displayRestaurantOrders(providedOrders) {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
             if (!currentRestaurantUser) return;
             try {
-                const allOrders = await getOrders();
-                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                let orders;
+                if (providedOrders) {
+                    orders = providedOrders;
+                } else {
+                    const allOrders = await getOrders();
+                    orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                    orders = uniqueOrders(orders);
+                }
 
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
@@ -2051,7 +2073,7 @@
             displayRestaurantStatusSections();
         }
 
-        async function displayRestaurantStatusSections() {
+        async function displayRestaurantStatusSections(providedOrders) {
             if (!currentRestaurantUser) return;
             
             if (restaurantFilter === 'all') {
@@ -2063,8 +2085,14 @@
             }
 
             try {
-                const allOrders = await getOrders();
-                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                let orders;
+                if (providedOrders) {
+                    orders = providedOrders;
+                } else {
+                    const allOrders = await getOrders();
+                    orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                    orders = uniqueOrders(orders);
+                }
 
                 if (restaurantDateFilter) {
                     const start = new Date(restaurantDateFilter);
@@ -2193,7 +2221,7 @@
             }
         }
 
-        // ---- دوال المطعم ----
+        // ---- دوال المطعم (نفسها) ----
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2355,7 +2383,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مع مودال الطلب الجاهز
+        //  الكابتن (Driver) - مع تطبيق uniqueOrders
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2494,37 +2522,45 @@
             if (!currentDriverUser) return;
             try {
                 const allOrders = await getOrders();
-                const myOrders = allOrders.filter(o => {
+                let myOrders = allOrders.filter(o => {
                     if (o.status === 'ready_for_pickup' && driverOnline) return true;
                     return o.driverId === currentDriverUser.username;
                 });
+                // إزالة التكرارات
+                const unique = uniqueOrders(myOrders);
 
-                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
+                const newReady = unique.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
                 if (newReady.length > 0 && driverOnline) {
                     const lastNew = newReady[newReady.length - 1];
                     showNewReadyOrderModal(lastNew);
                 }
 
-                lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
-                displayDriverOrders();
-                displayDriverStatusSections();
-                updateDriverStats();
+                lastDriverOrders = JSON.parse(JSON.stringify(unique));
+                displayDriverOrders(unique);
+                displayDriverStatusSections(unique);
+                updateDriverStats(unique);
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
             } catch (e) {
                 console.error('خطأ في تحديث الكابتن:', e);
             }
         }
 
-        async function displayDriverOrders() {
+        async function displayDriverOrders(providedOrders) {
             const grid = document.getElementById('driverOrdersGrid');
             grid.innerHTML = '';
             if (!currentDriverUser) return;
             try {
-                const allOrders = await getOrders();
-                let orders = allOrders.filter(o => {
-                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
-                    return o.driverId === currentDriverUser.username;
-                });
+                let orders;
+                if (providedOrders) {
+                    orders = providedOrders;
+                } else {
+                    const allOrders = await getOrders();
+                    orders = allOrders.filter(o => {
+                        if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                        return o.driverId === currentDriverUser.username;
+                    });
+                    orders = uniqueOrders(orders);
+                }
 
                 if (driverDateFilter) {
                     const start = new Date(driverDateFilter);
@@ -2599,13 +2635,13 @@
                     `;
                     grid.appendChild(card);
                 });
-                updateDriverStats();
+                updateDriverStats(orders);
             } catch (e) {
                 showNotification('فشل في جلب الطلبات', 'error');
             }
         }
 
-        async function displayDriverStatusSections() {
+        async function displayDriverStatusSections(providedOrders) {
             if (!currentDriverUser) return;
             
             if (driverFilter === 'all') {
@@ -2617,11 +2653,17 @@
             }
 
             try {
-                const allOrders = await getOrders();
-                let orders = allOrders.filter(o => {
-                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
-                    return o.driverId === currentDriverUser.username;
-                });
+                let orders;
+                if (providedOrders) {
+                    orders = providedOrders;
+                } else {
+                    const allOrders = await getOrders();
+                    orders = allOrders.filter(o => {
+                        if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                        return o.driverId === currentDriverUser.username;
+                    });
+                    orders = uniqueOrders(orders);
+                }
 
                 if (driverDateFilter) {
                     const start = new Date(driverDateFilter);
@@ -2763,7 +2805,7 @@
             }
         }
 
-        // ---- دوال الكابتن ----
+        // ---- دوال الكابتن (نفسها) ----
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2887,7 +2929,7 @@
             displayDriverStatusSections();
         }
 
-        function updateDriverStats() {
+        function updateDriverStats(providedOrders) {
             if (!currentDriverUser) return;
             document.getElementById('dAvailable').textContent = '...';
             document.getElementById('dPicking').textContent = '...';
@@ -2895,13 +2937,20 @@
             document.getElementById('dCompleted').textContent = driverStatsData.completedOrders || 0;
             document.getElementById('dEarnings').textContent = driverStatsData.totalEarnings || 0;
             document.getElementById('dRating').textContent = (driverStatsData.rating || 5.0).toFixed(1);
-            getOrders().then(allOrders => {
-                const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
-                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
-                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering').length;
-                document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status === 'ready_for_pickup')
-                    .length;
-            }).catch(() => {});
+            // تحديث الأعداد من orders المقدمة إن وجدت
+            if (providedOrders) {
+                const orders = providedOrders;
+                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username).length;
+                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username).length;
+                document.getElementById('dAvailable').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
+            } else {
+                getOrders().then(allOrders => {
+                    const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
+                    document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
+                    document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering').length;
+                    document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status === 'ready_for_pickup').length;
+                }).catch(() => {});
+            }
         }
 
         function toggleDriverStatus() {
@@ -2935,7 +2984,7 @@
         }
 
         // =================================================================
-        //  الأدمن (Admin)
+        //  الأدمن (Admin) - نفس الكود السابق
         // =================================================================
         let adminLoggedIn = false;
 
@@ -3192,9 +3241,8 @@
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
         console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
-        console.log('✅ تم حل مشكلة تكرار الطلبات (عند اختيار "الكل" تظهر القائمة، وعند اختيار فلتر محدد تظهر الأقسام)');
-        console.log('✅ تم توضيح أن سعر المنتجات المعروض في المطعم لا يشمل رسوم التوصيل');
-        console.log('✅ تم حذف العبارة "رسوم التوصيل 7 شيكل تضاف للعميل" من جميع الأماكن');
+        console.log('✅ تم حل مشكلة تكرار الطلبات (باستخدام دالة uniqueOrders)');
+        console.log('✅ تم توضيح أن سعر المنتجات لا يشمل رسوم التوصيل');
     </script>
 </body>
 </html>

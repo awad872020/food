@@ -1262,7 +1262,6 @@
         // =================================================================
         //  إدارة بيانات المطاعم (الأصناف) محلياً
         // =================================================================
-        // البيانات الافتراضية للمطاعم
         const defaultRestaurants = [
             { id: 1, name: 'مطعم اجعل لحد حوش', emoji: '🥩', cuisine: 'شاورما ومشاوي', category: 'shawarma', rating: 4.5,
                 menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18,
@@ -1287,7 +1286,6 @@
             if (stored) {
                 try {
                     globalRestaurants = JSON.parse(stored);
-                    // التأكد من وجود id لكل صنف
                     globalRestaurants.forEach(r => {
                         if (r.menu) {
                             r.menu.forEach(item => { if (!item.id) item.id = Date.now() + Math.random() * 1000; });
@@ -1296,9 +1294,7 @@
                     return;
                 } catch (e) {}
             }
-            // إذا لم توجد بيانات، نستخدم الافتراضية ونحفظها
             globalRestaurants = JSON.parse(JSON.stringify(defaultRestaurants));
-            // إعطاء معرفات للأصناف
             globalRestaurants.forEach(r => {
                 r.menu.forEach((item, idx) => { item.id = item.id || (r.id * 100 + idx + 1); });
             });
@@ -1348,9 +1344,7 @@
                 { username: 'driver1', displayName: 'أحمد الكابتن', extra: '0591111111', password: '123' },
                 { username: 'driver2', displayName: 'محمد الكابتن', extra: '0592222222', password: '123' }
             ],
-            staff: [
-                // { username: 'staff1', displayName: 'موظف بيتزا', extra: '0593333333', password: '123', parentRestaurant: 'مطعم بيتزا' }
-            ]
+            staff: []
         };
 
         let globalUsers = { restaurants: [], drivers: [], staff: [] };
@@ -1400,20 +1394,12 @@
 
         // دوال المستخدمين (محاكاة)
         async function getUsers() {
-            // نعيد نسخة من البيانات
             return JSON.parse(JSON.stringify(globalUsers));
         }
         async function saveUsers(users) {
             globalUsers = JSON.parse(JSON.stringify(users));
             saveUsersToStorage();
             return true;
-        }
-        async function adminLoginAPI(username, password) {
-            // بيانات الأدمن ثابتة
-            if (username === 'awad' && password === '050313651') {
-                return { success: true };
-            }
-            return { success: false };
         }
 
         // =================================================================
@@ -1602,7 +1588,6 @@
         let customerTrackingInterval = null;
         let customerTrackingId = null;
 
-        // نستخدم globalRestaurants بدلاً من الثابتة
         function getCustomerRestaurants() {
             return globalRestaurants;
         }
@@ -2002,14 +1987,12 @@
             sel.innerHTML = '<option value="">اختر المطعم</option>';
             try {
                 const users = await getUsers();
-                // نضيف المدراء
                 users.restaurants.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.username;
                     opt.textContent = u.displayName + ' (مدير)';
                     sel.appendChild(opt);
                 });
-                // نضيف الموظفين
                 users.staff.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.username;
@@ -2027,17 +2010,14 @@
             const pass = document.getElementById('restaurantPassword').value;
             try {
                 const users = await getUsers();
-                // البحث في المدراء أولاً
                 let found = users.restaurants.find(u => u.username === username && u.password === pass);
                 let isStaff = false;
                 let parentRestaurantName = null;
                 if (!found) {
-                    // البحث في الموظفين
                     const staffFound = users.staff.find(u => u.username === username && u.password === pass);
                     if (staffFound) {
                         isStaff = true;
                         parentRestaurantName = staffFound.parentRestaurant;
-                        // نبحث عن المطعم الرئيسي
                         const parent = users.restaurants.find(r => r.displayName === parentRestaurantName);
                         if (parent) {
                             found = { ...parent, staffDisplayName: staffFound.displayName, isStaff: true };
@@ -2053,7 +2033,6 @@
                 }
                 document.getElementById('restaurantLoginError').style.display = 'none';
                 if (isStaff) {
-                    // نضيف معلومات الموظف للكائن
                     found.staffDisplayName = found.staffDisplayName || found.displayName;
                     found.isStaff = true;
                     found.originalUsername = username;
@@ -2135,7 +2114,6 @@
             if (!currentRestaurantUser) return;
             try {
                 const allOrders = await getOrders();
-                // نستخدم اسم المطعم الرئيسي (في حالة الموظف نأخذ اسم المطعم الأصلي)
                 let restaurantName = currentRestaurantUser.displayName;
                 if (currentRestaurantUser.isStaff && currentRestaurantUser.parentRestaurant) {
                     restaurantName = currentRestaurantUser.parentRestaurant;
@@ -3222,7 +3200,6 @@
             document.getElementById('adminLoginPass').value = '';
             document.getElementById('adminLoginError').style.display = 'none';
             stopAutoRefresh('admin');
-            // تحديث قائمة المطاعم في إدارة القوائم
             populateAdminRestaurantSelect();
         }
 
@@ -3236,7 +3213,6 @@
                 opt.textContent = r.name;
                 sel.appendChild(opt);
             });
-            // تحديث قائمة المطاعم التابعة في نموذج إضافة الموظف
             populateAdminParentRestaurantSelect();
         }
 
@@ -3335,7 +3311,6 @@
                 const users = await getUsers();
                 const tbody = document.getElementById('adminUsersTableBody');
                 tbody.innerHTML = '';
-                // المدراء
                 users.restaurants.forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -3350,7 +3325,6 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                // الكباتن
                 users.drivers.forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -3365,7 +3339,6 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                // الموظفين
                 users.staff.forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -3484,7 +3457,6 @@
             if (deleteMenuItem(restId, itemId)) {
                 showNotification('✅ تم حذف الصنف بنجاح');
                 loadRestaurantMenu();
-                // تحديث واجهة العميل إذا كانت مفتوحة
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     displayCustomerRestaurants();
                 }
@@ -3516,13 +3488,51 @@
                 document.getElementById('adminNewItemPrice').value = '';
                 document.getElementById('adminNewItemDesc').value = '';
                 loadRestaurantMenu();
-                // تحديث واجهة العميل إذا كانت مفتوحة
                 if (document.getElementById('customerPage').classList.contains('active')) {
                     displayCustomerRestaurants();
                 }
             } else {
                 showNotification('فشل في إضافة الصنف', 'error');
             }
+        }
+
+        // =================================================================
+        //  دالة تسجيل دخول الأدمن (محلية، بدون خادم)
+        // =================================================================
+        async function adminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminLoginUser').value;
+            const pass = document.getElementById('adminLoginPass').value;
+            // التحقق المحلي (بدون خادم)
+            if (user === 'awad' && pass === '050313651') {
+                adminLoggedIn = true;
+                showAdminDashboard();
+                document.getElementById('adminLoginError').style.display = 'none';
+                showNotification('✅ مرحباً بك في لوحة الأدمن');
+            } else {
+                document.getElementById('adminLoginError').style.display = 'block';
+                document.getElementById('adminLoginError').textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+            }
+        }
+
+        // =================================================================
+        //  دوال لوحة الأدمن
+        // =================================================================
+        function logoutAdmin() {
+            adminLoggedIn = false;
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLoginPage').style.display = 'flex';
+            document.getElementById('adminLoginUser').value = '';
+            document.getElementById('adminLoginPass').value = '';
+            showNotification('تم تسجيل الخروج من لوحة الأدمن');
+            stopAutoRefresh('admin');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLoginPage').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            renderAdminUsers();
+            startAutoRefresh('admin', renderAdminUsers, 3000);
         }
 
         // =================================================================
@@ -3606,7 +3616,7 @@
 
         console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
         console.log(`📡 API_BASE: ${API_BASE}`);
-        console.log('✅ بيانات الأدمن: awad / 050313651');
+        console.log('✅ بيانات الأدمن: awad / 050313651 (تسجيل دخول محلي)');
         console.log('✅ تم تفعيل إدارة المطاعم (الأصناف) وإدارة موظفي المطاعم');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ');
     </script>

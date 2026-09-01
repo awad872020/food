@@ -6,7 +6,7 @@
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ============================================================
-           الأنماط العامة (نفس الكود السابق، لم يتغير)
+           الأنماط العامة (نفس الكود السابق)
            ============================================================ */
         * {
             margin: 0;
@@ -718,6 +718,20 @@
             display: inline-block;
             margin: 0.5rem 0;
         }
+        .menu-item-admin {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-item-admin .item-info {
+            flex: 1;
+        }
+        .menu-item-admin .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
         @media (max-width: 768px) {
             .stats-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -800,7 +814,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل (نفس الكود السابق)
+    صفحة العميل
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -905,7 +919,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة المطعم (مع تعديل منع التكرار)
+    صفحة المطعم
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -919,7 +933,6 @@
             </div>
         </div>
 
-        <!-- مودال الطلب الجديد للمطعم -->
         <div class="modal" id="restaurantNewOrderModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantNewOrderModal()">&times;</button>
@@ -1016,7 +1029,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن (مع تعديل منع التكرار)
+    صفحة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1031,7 +1044,6 @@
             </div>
         </div>
 
-        <!-- مودال الطلب الجاهز للكابتن -->
         <div class="modal" id="driverNewReadyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverNewReadyModal()">&times;</button>
@@ -1121,7 +1133,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الأدمن (نفس الكود السابق)
+    صفحة الأدمن (مع ميزات إدارة المطاعم والموظفين)
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1147,18 +1159,31 @@
                 </div>
             </div>
             <div style="padding:1.5rem 5%;">
+
+                <!-- ====== قسم إدارة المستخدمين ====== -->
                 <h2>إدارة المستخدمين</h2>
                 <div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;">
-                    <button class="btn btn-success" onclick="showAdminAddForm('restaurant')">➕ إضافة مطعم</button>
-                    <button class="btn btn-info" onclick="showAdminAddForm('driver')">➕ إضافة كابتن</button>
+                    <button class="btn btn-success" onclick="showAdminAddForm('restaurant')">➕ إدارة مطاعم</button>
+                    <button class="btn btn-info" onclick="showAdminAddForm('driver')">➕ إدارة كباتن</button>
+                    <button class="btn btn-warning" onclick="showAdminAddForm('staff')">➕ إدارة موظفي مطاعم</button>
                 </div>
                 <div id="adminFormContainer" style="display:none;background:white;padding:1.5rem;border-radius:15px;margin:1rem 0;">
                     <h3 id="adminFormTitle">إضافة مستخدم</h3>
                     <form class="login-form" onsubmit="adminSaveUser(event)">
                         <input type="hidden" id="adminEditId">
+                        <select id="adminUserType" required onchange="toggleAdminUserType()">
+                            <option value="restaurant">مطعم (مدير)</option>
+                            <option value="driver">كابتن</option>
+                            <option value="staff">موظف مطعم</option>
+                        </select>
                         <input type="text" id="adminUsername" placeholder="اسم المستخدم" required>
                         <input type="text" id="adminDisplayName" placeholder="الاسم الظاهر" required>
-                        <input type="text" id="adminExtra" placeholder="معلومات إضافية">
+                        <input type="text" id="adminExtra" placeholder="معلومات إضافية (رقم جوال مثلاً)">
+                        <div id="adminParentRestaurantDiv" style="display:none;">
+                            <select id="adminParentRestaurant" required>
+                                <option value="">-- اختر المطعم التابع --</option>
+                            </select>
+                        </div>
                         <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
                         <div style="display:flex;gap:1rem;">
                             <button type="submit" class="btn btn-success">حفظ</button>
@@ -1172,12 +1197,46 @@
                         <tbody id="adminUsersTableBody"></tbody>
                     </table>
                 </div>
+
+                <hr style="margin:2rem 0;">
+
+                <!-- ====== قسم إدارة المطاعم (الأصناف) ====== -->
+                <h2>إدارة قوائم المطاعم</h2>
+                <div style="margin:1rem 0;background:white;padding:1.5rem;border-radius:15px;">
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+                        <label style="font-weight:bold;">اختر المطعم:</label>
+                        <select id="adminMenuRestaurantSelect" onchange="loadRestaurantMenu()" style="flex:1;padding:0.5rem;border-radius:8px;border:1px solid #ddd;">
+                            <option value="">-- اختر مطعماً --</option>
+                        </select>
+                    </div>
+                    <div id="adminMenuContainer" style="margin-top:1rem;">
+                        <div id="adminMenuItemsList" style="margin-bottom:1rem;"></div>
+                        <div style="border-top:1px solid #eee;padding-top:1rem;">
+                            <h4>➕ إضافة صنف جديد</h4>
+                            <form onsubmit="adminAddMenuItem(event)" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end;">
+                                <div style="flex:1;min-width:150px;">
+                                    <label>اسم الصنف</label>
+                                    <input type="text" id="adminNewItemName" placeholder="مثل: شاورما دجاج" required style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:8px;">
+                                </div>
+                                <div style="flex:1;min-width:100px;">
+                                    <label>السعر (شيكل)</label>
+                                    <input type="number" id="adminNewItemPrice" placeholder="15" required style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:8px;">
+                                </div>
+                                <div style="flex:2;min-width:150px;">
+                                    <label>الوصف</label>
+                                    <input type="text" id="adminNewItemDesc" placeholder="مثل: مع ثوم" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:8px;">
+                                </div>
+                                <button type="submit" class="btn btn-success" style="margin-bottom:2px;">➕ إضافة</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع إضافة دالة uniqueOrders وتطبيقها)
+    الجافاسكريبت الكامل
     ============================================================ -->
     <script>
         // =================================================================
@@ -1193,19 +1252,202 @@
             STORAGE_KEYS: {
                 CUSTOMER_INFO: 'customer_info',
                 TRACKING_ORDER_ID: 'tracking_order_id',
-                DRIVER_SESSION: 'driver_session'
+                DRIVER_SESSION: 'driver_session',
+                RESTAURANTS_DATA: 'food_restaurants_data',
+                USERS_DATA: 'food_users_data'
             }
         };
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
-        //  Web Audio API - نظام الصوت المحسّن
+        //  إدارة بيانات المطاعم (الأصناف) محلياً
+        // =================================================================
+        // البيانات الافتراضية للمطاعم
+        const defaultRestaurants = [
+            { id: 1, name: 'مطعم اجعل لحد حوش', emoji: '🥩', cuisine: 'شاورما ومشاوي', category: 'shawarma', rating: 4.5,
+                menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18,
+                        desc: 'مع طحينة' }, { id: 10, name: 'كباب', price: 25, desc: 'لحم مفروم مشوي' }, { id: 11,
+                        name: 'شيش طاووق', price: 22, desc: 'دجاج متبل' }, { id: 12, name: 'ريش مشوي', price: 30,
+                        desc: 'لحم غنم' }, { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }] },
+            { id: 2, name: 'مطعم بيتزا', emoji: '🍕', cuisine: 'بيتزا وإيطالي', category: 'pizza', rating: 4.7,
+                menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28,
+                        desc: 'فلفل ومشروم' }] },
+            { id: 3, name: 'مطعم بروست', emoji: '🍗', cuisine: 'بروست ومقليات', category: 'broast', rating: 4.8,
+                menu: [{ id: 6, name: 'بروست دجاج', price: 35, desc: '8 قطع' }, { id: 7, name: 'أجنحة', price: 25,
+                        desc: '6 قطع' }] },
+            { id: 4, name: 'مطعم الشرق الأوسط', emoji: '🧆', cuisine: 'مأكولات عربية', category: 'arabic', rating: 4.6,
+                menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20,
+                        desc: 'مع لحم' }] }
+        ];
+
+        let globalRestaurants = [];
+
+        function loadRestaurantsFromStorage() {
+            const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.RESTAURANTS_DATA);
+            if (stored) {
+                try {
+                    globalRestaurants = JSON.parse(stored);
+                    // التأكد من وجود id لكل صنف
+                    globalRestaurants.forEach(r => {
+                        if (r.menu) {
+                            r.menu.forEach(item => { if (!item.id) item.id = Date.now() + Math.random() * 1000; });
+                        }
+                    });
+                    return;
+                } catch (e) {}
+            }
+            // إذا لم توجد بيانات، نستخدم الافتراضية ونحفظها
+            globalRestaurants = JSON.parse(JSON.stringify(defaultRestaurants));
+            // إعطاء معرفات للأصناف
+            globalRestaurants.forEach(r => {
+                r.menu.forEach((item, idx) => { item.id = item.id || (r.id * 100 + idx + 1); });
+            });
+            saveRestaurantsToStorage();
+        }
+
+        function saveRestaurantsToStorage() {
+            localStorage.setItem(CONFIG.STORAGE_KEYS.RESTAURANTS_DATA, JSON.stringify(globalRestaurants));
+        }
+
+        function getRestaurants() {
+            return globalRestaurants;
+        }
+
+        function getRestaurantById(id) {
+            return globalRestaurants.find(r => r.id === id);
+        }
+
+        function addMenuItem(restId, name, price, desc) {
+            const rest = getRestaurantById(restId);
+            if (!rest) return false;
+            const newId = Date.now() + Math.floor(Math.random() * 1000);
+            rest.menu.push({ id: newId, name, price: parseFloat(price), desc: desc || '' });
+            saveRestaurantsToStorage();
+            return true;
+        }
+
+        function deleteMenuItem(restId, itemId) {
+            const rest = getRestaurantById(restId);
+            if (!rest) return false;
+            rest.menu = rest.menu.filter(item => item.id !== itemId);
+            saveRestaurantsToStorage();
+            return true;
+        }
+
+        // =================================================================
+        //  إدارة المستخدمين (محاكاة الخادم)
+        // =================================================================
+        const defaultUsers = {
+            restaurants: [
+                { username: 'rest1', displayName: 'مطعم اجعل لحد حوش', extra: '0599999999', password: '123' },
+                { username: 'rest2', displayName: 'مطعم بيتزا', extra: '0598888888', password: '123' },
+                { username: 'rest3', displayName: 'مطعم بروست', extra: '0597777777', password: '123' },
+                { username: 'rest4', displayName: 'مطعم الشرق الأوسط', extra: '0596666666', password: '123' }
+            ],
+            drivers: [
+                { username: 'driver1', displayName: 'أحمد الكابتن', extra: '0591111111', password: '123' },
+                { username: 'driver2', displayName: 'محمد الكابتن', extra: '0592222222', password: '123' }
+            ],
+            staff: [
+                // { username: 'staff1', displayName: 'موظف بيتزا', extra: '0593333333', password: '123', parentRestaurant: 'مطعم بيتزا' }
+            ]
+        };
+
+        let globalUsers = { restaurants: [], drivers: [], staff: [] };
+
+        function loadUsersFromStorage() {
+            const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.USERS_DATA);
+            if (stored) {
+                try {
+                    globalUsers = JSON.parse(stored);
+                    return;
+                } catch (e) {}
+            }
+            globalUsers = JSON.parse(JSON.stringify(defaultUsers));
+            saveUsersToStorage();
+        }
+
+        function saveUsersToStorage() {
+            localStorage.setItem(CONFIG.STORAGE_KEYS.USERS_DATA, JSON.stringify(globalUsers));
+        }
+
+        // =================================================================
+        //  دوال الخادم (محاكاة)
+        // =================================================================
+        async function getOrders() {
+            const res = await fetch(`${API_BASE}/orders`);
+            if (!res.ok) throw new Error('فشل في جلب الطلبات');
+            return await res.json();
+        }
+        async function createOrder(orderData) {
+            const res = await fetch(`${API_BASE}/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            if (!res.ok) throw new Error('فشل في إنشاء الطلب');
+            return await res.json();
+        }
+        async function updateOrderStatus(orderId, newStatus, additionalData = {}) {
+            const res = await fetch(`${API_BASE}/orders/${orderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus, ...additionalData })
+            });
+            if (!res.ok) throw new Error('فشل في تحديث الطلب');
+            return await res.json();
+        }
+
+        // دوال المستخدمين (محاكاة)
+        async function getUsers() {
+            // نعيد نسخة من البيانات
+            return JSON.parse(JSON.stringify(globalUsers));
+        }
+        async function saveUsers(users) {
+            globalUsers = JSON.parse(JSON.stringify(users));
+            saveUsersToStorage();
+            return true;
+        }
+        async function adminLoginAPI(username, password) {
+            // بيانات الأدمن ثابتة
+            if (username === 'awad' && password === '050313651') {
+                return { success: true };
+            }
+            return { success: false };
+        }
+
+        // =================================================================
+        //  دوال مساعدة
+        // =================================================================
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-GB', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            });
+        }
+        function generateVerificationCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        function uniqueOrders(orders) {
+            const seen = new Set();
+            return orders.filter(order => {
+                const key = order.id;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        // =================================================================
+        //  Web Audio API
         // =================================================================
         let audioCtx = null;
 
         function getAudioContext() {
             if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             }
             return audioCtx;
         }
@@ -1249,82 +1491,6 @@
         }
 
         // =================================================================
-        //  دوال الخادم
-        // =================================================================
-        async function getOrders() {
-            const res = await fetch(`${API_BASE}/orders`);
-            if (!res.ok) throw new Error('فشل في جلب الطلبات');
-            return await res.json();
-        }
-        async function createOrder(orderData) {
-            const res = await fetch(`${API_BASE}/orders`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-            if (!res.ok) throw new Error('فشل في إنشاء الطلب');
-            return await res.json();
-        }
-        async function updateOrderStatus(orderId, newStatus, additionalData = {}) {
-            const res = await fetch(`${API_BASE}/orders/${orderId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus, ...additionalData })
-            });
-            if (!res.ok) throw new Error('فشل في تحديث الطلب');
-            return await res.json();
-        }
-        async function getUsers() {
-            const res = await fetch(`${API_BASE}/users`);
-            if (!res.ok) throw new Error('فشل في جلب المستخدمين');
-            return await res.json();
-        }
-        async function saveUsers(users) {
-            const res = await fetch(`${API_BASE}/users`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(users)
-            });
-            if (!res.ok) throw new Error('فشل في حفظ المستخدمين');
-            return await res.json();
-        }
-        async function adminLoginAPI(username, password) {
-            const res = await fetch(`${API_BASE}/admin/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            return await res.json();
-        }
-
-        // =================================================================
-        //  دوال مساعدة
-        // =================================================================
-        function formatDate(dateStr) {
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('en-GB', {
-                year: 'numeric', month: '2-digit', day: '2-digit',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-            });
-        }
-        function generateVerificationCode() {
-            return Math.floor(1000 + Math.random() * 9000).toString();
-        }
-
-        // =================================================================
-        //  دالة إزالة التكرارات من مصفوفة الطلبات (بناءً على id)
-        // =================================================================
-        function uniqueOrders(orders) {
-            const seen = new Set();
-            return orders.filter(order => {
-                const key = order.id;
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
-        }
-
-        // =================================================================
         //  إشعارات
         // =================================================================
         function showNotification(msg, type = 'success') {
@@ -1357,6 +1523,7 @@
                 }
             });
         }
+
         function sendDesktopNotification(title, body) {
             if (!('Notification' in window)) return;
             if (Notification.permission === 'granted') {
@@ -1368,7 +1535,6 @@
             }
         }
 
-        // إشعارات Push حقيقية
         async function registerFcmTokenIfNeeded(role, username) {
             try {
                 if (!window.AndroidBridge || typeof window.AndroidBridge.getFcmToken !== 'function') return;
@@ -1385,7 +1551,7 @@
         }
 
         // =================================================================
-        //  التنقل
+        //  التنقل والتحديث التلقائي
         // =================================================================
         function navigateTo(page) {
             stopAutoRefresh('customer');
@@ -1428,7 +1594,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer) - نفس الكود السابق
+        //  العميل (Customer)
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1436,16 +1602,10 @@
         let customerTrackingInterval = null;
         let customerTrackingId = null;
 
-        const customerRestaurants = [
-            { id: 1, name: 'مطعم اجعل لحد حوش', emoji: '🥩', cuisine: 'شاورما ومشاوي', category: 'shawarma', rating: 4.5,
-                menu: [{ id: 1, name: 'شاورما دجاج', price: 15, desc: 'مع ثوم' }, { id: 2, name: 'شاورما لحم', price: 18, desc: 'مع طحينة' }, { id: 10, name: 'كباب', price: 25, desc: 'لحم مفروم مشوي' }, { id: 11, name: 'شيش طاووق', price: 22, desc: 'دجاج متبل' }, { id: 12, name: 'ريش مشوي', price: 30, desc: 'لحم غنم' }, { id: 3, name: 'بطاطس', price: 8, desc: 'مقرمشة' }] },
-            { id: 2, name: 'مطعم بيتزا', emoji: '🍕', cuisine: 'بيتزا وإيطالي', category: 'pizza', rating: 4.7,
-                menu: [{ id: 4, name: 'مارغريتا', price: 25, desc: 'موزاريلا' }, { id: 5, name: 'خضار', price: 28, desc: 'فلفل ومشروم' }] },
-            { id: 3, name: 'مطعم بروست', emoji: '🍗', cuisine: 'بروست ومقليات', category: 'broast', rating: 4.8,
-                menu: [{ id: 6, name: 'بروست دجاج', price: 35, desc: '8 قطع' }, { id: 7, name: 'أجنحة', price: 25, desc: '6 قطع' }] },
-            { id: 4, name: 'مطعم الشرق الأوسط', emoji: '🧆', cuisine: 'مأكولات عربية', category: 'arabic', rating: 4.6,
-                menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20, desc: 'مع لحم' }] }
-        ];
+        // نستخدم globalRestaurants بدلاً من الثابتة
+        function getCustomerRestaurants() {
+            return globalRestaurants;
+        }
 
         function initCustomer() {
             displayCustomerRestaurants();
@@ -1501,7 +1661,7 @@
         function displayCustomerRestaurants() {
             const grid = document.getElementById('customerRestaurantsGrid');
             grid.innerHTML = '';
-            let list = customerRestaurants;
+            let list = getCustomerRestaurants();
             if (customerFilter !== 'all') list = list.filter(r => r.category === customerFilter);
             const search = document.getElementById('customerSearch').value.toLowerCase();
             if (search) list = list.filter(r => r.name.includes(search) || r.cuisine.includes(search));
@@ -1539,7 +1699,7 @@
         }
 
         function showCustomerMenu(restId) {
-            const rest = customerRestaurants.find(r => r.id === restId);
+            const rest = getRestaurantById(restId);
             if (!rest) return;
             const modal = document.getElementById('customerCartModal');
             const container = document.getElementById('customerCartItems');
@@ -1563,7 +1723,7 @@
         }
 
         function addToCustomerCart(restId, itemId) {
-            const rest = customerRestaurants.find(r => r.id === restId);
+            const rest = getRestaurantById(restId);
             const item = rest.menu.find(i => i.id === itemId);
             const existing = customerCart.find(c => c.itemId === itemId);
             if (existing) existing.quantity += 1;
@@ -1716,7 +1876,7 @@
 
         function updateCustomerTrackingSteps(status) {
             const map = { pending: 1, preparing: 2, ready_for_pickup: 2, picking: 3, delivering: 3, completed: 4,
-            cancelled: -1 };
+                cancelled: -1 };
             const cur = map[status] || 1;
             for (let i = 1; i <= 4; i++) {
                 const el = document.getElementById('cstep' + i);
@@ -1812,7 +1972,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع تطبيق uniqueOrders
+        //  المطعم (Restaurant)
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1842,10 +2002,18 @@
             sel.innerHTML = '<option value="">اختر المطعم</option>';
             try {
                 const users = await getUsers();
+                // نضيف المدراء
                 users.restaurants.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.username;
-                    opt.textContent = u.displayName;
+                    opt.textContent = u.displayName + ' (مدير)';
+                    sel.appendChild(opt);
+                });
+                // نضيف الموظفين
+                users.staff.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.username;
+                    opt.textContent = u.displayName + ' (موظف - ' + u.parentRestaurant + ')';
                     sel.appendChild(opt);
                 });
             } catch (e) {
@@ -1859,12 +2027,39 @@
             const pass = document.getElementById('restaurantPassword').value;
             try {
                 const users = await getUsers();
-                const found = users.restaurants.find(u => u.username === username && u.password === pass);
+                // البحث في المدراء أولاً
+                let found = users.restaurants.find(u => u.username === username && u.password === pass);
+                let isStaff = false;
+                let parentRestaurantName = null;
+                if (!found) {
+                    // البحث في الموظفين
+                    const staffFound = users.staff.find(u => u.username === username && u.password === pass);
+                    if (staffFound) {
+                        isStaff = true;
+                        parentRestaurantName = staffFound.parentRestaurant;
+                        // نبحث عن المطعم الرئيسي
+                        const parent = users.restaurants.find(r => r.displayName === parentRestaurantName);
+                        if (parent) {
+                            found = { ...parent, staffDisplayName: staffFound.displayName, isStaff: true };
+                        } else {
+                            showNotification('المطعم التابع غير موجود', 'error');
+                            return;
+                        }
+                    }
+                }
                 if (!found) {
                     document.getElementById('restaurantLoginError').style.display = 'block';
                     return;
                 }
                 document.getElementById('restaurantLoginError').style.display = 'none';
+                if (isStaff) {
+                    // نضيف معلومات الموظف للكائن
+                    found.staffDisplayName = found.staffDisplayName || found.displayName;
+                    found.isStaff = true;
+                    found.originalUsername = username;
+                    found.originalDisplayName = found.staffDisplayName;
+                    found.parentRestaurant = parentRestaurantName;
+                }
                 currentRestaurantUser = found;
                 localStorage.setItem('current_restaurant_user', JSON.stringify(found));
                 showRestaurantDashboard();
@@ -1878,7 +2073,12 @@
         function showRestaurantDashboard() {
             document.getElementById('restaurantLoginPage').style.display = 'none';
             document.getElementById('restaurantDashboard').style.display = 'block';
-            document.getElementById('restaurantBadge').textContent = `🍽️ ${currentRestaurantUser.displayName}`;
+            let displayName = currentRestaurantUser.displayName;
+            if (currentRestaurantUser.isStaff) {
+                displayName = currentRestaurantUser.originalDisplayName + ' (موظف - ' + currentRestaurantUser.parentRestaurant +
+                ')';
+            }
+            document.getElementById('restaurantBadge').textContent = `🍽️ ${displayName}`;
             lastRestaurantOrders = [];
             refreshRestaurantViews();
         }
@@ -1935,8 +2135,12 @@
             if (!currentRestaurantUser) return;
             try {
                 const allOrders = await getOrders();
-                const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
-                // إزالة التكرارات
+                // نستخدم اسم المطعم الرئيسي (في حالة الموظف نأخذ اسم المطعم الأصلي)
+                let restaurantName = currentRestaurantUser.displayName;
+                if (currentRestaurantUser.isStaff && currentRestaurantUser.parentRestaurant) {
+                    restaurantName = currentRestaurantUser.parentRestaurant;
+                }
+                const myOrders = allOrders.filter(o => o.restaurantName === restaurantName);
                 const unique = uniqueOrders(myOrders);
 
                 const newPending = unique.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
@@ -1954,7 +2158,6 @@
             }
         }
 
-        // تعديل دوال العرض لتقبل مصفوفة الطلبات (اختياري)
         async function displayRestaurantOrders(providedOrders) {
             const grid = document.getElementById('restaurantOrdersGrid');
             grid.innerHTML = '';
@@ -1965,7 +2168,11 @@
                     orders = providedOrders;
                 } else {
                     const allOrders = await getOrders();
-                    orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                    let restaurantName = currentRestaurantUser.displayName;
+                    if (currentRestaurantUser.isStaff && currentRestaurantUser.parentRestaurant) {
+                        restaurantName = currentRestaurantUser.parentRestaurant;
+                    }
+                    orders = allOrders.filter(o => o.restaurantName === restaurantName);
                     orders = uniqueOrders(orders);
                 }
 
@@ -1985,7 +2192,7 @@
                 }
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                
+
                 if (restaurantFilter !== 'all') {
                     grid.style.display = 'none';
                     return;
@@ -2009,8 +2216,10 @@
                         `;
                     } else {
                         if (o.status === 'preparing') actions = `<span style="color:#1e90ff;">👨‍🍳 قيد التحضير</span>`;
-                        else if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
-                        else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام (بانتظار تأكيد المطعم)</span>`;
+                        else if (o.status === 'ready_for_pickup') actions =
+                            `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
+                        else if (o.status === 'picking') actions =
+                            `<span style="color:#ffa502;">🏪 قيد الاستلام (بانتظار تأكيد المطعم)</span>`;
                         else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
                         else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
                         else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
@@ -2075,7 +2284,7 @@
 
         async function displayRestaurantStatusSections(providedOrders) {
             if (!currentRestaurantUser) return;
-            
+
             if (restaurantFilter === 'all') {
                 document.getElementById('restaurantPreparingSection').style.display = 'none';
                 document.getElementById('restaurantReadySection').style.display = 'none';
@@ -2090,7 +2299,11 @@
                     orders = providedOrders;
                 } else {
                     const allOrders = await getOrders();
-                    orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+                    let restaurantName = currentRestaurantUser.displayName;
+                    if (currentRestaurantUser.isStaff && currentRestaurantUser.parentRestaurant) {
+                        restaurantName = currentRestaurantUser.parentRestaurant;
+                    }
+                    orders = allOrders.filter(o => o.restaurantName === restaurantName);
                     orders = uniqueOrders(orders);
                 }
 
@@ -2118,7 +2331,8 @@
                             const itemTotal = item.price * item.quantity;
                             return `${item.itemName} × ${item.quantity} = ${itemTotal} شيكل`;
                         }).join('، ');
-                        const totalItemsPrice = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const totalItemsPrice = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         const displayTotal = o.itemsTotal || totalItemsPrice;
                         return `
                             <div class="mini-order-card" style="border-right-color:#1e90ff;">
@@ -2146,7 +2360,8 @@
                     readySection.style.display = 'block';
                     readyGrid.innerHTML = ready.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         return `
                             <div class="mini-order-card" style="border-right-color:#00b894;">
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
@@ -2174,7 +2389,8 @@
                     pickSection.style.display = 'block';
                     pickGrid.innerHTML = picking.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         return `
                             <div class="mini-order-card" style="border-right-color:#ffa502;">
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
@@ -2202,7 +2418,8 @@
                     delSection.style.display = 'block';
                     delGrid.innerHTML = delivering.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         return `
                             <div class="mini-order-card" style="border-right-color:#9c27b0;">
                                 <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
@@ -2221,7 +2438,7 @@
             }
         }
 
-        // ---- دوال المطعم (نفسها) ----
+        // ---- دوال المطعم ----
         function openRestaurantPickupModal(orderId) {
             pendingPickupOrderId = orderId;
             const select = document.getElementById('restaurantPickupDriverSelect');
@@ -2383,7 +2600,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - مع تطبيق uniqueOrders
+        //  الكابتن (Driver)
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2526,7 +2743,6 @@
                     if (o.status === 'ready_for_pickup' && driverOnline) return true;
                     return o.driverId === currentDriverUser.username;
                 });
-                // إزالة التكرارات
                 const unique = uniqueOrders(myOrders);
 
                 const newReady = unique.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
@@ -2576,7 +2792,7 @@
                 if (driverFilter !== 'all') orders = orders.filter(o => o.status === driverFilter);
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                
+
                 if (driverFilter !== 'all') {
                     grid.style.display = 'none';
                     return;
@@ -2643,7 +2859,7 @@
 
         async function displayDriverStatusSections(providedOrders) {
             if (!currentDriverUser) return;
-            
+
             if (driverFilter === 'all') {
                 document.getElementById('driverReadySection').style.display = 'none';
                 document.getElementById('driverPickingSection').style.display = 'none';
@@ -2686,7 +2902,8 @@
                     readySection.style.display = 'block';
                     readyGrid.innerHTML = ready.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
                         const totalPrice = o.total || (itemsTotal + deliveryFee);
                         return `
@@ -2718,7 +2935,8 @@
                     pickSection.style.display = 'block';
                     pickGrid.innerHTML = picking.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
                         const totalPrice = o.total || (itemsTotal + deliveryFee);
                         return `
@@ -2741,7 +2959,8 @@
                 }
 
                 // delivering
-                const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
+                const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser
+                .username);
                 const delGrid = document.getElementById('driverDeliveringGrid');
                 const delSection = document.getElementById('driverDeliveringSection');
                 if (delivering.length === 0) {
@@ -2750,7 +2969,8 @@
                     delSection.style.display = 'block';
                     delGrid.innerHTML = delivering.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
                         const totalPrice = o.total || (itemsTotal + deliveryFee);
                         return `
@@ -2773,7 +2993,8 @@
                 }
 
                 // completed
-                const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
+                const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser
+                .username);
                 const compGrid = document.getElementById('driverCompletedGrid');
                 const compSection = document.getElementById('driverCompletedSection');
                 if (completed.length === 0) {
@@ -2782,7 +3003,8 @@
                     compSection.style.display = 'block';
                     compGrid.innerHTML = completed.map(o => {
                         const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
-                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity),
+                        0);
                         const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
                         const totalPrice = o.total || (itemsTotal + deliveryFee);
                         return `
@@ -2805,7 +3027,7 @@
             }
         }
 
-        // ---- دوال الكابتن (نفسها) ----
+        // ---- دوال الكابتن ----
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2937,18 +3159,23 @@
             document.getElementById('dCompleted').textContent = driverStatsData.completedOrders || 0;
             document.getElementById('dEarnings').textContent = driverStatsData.totalEarnings || 0;
             document.getElementById('dRating').textContent = (driverStatsData.rating || 5.0).toFixed(1);
-            // تحديث الأعداد من orders المقدمة إن وجدت
             if (providedOrders) {
                 const orders = providedOrders;
-                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username).length;
-                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username).length;
-                document.getElementById('dAvailable').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
+                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking' && o.driverId ===
+                    currentDriverUser.username).length;
+                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering' && o
+                    .driverId === currentDriverUser.username).length;
+                document.getElementById('dAvailable').textContent = orders.filter(o => o.status === 'ready_for_pickup')
+                    .length;
             } else {
                 getOrders().then(allOrders => {
                     const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
-                    document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
-                    document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering').length;
-                    document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status === 'ready_for_pickup').length;
+                    document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking')
+                        .length;
+                    document.getElementById('dDelivering').textContent = orders.filter(o => o.status ===
+                        'delivering').length;
+                    document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status ===
+                        'ready_for_pickup').length;
                 }).catch(() => {});
             }
         }
@@ -2984,7 +3211,7 @@
         }
 
         // =================================================================
-        //  الأدمن (Admin) - نفس الكود السابق
+        //  الأدمن (Admin)
         // =================================================================
         let adminLoggedIn = false;
 
@@ -2995,43 +3222,112 @@
             document.getElementById('adminLoginPass').value = '';
             document.getElementById('adminLoginError').style.display = 'none';
             stopAutoRefresh('admin');
+            // تحديث قائمة المطاعم في إدارة القوائم
+            populateAdminRestaurantSelect();
         }
 
-        async function adminLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('adminLoginUser').value;
-            const pass = document.getElementById('adminLoginPass').value;
-            try {
-                const result = await adminLoginAPI(user, pass);
-                if (result.success) {
-                    adminLoggedIn = true;
-                    showAdminDashboard();
-                    document.getElementById('adminLoginError').style.display = 'none';
-                    showNotification('✅ مرحباً بك في لوحة الأدمن');
-                } else {
-                    document.getElementById('adminLoginError').style.display = 'block';
-                    document.getElementById('adminLoginError').textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
-                }
-            } catch (e) {
-                showNotification('فشل في الاتصال بالخادم', 'error');
+        function populateAdminRestaurantSelect() {
+            const sel = document.getElementById('adminMenuRestaurantSelect');
+            sel.innerHTML = '<option value="">-- اختر مطعماً --</option>';
+            const rests = getRestaurants();
+            rests.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = r.name;
+                sel.appendChild(opt);
+            });
+            // تحديث قائمة المطاعم التابعة في نموذج إضافة الموظف
+            populateAdminParentRestaurantSelect();
+        }
+
+        function populateAdminParentRestaurantSelect() {
+            const sel = document.getElementById('adminParentRestaurant');
+            sel.innerHTML = '<option value="">-- اختر المطعم التابع --</option>';
+            const users = getUsers();
+            users.restaurants.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.displayName;
+                opt.textContent = r.displayName;
+                sel.appendChild(opt);
+            });
+        }
+
+        function toggleAdminUserType() {
+            const type = document.getElementById('adminUserType').value;
+            const div = document.getElementById('adminParentRestaurantDiv');
+            if (type === 'staff') {
+                div.style.display = 'block';
+                populateAdminParentRestaurantSelect();
+            } else {
+                div.style.display = 'none';
             }
         }
 
-        function logoutAdmin() {
-            adminLoggedIn = false;
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('adminLoginPage').style.display = 'flex';
-            document.getElementById('adminLoginUser').value = '';
-            document.getElementById('adminLoginPass').value = '';
-            showNotification('تم تسجيل الخروج من لوحة الأدمن');
-            stopAutoRefresh('admin');
+        function showAdminAddForm(type) {
+            document.getElementById('adminFormContainer').style.display = 'block';
+            document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '➕ إدارة مطاعم' :
+                type === 'driver' ? '➕ إدارة كباتن' : '➕ إدارة موظفي مطاعم';
+            document.getElementById('adminEditId').value = '';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminDisplayName').value = '';
+            document.getElementById('adminExtra').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminUserType').value = type;
+            toggleAdminUserType();
+            document.getElementById('adminFormContainer').dataset.type = type;
         }
 
-        function showAdminDashboard() {
-            document.getElementById('adminLoginPage').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
-            renderAdminUsers();
-            startAutoRefresh('admin', renderAdminUsers, 3000);
+        function hideAdminForm() {
+            document.getElementById('adminFormContainer').style.display = 'none';
+        }
+
+        async function adminSaveUser(e) {
+            e.preventDefault();
+            const type = document.getElementById('adminUserType').value;
+            const editId = document.getElementById('adminEditId').value;
+            const username = document.getElementById('adminUsername').value.trim();
+            const displayName = document.getElementById('adminDisplayName').value.trim();
+            const extra = document.getElementById('adminExtra').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const parentRestaurant = document.getElementById('adminParentRestaurant').value;
+
+            if (!username || !displayName || !password) { showNotification('جميع الحقول مطلوبة', 'error'); return; }
+            if (type === 'staff' && !parentRestaurant) { showNotification('يرجى اختيار المطعم التابع', 'error'); return; }
+
+            try {
+                const users = await getUsers();
+                let list = [];
+                if (type === 'restaurant') list = users.restaurants;
+                else if (type === 'driver') list = users.drivers;
+                else if (type === 'staff') list = users.staff;
+
+                if (!editId && list.find(u => u.username === username)) {
+                    showNotification('اسم المستخدم موجود مسبقاً', 'error');
+                    return;
+                }
+
+                const newUser = { username, displayName, extra, password };
+                if (type === 'staff') newUser.parentRestaurant = parentRestaurant;
+
+                if (editId) {
+                    const idx = list.findIndex(u => u.username === editId);
+                    if (idx !== -1) {
+                        list[idx] = newUser;
+                    }
+                } else {
+                    list.push(newUser);
+                }
+
+                await saveUsers(users);
+                hideAdminForm();
+                renderAdminUsers();
+                showNotification(`✅ تم حفظ المستخدم ${displayName}`);
+                populateRestaurantSelect();
+                populateDriverSelect();
+                populateAdminParentRestaurantSelect();
+            } catch (e) {
+                showNotification('فشل في حفظ المستخدم', 'error');
+            }
         }
 
         async function renderAdminUsers() {
@@ -3039,10 +3335,11 @@
                 const users = await getUsers();
                 const tbody = document.getElementById('adminUsersTableBody');
                 tbody.innerHTML = '';
+                // المدراء
                 users.restaurants.forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>🍽️ مطعم</td>
+                        <td>🍽️ مطعم (مدير)</td>
                         <td>${u.username}</td>
                         <td>${u.displayName}</td>
                         <td>${u.extra || '-'}</td>
@@ -3053,6 +3350,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
+                // الكباتن
                 users.drivers.forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -3067,7 +3365,23 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                if (!users.restaurants.length && !users.drivers.length) {
+                // الموظفين
+                users.staff.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>👨‍💼 موظف مطعم (${u.parentRestaurant})</td>
+                        <td>${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td>${u.extra || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="adminEditUser('staff','${u.username}')">✏️</button>
+                            <button class="btn btn-danger" onclick="adminDeleteUser('staff','${u.username}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                if (!users.restaurants.length && !users.drivers.length && !users.staff.length) {
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;">لا يوجد مستخدمين</td></tr>';
                 }
             } catch (e) {
@@ -3075,71 +3389,29 @@
             }
         }
 
-        function showAdminAddForm(type) {
-            document.getElementById('adminFormContainer').style.display = 'block';
-            document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '➕ إضافة مطعم' :
-                '➕ إضافة كابتن';
-            document.getElementById('adminEditId').value = '';
-            document.getElementById('adminUsername').value = '';
-            document.getElementById('adminDisplayName').value = '';
-            document.getElementById('adminExtra').value = '';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminFormContainer').dataset.type = type;
-        }
-
-        function hideAdminForm() {
-            document.getElementById('adminFormContainer').style.display = 'none';
-        }
-
-        async function adminSaveUser(e) {
-            e.preventDefault();
-            const type = document.getElementById('adminFormContainer').dataset.type;
-            const editId = document.getElementById('adminEditId').value;
-            const username = document.getElementById('adminUsername').value.trim();
-            const displayName = document.getElementById('adminDisplayName').value.trim();
-            const extra = document.getElementById('adminExtra').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-            if (!username || !displayName || !password) { showNotification('جميع الحقول مطلوبة', 'error'); return; }
-            try {
-                const users = await getUsers();
-                const list = type === 'restaurant' ? users.restaurants : users.drivers;
-                if (!editId && list.find(u => u.username === username)) {
-                    showNotification('اسم المستخدم موجود مسبقاً', 'error');
-                    return;
-                }
-                if (editId) {
-                    const idx = list.findIndex(u => u.username === editId);
-                    if (idx !== -1) {
-                        list[idx] = { username, displayName, extra, password };
-                    }
-                } else {
-                    list.push({ username, displayName, extra, password });
-                }
-                await saveUsers(users);
-                hideAdminForm();
-                renderAdminUsers();
-                showNotification(`✅ تم حفظ المستخدم ${displayName}`);
-                populateRestaurantSelect();
-                populateDriverSelect();
-            } catch (e) {
-                showNotification('فشل في حفظ المستخدم', 'error');
-            }
-        }
-
         async function adminEditUser(type, username) {
             try {
                 const users = await getUsers();
-                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                let list = [];
+                if (type === 'restaurant') list = users.restaurants;
+                else if (type === 'driver') list = users.drivers;
+                else if (type === 'staff') list = users.staff;
                 const found = list.find(u => u.username === username);
                 if (!found) return;
+
                 document.getElementById('adminFormContainer').style.display = 'block';
                 document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '✏️ تعديل مطعم' :
-                    '✏️ تعديل كابتن';
+                    type === 'driver' ? '✏️ تعديل كابتن' : '✏️ تعديل موظف';
                 document.getElementById('adminEditId').value = username;
                 document.getElementById('adminUsername').value = found.username;
                 document.getElementById('adminDisplayName').value = found.displayName;
                 document.getElementById('adminExtra').value = found.extra || '';
                 document.getElementById('adminPassword').value = found.password;
+                document.getElementById('adminUserType').value = type;
+                if (type === 'staff') {
+                    document.getElementById('adminParentRestaurant').value = found.parentRestaurant || '';
+                }
+                toggleAdminUserType();
                 document.getElementById('adminFormContainer').dataset.type = type;
             } catch (e) {
                 showNotification('فشل في تحميل بيانات المستخدم', 'error');
@@ -3150,7 +3422,10 @@
             if (!confirm(`تأكيد حذف المستخدم "${username}"؟`)) return;
             try {
                 const users = await getUsers();
-                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                let list = [];
+                if (type === 'restaurant') list = users.restaurants;
+                else if (type === 'driver') list = users.drivers;
+                else if (type === 'staff') list = users.staff;
                 const idx = list.findIndex(u => u.username === username);
                 if (idx !== -1) {
                     list.splice(idx, 1);
@@ -3159,11 +3434,94 @@
                     showNotification(`🗑️ تم حذف المستخدم`);
                     populateRestaurantSelect();
                     populateDriverSelect();
+                    populateAdminParentRestaurantSelect();
                     if (type === 'restaurant' && currentRestaurantUser?.username === username) logoutRestaurant();
                     if (type === 'driver' && currentDriverUser?.username === username) logoutDriver();
                 }
             } catch (e) {
                 showNotification('فشل في حذف المستخدم', 'error');
+            }
+        }
+
+        // ===== دوال إدارة المطاعم (الأصناف) في الأدمن =====
+        function loadRestaurantMenu() {
+            const sel = document.getElementById('adminMenuRestaurantSelect');
+            const restId = parseInt(sel.value);
+            const container = document.getElementById('adminMenuItemsList');
+            if (!restId) {
+                container.innerHTML = '<p style="color:#636e72;">يرجى اختيار مطعم لعرض قائمته</p>';
+                return;
+            }
+            const rest = getRestaurantById(restId);
+            if (!rest) {
+                container.innerHTML = '<p style="color:#ff4757;">المطعم غير موجود</p>';
+                return;
+            }
+            if (!rest.menu || rest.menu.length === 0) {
+                container.innerHTML = '<p style="color:#636e72;">لا توجد أصناف في قائمة هذا المطعم</p>';
+                return;
+            }
+            let html = '<h4>📋 الأصناف الحالية</h4><div style="margin-top:0.5rem;">';
+            rest.menu.forEach(item => {
+                html += `
+                    <div class="menu-item-admin">
+                        <div class="item-info">
+                            <strong>${item.name}</strong> - ${item.price} شيكل
+                            ${item.desc ? `<span style="color:#636e72;font-size:0.85rem;"> (${item.desc})</span>` : ''}
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger" style="padding:0.2rem 0.8rem;font-size:0.8rem;" onclick="adminDeleteMenuItem(${restId}, ${item.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function adminDeleteMenuItem(restId, itemId) {
+            if (!confirm('تأكيد حذف هذا الصنف؟')) return;
+            if (deleteMenuItem(restId, itemId)) {
+                showNotification('✅ تم حذف الصنف بنجاح');
+                loadRestaurantMenu();
+                // تحديث واجهة العميل إذا كانت مفتوحة
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    displayCustomerRestaurants();
+                }
+            } else {
+                showNotification('فشل في حذف الصنف', 'error');
+            }
+        }
+
+        function adminAddMenuItem(e) {
+            e.preventDefault();
+            const sel = document.getElementById('adminMenuRestaurantSelect');
+            const restId = parseInt(sel.value);
+            if (!restId) {
+                showNotification('يرجى اختيار مطعم أولاً', 'error');
+                return;
+            }
+            const name = document.getElementById('adminNewItemName').value.trim();
+            const price = parseFloat(document.getElementById('adminNewItemPrice').value);
+            const desc = document.getElementById('adminNewItemDesc').value.trim();
+
+            if (!name || !price) {
+                showNotification('الاسم والسعر مطلوبان', 'error');
+                return;
+            }
+
+            if (addMenuItem(restId, name, price, desc)) {
+                showNotification(`✅ تمت إضافة الصنف "${name}" بنجاح`);
+                document.getElementById('adminNewItemName').value = '';
+                document.getElementById('adminNewItemPrice').value = '';
+                document.getElementById('adminNewItemDesc').value = '';
+                loadRestaurantMenu();
+                // تحديث واجهة العميل إذا كانت مفتوحة
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    displayCustomerRestaurants();
+                }
+            } else {
+                showNotification('فشل في إضافة الصنف', 'error');
             }
         }
 
@@ -3174,7 +3532,11 @@
             if (event.data.type === 'NEW_ORDER') {
                 if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
                     const order = event.data.order;
-                    if (order.restaurantName === currentRestaurantUser.displayName) {
+                    let restaurantName = currentRestaurantUser.displayName;
+                    if (currentRestaurantUser.isStaff && currentRestaurantUser.parentRestaurant) {
+                        restaurantName = currentRestaurantUser.parentRestaurant;
+                    }
+                    if (order.restaurantName === restaurantName) {
                         showNewOrderModal(order);
                         refreshRestaurantViews();
                     }
@@ -3228,6 +3590,12 @@
             }
         }
 
+        // =================================================================
+        //  التهيئة العامة
+        // =================================================================
+        loadRestaurantsFromStorage();
+        loadUsersFromStorage();
+
         document.addEventListener('click', () => {
             const ctx = getAudioContext();
             if (ctx.state === 'suspended') ctx.resume();
@@ -3239,10 +3607,8 @@
         console.log('🍔 ديليفري اذنا - نظام توصيل الطعام (نسخة خادم خلفي)');
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
-        console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
-        console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
-        console.log('✅ تم حل مشكلة تكرار الطلبات (باستخدام دالة uniqueOrders)');
-        console.log('✅ تم توضيح أن سعر المنتجات لا يشمل رسوم التوصيل');
+        console.log('✅ تم تفعيل إدارة المطاعم (الأصناف) وإدارة موظفي المطاعم');
+        console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ');
     </script>
 </body>
 </html>

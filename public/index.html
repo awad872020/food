@@ -1177,7 +1177,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع تعديلات منع التكرار)
+    الجافاسكريبت الكامل (مع تعديلات إظهار السعر بدون توصيل)
     ============================================================ -->
     <script>
         // =================================================================
@@ -1799,7 +1799,7 @@
         }
 
         // =================================================================
-        //  المطعم (Restaurant) - مع مودال الطلب الجديد
+        //  المطعم (Restaurant) - مع مودال الطلب الجديد وإظهار السعر بدون توصيل
         // =================================================================
         let currentRestaurantUser = null;
         let restaurantFilter = 'all';
@@ -1892,7 +1892,8 @@
                 <p>العنوان: ${order.address}</p>
                 <p>المطعم: ${order.restaurantName}</p>
                 <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                <p>المجموع: ${order.total} شيكل</p>
+                <p>المجموع (بدون توصيل): ${order.itemsTotal || order.items.reduce((s,i) => s + i.price*i.quantity, 0)} شيكل</p>
+                <p style="color:#636e72;font-size:0.9rem;">(رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)</p>
             `;
             document.getElementById('restaurantNewOrderModal').style.display = 'block';
             playRestaurantSound();
@@ -1964,7 +1965,6 @@
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 
-                // إخفاء أو إظهار القائمة بناءً على الفلتر
                 if (restaurantFilter !== 'all') {
                     grid.style.display = 'none';
                     return;
@@ -1999,7 +1999,8 @@
                         <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
                         <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                        <div class="order-total">إجمالي المنتجات: ${totalProducts} شيكل</div>
+                        <div class="order-total">إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل</div>
+                        <div style="font-size:0.8rem;color:#636e72;text-align:left;margin-bottom:0.5rem;">(رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)</div>
                         <div class="payment-method">💳 ${o.paymentMethod}</div>
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2055,7 +2056,6 @@
         async function displayRestaurantStatusSections() {
             if (!currentRestaurantUser) return;
             
-            // إذا كان الفلتر "الكل"، نخفي جميع الأقسام الفرعية
             if (restaurantFilter === 'all') {
                 document.getElementById('restaurantPreparingSection').style.display = 'none';
                 document.getElementById('restaurantReadySection').style.display = 'none';
@@ -2100,10 +2100,10 @@
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items" style="font-size:0.9rem;">📋 ${detailedItems}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
-                                    المجموع الكلي للمنتجات: ${displayTotal} شيكل
+                                    المجموع الكلي للمنتجات (بدون توصيل): ${displayTotal} شيكل
                                 </div>
                                 <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
-                                    (لا يشمل رسوم التوصيل)
+                                    (رسوم التوصيل ${CONFIG.DELIVERY_FEE} شيكل تضاف للعميل)
                                 </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
@@ -2130,7 +2130,10 @@
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
-                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                    إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
+                                </div>
+                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
+                                    (لا يشمل رسوم التوصيل)
                                 </div>
                                 <div class="mini-actions">
                                     <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
@@ -2158,7 +2161,10 @@
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
-                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                    إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
+                                </div>
+                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
+                                    (لا يشمل رسوم التوصيل)
                                 </div>
                                 <div class="mini-details">🚗 الكابتن: ${o.driverName || 'غير معين'}</div>
                                 <div class="mini-actions">
@@ -2186,7 +2192,10 @@
                                 <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
-                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                    إجمالي المنتجات (بدون توصيل): ${totalProducts} شيكل
+                                </div>
+                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
+                                    (لا يشمل رسوم التوصيل)
                                 </div>
                                 <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
                             </div>
@@ -2475,7 +2484,7 @@
                 <p>العنوان: ${order.address}</p>
                 <p>المطعم: ${order.restaurantName}</p>
                 <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
-                <p>المجموع: ${order.total} شيكل</p>
+                <p>المجموع (بدون توصيل): ${order.itemsTotal || order.items.reduce((s,i) => s + i.price*i.quantity, 0)} شيكل</p>
                 <p>رسوم التوصيل: ${order.deliveryFee || CONFIG.DELIVERY_FEE} شيكل</p>
             `;
             document.getElementById('driverNewReadyModal').style.display = 'block';
@@ -2546,7 +2555,6 @@
 
                 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 
-                // إخفاء أو إظهار القائمة بناءً على الفلتر
                 if (driverFilter !== 'all') {
                     grid.style.display = 'none';
                     return;
@@ -2596,10 +2604,10 @@
                         <div class="customer-details">📍 ${o.address}</div>
                         <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
                         <div style="font-size:0.95rem; color:#2d3436; margin:0.3rem 0;">
-                            <span>سعر المنتجات: <strong>${itemsTotal}</strong> شيكل</span>
+                            <span>سعر المنتجات (بدون توصيل): <strong>${itemsTotal}</strong> شيكل</span>
                             <span style="margin-right:1rem;">+ رسوم التوصيل: <strong>${deliveryFee}</strong> شيكل</span>
                         </div>
-                        <div class="order-total">المجموع الكلي: ${totalPrice} شيكل</div>
+                        <div class="order-total">المجموع الكلي (مع التوصيل): ${totalPrice} شيكل</div>
                         ${o.status === 'delivering' && o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز التأكيد: <strong style="color:#ff6b35;">اطلبه من العميل</strong></div>` : ''}
                         <div class="order-actions">${actions}</div>
                     `;
@@ -2614,7 +2622,6 @@
         async function displayDriverStatusSections() {
             if (!currentDriverUser) return;
             
-            // إذا كان الفلتر "الكل"، نخفي جميع الأقسام الفرعية
             if (driverFilter === 'all') {
                 document.getElementById('driverReadySection').style.display = 'none';
                 document.getElementById('driverPickingSection').style.display = 'none';
@@ -2660,7 +2667,7 @@
                                 <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span>المنتجات (بدون توصيل): ${itemsTotal}</span>
                                     <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
                                     <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
                                 </div>
@@ -2692,7 +2699,7 @@
                                 <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span>المنتجات (بدون توصيل): ${itemsTotal}</span>
                                     <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
                                     <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
                                 </div>
@@ -2724,7 +2731,7 @@
                                 <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span>المنتجات (بدون توصيل): ${itemsTotal}</span>
                                     <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
                                     <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
                                 </div>
@@ -2756,7 +2763,7 @@
                                 <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
                                 <div class="mini-items">📋 ${itemsText}</div>
                                 <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
-                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span>المنتجات (بدون توصيل): ${itemsTotal}</span>
                                     <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
                                     <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
                                 </div>
@@ -3200,6 +3207,7 @@
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
         console.log('✅ تم تفعيل المودال الفوري للطلبات الجديدة والجاهزة');
         console.log('✅ تم حل مشكلة تكرار الطلبات (عند اختيار "الكل" تظهر القائمة، وعند اختيار فلتر محدد تظهر الأقسام)');
+        console.log('✅ تم توضيح أن سعر المنتجات المعروض في المطعم لا يشمل رسوم التوصيل');
     </script>
 </body>
 </html>

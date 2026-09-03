@@ -203,6 +203,18 @@ app.post('/api/notifications/register-token', (req, res) => {
         return res.status(400).json({ error: 'role لازم يكون restaurant أو driver' });
     }
     const db = readDB();
+
+    // نشيل هاد الرمز بالذات من أي حساب تاني (مطعم أو كابتن) كان مسجّل فيه سابقاً
+    // حتى لو صار تسجيل دخول بحسابات مختلفة على نفس الجهاز، كل جهاز يبقى مرتبط
+    // بآخر حساب دخل منه بس
+    ['restaurants', 'drivers'].forEach(group => {
+        (db.users[group] || []).forEach(u => {
+            if (Array.isArray(u.fcmTokens) && u.fcmTokens.includes(token)) {
+                u.fcmTokens = u.fcmTokens.filter(t => t !== token);
+            }
+        });
+    });
+
     const group = role === 'restaurant' ? db.users.restaurants : db.users.drivers;
     const user = group.find(u => u.username === username);
     if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
@@ -210,8 +222,8 @@ app.post('/api/notifications/register-token', (req, res) => {
     if (!Array.isArray(user.fcmTokens)) user.fcmTokens = [];
     if (!user.fcmTokens.includes(token)) {
         user.fcmTokens.push(token);
-        writeDB(db);
     }
+    writeDB(db);
     res.json({ success: true });
 });
 

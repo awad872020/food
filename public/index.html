@@ -2504,7 +2504,7 @@
         }
 
         // =================================================================
-        //  الكابتن (Driver) - بدون تغيير
+        //  الكابتن (Driver) - تم تعديل سلوك البقاء متصلاً عند استلام طلب
         // =================================================================
         let currentDriverUser = null;
         let driverFilter = 'all';
@@ -2906,6 +2906,10 @@
             }
         }
 
+        // ================================================================
+        //  التعديل: إزالة setDriverStatus(false) عند استلام الطلب
+        //  حتى يبقى الكابتن متصلاً (online)
+        // ================================================================
         async function driverPickupFromRestaurant(orderId) {
             if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
             try {
@@ -2932,7 +2936,8 @@
                 });
                 showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
                 showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
-                setDriverStatus(false);
+                // نزيل السطر الذي كان يجعله غير متصل
+                // setDriverStatus(false);  <-- تم حذفه
                 await refreshDriverViews();
                 const allOrders = await getOrders();
                 channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
@@ -3012,7 +3017,9 @@
                 driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
                 localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
                 showNotification(`✅ تم تسليم الطلب #${pendingVerifyOrderId} بنجاح (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
-                setDriverStatus(true);
+                // في حالة إعادة تعيين الحالة إلى متصل بعد التسليم، لكننا نفضل أن يظل متصلاً طوال الوقت
+                // لذا نتركه دون تغيير، أو يمكن استدعاء setDriverStatus(true) لكنها ستظهر إشعاراً.
+                // نفضل عدم تغيير الحالة تلقائياً.
                 closeDriverVerifyModal();
                 await refreshDriverViews();
             } catch (e) {
@@ -3333,6 +3340,7 @@
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
+        console.log('✅ تم تعديل سلوك الكابتن: يبقى متصلاً (Online) عند استلام طلب');
         console.log('✅ تم إضافة المنطقة تلقائياً في حقل العنوان عند إتمام الطلب، مع إمكانية تعديلها من العميل.');
     </script>
 </body>

@@ -6,7 +6,7 @@
     <title>ديليفري اذنا - نظام توصيل الطعام</title>
     <style>
         /* ============================================================
-           الأنماط العامة (نفسها)
+           الأنماط العامة
            ============================================================ */
         * {
             margin: 0;
@@ -821,7 +821,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل
+    صفحة العميل (تم تعديلها)
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -840,7 +840,7 @@
                 <input type="text" id="customerSearch" placeholder="ابحث عن مطعم..." onkeyup="filterCustomerRestaurants()" style="flex:1;border:none;outline:none;padding:0.5rem;">
                 <button style="background:none;border:none;font-size:1.2rem;">🔍</button>
             </div>
-            <!-- زر اختيار المنطقة -->
+            <!-- زر اختيار المنطقة مع النص الجديد -->
             <button class="btn btn-light" onclick="changeLocation()" style="background:white;border:none;border-radius:30px;padding:0.3rem 1.2rem;display:flex;align-items:center;gap:0.3rem;">
                 📍 <span id="customerLocationText">اختر المنطقة</span> <span style="font-size:0.8rem;">🔄</span>
             </button>
@@ -880,7 +880,7 @@
                 <p>الوقت المتوقع: <span id="cEstimatedTime">-</span></p>
             </div>
         </div>
-        <!-- مودال اختيار المنطقة (تم تعديل النص) -->
+        <!-- مودال اختيار المنطقة (مع التعديلات المطلوبة) -->
         <div class="modal" id="customerLocationModal">
             <div class="modal-content">
                 <h2>📍 اختر المنطقة</h2>
@@ -891,14 +891,14 @@
                 <div id="customLocationDiv" style="display:none;margin:1rem 0;">
                     <!-- الحقل الأول: اسم المنطقة (للقراءة فقط أو قابل للكتابة حسب الاختيار) -->
                     <input type="text" id="locationNameInput" placeholder="اسم المنطقة" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;margin-bottom:0.5rem;">
-                    <!-- الحقل الثاني: معلم قريب (اختياري) - تم تحديث النص -->
+                    <!-- الحقل الثاني: معلم قريب (اختياري) -->
                     <input type="text" id="locationLandmarkInput" placeholder="معلم قريب (اختياري) - مثل: مسجد، مدرسة، بقالة، منزل عائلة" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;">
                     <button class="btn btn-success" onclick="confirmCustomLocation()" style="margin-top:0.5rem;width:100%;">تأكيد</button>
                 </div>
                 <button class="btn btn-primary" onclick="closeLocationModal()" style="width:100%;">إلغاء</button>
             </div>
         </div>
-        <!-- باقي المودالات -->
+        <!-- باقي المودالات (بدون تغيير) -->
         <div class="modal" id="customerCartModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="toggleCustomerCart()">&times;</button>
@@ -1220,7 +1220,7 @@
     </div>
 
     <!-- ============================================================
-    الجافاسكريبت الكامل (مع التعديلات الجديدة)
+    الجافاسكريبت الكامل
     ============================================================ -->
     <script>
         // =================================================================
@@ -1243,7 +1243,7 @@
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
-        //  Web Audio API - نظام الصوت المحسّن (نفسه)
+        //  Web Audio API - نظام الصوت المحسّن
         // =================================================================
         let audioCtx = null;
 
@@ -1293,7 +1293,7 @@
         }
 
         // =================================================================
-        //  دوال الخادم (نفسها)
+        //  دوال الخادم
         // =================================================================
         async function getOrders() {
             const res = await fetch(`${API_BASE}/orders`);
@@ -1356,7 +1356,7 @@
         }
 
         // =================================================================
-        //  إشعارات (نفسها)
+        //  إشعارات
         // =================================================================
         function showNotification(msg, type = 'success') {
             const div = document.createElement('div');
@@ -1415,7 +1415,7 @@
         }
 
         // =================================================================
-        //  التنقل (نفسه)
+        //  التنقل
         // =================================================================
         function navigateTo(page) {
             stopAutoRefresh('customer');
@@ -1531,7 +1531,7 @@
                 nameInput.value = loc;
                 nameInput.placeholder = '';
             }
-            // تفريغ حقل المعلم القريب وتعيين الـ placeholder الجديد (تم تحديث النص)
+            // تفريغ حقل المعلم القريب وتعيين الـ placeholder
             landmarkInput.value = '';
             landmarkInput.placeholder = 'معلم قريب (اختياري) - مثل: مسجد، مدرسة، بقالة، منزل عائلة';
             nameInput.focus();
@@ -1612,7 +1612,7 @@
             startAutoRefresh('customer', refreshCustomerData, 3000);
         }
 
-        // باقي دوال العميل (بدون تغيير كبير) مع تعديل طفيف في customerSubmitOrder لإضافة المنطقة إلى العنوان
+        // باقي دوال العميل (بدون تغيير) مع إضافة المنطقة للعنوان في الطلب
         function refreshCustomerData() {
             if (customerTrackingId) {
                 getOrders().then(orders => {
@@ -1789,7 +1789,7 @@
             const form = document.querySelector('#customerCheckoutModal form');
             form[0].value = customerUser.name;
             form[1].value = customerUser.phone;
-            // نضيف المنطقة إلى العنوان تلقائياً (يمكن للمستخدم تعديلها)
+            // نضيف المنطقة إلى العنوان تلقائياً
             form[2].value = customerUser.address + (customerLocation ? '، ' + customerLocation : '');
         }
 
@@ -1799,7 +1799,6 @@
 
         async function customerSubmitOrder(e) {
             e.preventDefault();
-            // التأكد من وجود منطقة
             if (!customerLocation) {
                 showNotification('يرجى تحديد منطقتك أولاً', 'error');
                 changeLocation();
@@ -1808,7 +1807,6 @@
             const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
             const total = itemsTotal + CONFIG.DELIVERY_FEE;
             const verificationCode = generateVerificationCode();
-            // دمج المنطقة مع العنوان
             const address = e.target[2].value.trim() + '، ' + customerLocation;
             const orderData = {
                 restaurantId: customerCart[0].restaurantId,
@@ -1974,14 +1972,1361 @@
         }
 
         // =================================================================
-        //  باقي الأقسام (المطعم، الكابتن، الأدمن) كما هي بدون تغيير
-        //  (سيتم وضعها كاملة في النسخة النهائية)
+        //  المطعم (Restaurant) - بدون تغيير
         // =================================================================
+        let currentRestaurantUser = null;
+        let restaurantFilter = 'all';
+        let restaurantDateFilter = null;
+        let pendingPickupOrderId = null;
+        let lastRestaurantOrders = [];
+        let displayedNewOrderIds = new Set();
+        let pendingNewOrderId = null;
 
-        // ... (يتبع باقي الكود الخاص بالمطعم والكابتن والأدمن)
+        function initRestaurant() {
+            const saved = JSON.parse(localStorage.getItem('current_restaurant_user') || 'null');
+            if (saved) {
+                currentRestaurantUser = saved;
+                showRestaurantDashboard();
+                startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
+                registerFcmTokenIfNeeded('restaurant', saved.username);
+            } else {
+                document.getElementById('restaurantLoginPage').style.display = 'flex';
+                document.getElementById('restaurantDashboard').style.display = 'none';
+                populateRestaurantSelect();
+                stopAutoRefresh('restaurant');
+            }
+        }
+
+        async function populateRestaurantSelect() {
+            const sel = document.getElementById('restaurantUserSelect');
+            sel.innerHTML = '<option value="">اختر المطعم</option>';
+            try {
+                const users = await getUsers();
+                users.restaurants.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.username;
+                    opt.textContent = u.displayName;
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                showNotification('فشل في جلب بيانات المطاعم', 'error');
+            }
+        }
+
+        async function restaurantLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('restaurantUserSelect').value;
+            const pass = document.getElementById('restaurantPassword').value;
+            try {
+                const users = await getUsers();
+                const found = users.restaurants.find(u => u.username === username && u.password === pass);
+                if (!found) {
+                    document.getElementById('restaurantLoginError').style.display = 'block';
+                    return;
+                }
+                document.getElementById('restaurantLoginError').style.display = 'none';
+                currentRestaurantUser = found;
+                localStorage.setItem('current_restaurant_user', JSON.stringify(found));
+                showRestaurantDashboard();
+                startAutoRefresh('restaurant', refreshRestaurantViews, 3000);
+                registerFcmTokenIfNeeded('restaurant', found.username);
+            } catch (e) {
+                showNotification('فشل في تسجيل الدخول', 'error');
+            }
+        }
+
+        function showRestaurantDashboard() {
+            document.getElementById('restaurantLoginPage').style.display = 'none';
+            document.getElementById('restaurantDashboard').style.display = 'block';
+            document.getElementById('restaurantBadge').textContent = `🍽️ ${currentRestaurantUser.displayName}`;
+            lastRestaurantOrders = [];
+            refreshRestaurantViews();
+        }
+
+        function logoutRestaurant() {
+            currentRestaurantUser = null;
+            localStorage.removeItem('current_restaurant_user');
+            document.getElementById('restaurantDashboard').style.display = 'none';
+            document.getElementById('restaurantLoginPage').style.display = 'flex';
+            document.getElementById('restaurantPassword').value = '';
+            stopAutoRefresh('restaurant');
+            displayedNewOrderIds.clear();
+        }
+
+        function showNewOrderModal(order) {
+            if (displayedNewOrderIds.has(order.id)) return;
+            displayedNewOrderIds.add(order.id);
+            pendingNewOrderId = order.id;
+            const details = document.getElementById('restaurantNewOrderDetails');
+            details.innerHTML = `
+                <p><strong>طلب #${order.id}</strong></p>
+                <p>العميل: ${order.customerName}</p>
+                <p>الهاتف: ${order.phone}</p>
+                <p>العنوان: ${order.address}</p>
+                <p>المطعم: ${order.restaurantName}</p>
+                <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                <p>المجموع: ${order.total} شيكل</p>
+            `;
+            document.getElementById('restaurantNewOrderModal').style.display = 'block';
+            playRestaurantSound();
+            sendDesktopNotification('🆕 طلب جديد', `طلب #${order.id} من ${order.customerName}`);
+        }
+
+        function closeRestaurantNewOrderModal() {
+            document.getElementById('restaurantNewOrderModal').style.display = 'none';
+            pendingNewOrderId = null;
+        }
+
+        function acceptNewOrder() {
+            if (pendingNewOrderId) {
+                restaurantAccept(pendingNewOrderId);
+                closeRestaurantNewOrderModal();
+            }
+        }
+
+        function rejectNewOrder() {
+            if (pendingNewOrderId) {
+                restaurantReject(pendingNewOrderId);
+                closeRestaurantNewOrderModal();
+            }
+        }
+
+        async function refreshRestaurantViews() {
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                const newPending = myOrders.filter(o => o.status === 'pending' && !displayedNewOrderIds.has(o.id));
+                if (newPending.length > 0) {
+                    const lastNew = newPending[newPending.length - 1];
+                    showNewOrderModal(lastNew);
+                }
+
+                lastRestaurantOrders = JSON.parse(JSON.stringify(myOrders));
+                displayRestaurantOrders();
+                displayRestaurantStatusSections();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث المطعم:', e);
+            }
+        }
+
+        async function displayRestaurantOrders() {
+            const grid = document.getElementById('restaurantOrdersGrid');
+            grid.innerHTML = '';
+            if (!currentRestaurantUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                if (restaurantDateFilter) {
+                    const start = new Date(restaurantDateFilter);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(restaurantDateFilter);
+                    end.setHours(23, 59, 59, 999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                if (restaurantFilter !== 'all') {
+                    orders = orders.filter(o => o.status === restaurantFilter);
+                }
+
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                if (restaurantFilter !== 'all') {
+                    grid.style.display = 'none';
+                    return;
+                } else {
+                    grid.style.display = 'grid';
+                }
+
+                if (!orders.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
+                    return;
+                }
+
+                orders.forEach(o => {
+                    const card = document.createElement('div');
+                    card.className = `order-card ${o.status}`;
+                    let actions = '';
+                    if (o.status === 'pending') {
+                        actions = `
+                            <button class="btn btn-success" onclick="restaurantAccept(${o.id})">قبول ✅</button>
+                            <button class="btn btn-danger" onclick="restaurantReject(${o.id})">رفض ❌</button>
+                        `;
+                    } else {
+                        if (o.status === 'preparing') actions = `<span style="color:#1e90ff;">👨‍🍳 قيد التحضير</span>`;
+                        else if (o.status === 'ready_for_pickup') actions = `<span style="color:#00b894;">📦 جاهز - في انتظار الكابتن</span>`;
+                        else if (o.status === 'picking') actions = `<span style="color:#ffa502;">🏪 قيد الاستلام (بانتظار تأكيد المطعم)</span>`;
+                        else if (o.status === 'delivering') actions = `<span style="color:#9c27b0;">🛵 جاري التوصيل</span>`;
+                        else if (o.status === 'completed') actions = `<span style="color:#00b894;">✅ مكتمل</span>`;
+                        else if (o.status === 'cancelled') actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    }
+                    const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    card.innerHTML = `
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
+                        <div class="customer-info"><h4>👤 ${o.customerName}</h4><div class="customer-details">📞 ${o.phone}<br>📍 ${o.address}</div></div>
+                        <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                        <div class="order-total">إجمالي المنتجات: ${totalProducts} شيكل</div>
+                        <div class="payment-method">💳 ${o.paymentMethod}</div>
+                        <div class="order-actions">${actions}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                updateRestaurantStats(orders);
+            } catch (e) {
+                showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        function filterRestaurantOrdersByDate() {
+            const dateInput = document.getElementById('restaurantDateFilter');
+            if (dateInput.value) {
+                restaurantDateFilter = new Date(dateInput.value);
+                displayRestaurantOrders();
+                displayRestaurantStatusSections();
+            } else {
+                clearRestaurantDateFilter();
+            }
+        }
+
+        function clearRestaurantDateFilter() {
+            restaurantDateFilter = null;
+            document.getElementById('restaurantDateFilter').value = '';
+            displayRestaurantOrders();
+            displayRestaurantStatusSections();
+        }
+
+        function updateRestaurantStats(orders) {
+            if (!orders) orders = [];
+            document.getElementById('rTotalOrders').textContent = orders.length;
+            document.getElementById('rPendingOrders').textContent = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('rPreparingOrders').textContent = orders.filter(o => o.status === 'preparing').length;
+            document.getElementById('rReadyOrders').textContent = orders.filter(o => o.status === 'ready_for_pickup').length;
+            document.getElementById('rCompletedOrders').textContent = orders.filter(o => o.status === 'completed').length;
+            const rev = orders.filter(o => o.status === 'completed').reduce((s, o) => {
+                const total = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                return s + total;
+            }, 0);
+            document.getElementById('rRevenue').textContent = rev;
+            document.getElementById('restaurantNotifBadge').textContent = orders.filter(o => o.status === 'pending').length;
+        }
+
+        function filterRestaurantOrders(filter) {
+            restaurantFilter = filter;
+            document.querySelectorAll('#restaurantFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`#restaurantFilters [data-filter="${filter}"]`).classList.add('active');
+            displayRestaurantOrders();
+            displayRestaurantStatusSections();
+        }
+
+        async function displayRestaurantStatusSections() {
+            if (!currentRestaurantUser) return;
+            if (restaurantFilter === 'all') {
+                document.getElementById('restaurantPreparingSection').style.display = 'none';
+                document.getElementById('restaurantReadySection').style.display = 'none';
+                document.getElementById('restaurantPickingSection').style.display = 'none';
+                document.getElementById('restaurantDeliveringSection').style.display = 'none';
+                return;
+            }
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => o.restaurantName === currentRestaurantUser.displayName);
+
+                if (restaurantDateFilter) {
+                    const start = new Date(restaurantDateFilter);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(restaurantDateFilter);
+                    end.setHours(23, 59, 59, 999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                const preparing = orders.filter(o => o.status === 'preparing');
+                const prepGrid = document.getElementById('restaurantPreparingGrid');
+                const prepSection = document.getElementById('restaurantPreparingSection');
+                if (preparing.length === 0) {
+                    prepSection.style.display = 'none';
+                } else {
+                    prepSection.style.display = 'block';
+                    prepGrid.innerHTML = preparing.map(o => {
+                        const detailedItems = o.items.map(item => {
+                            const itemTotal = item.price * item.quantity;
+                            return `${item.itemName} × ${item.quantity} = ${itemTotal} شيكل`;
+                        }).join('، ');
+                        const totalItemsPrice = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const displayTotal = o.itemsTotal || totalItemsPrice;
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#1e90ff;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items" style="font-size:0.9rem;">📋 ${detailedItems}</div>
+                                <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
+                                    المجموع الكلي للمنتجات: ${displayTotal} شيكل
+                                </div>
+                                <div style="font-size:0.8rem; color:#636e72; margin:0.2rem 0;">
+                                    (لا يشمل رسوم التوصيل)
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="restaurantReady(${o.id})">تأكيد الجاهزية 📦</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const ready = orders.filter(o => o.status === 'ready_for_pickup');
+                const readyGrid = document.getElementById('restaurantReadyGrid');
+                const readySection = document.getElementById('restaurantReadySection');
+                if (ready.length === 0) {
+                    readySection.style.display = 'none';
+                } else {
+                    readySection.style.display = 'block';
+                    readyGrid.innerHTML = ready.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
+                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="openRestaurantPickupModal(${o.id})">✅ تأكيد استلام الكابتن</button>
+                                    <button class="btn btn-warning" onclick="resendDriverNotification(${o.id})">🔔 إشعار الكابتن</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const picking = orders.filter(o => o.status === 'picking');
+                const pickGrid = document.getElementById('restaurantPickingGrid');
+                const pickSection = document.getElementById('restaurantPickingSection');
+                if (picking.length === 0) {
+                    pickSection.style.display = 'none';
+                } else {
+                    pickSection.style.display = 'block';
+                    pickGrid.innerHTML = picking.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#ffa502;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
+                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                </div>
+                                <div class="mini-details">🚗 الكابتن: ${o.driverName || 'غير معين'}</div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="confirmRestaurantPickupDirect(${o.id})">تأكيد الاستلام ✅</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const delivering = orders.filter(o => o.status === 'delivering');
+                const delGrid = document.getElementById('restaurantDeliveringGrid');
+                const delSection = document.getElementById('restaurantDeliveringSection');
+                if (delivering.length === 0) {
+                    delSection.style.display = 'none';
+                } else {
+                    delSection.style.display = 'block';
+                    delGrid.innerHTML = delivering.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const totalProducts = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#9c27b0;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.95rem; color:#2d3436; margin:0.2rem 0; font-weight:bold;">
+                                    إجمالي المنتجات: ${totalProducts} شيكل
+                                </div>
+                                <div class="mini-details">🚗 ${o.driverName || 'كابتن غير معين'}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                showNotification('فشل في تحديث الأقسام', 'error');
+            }
+        }
+
+        function openRestaurantPickupModal(orderId) {
+            pendingPickupOrderId = orderId;
+            const select = document.getElementById('restaurantPickupDriverSelect');
+            select.innerHTML = '<option value="">-- اختر كابتن --</option>';
+            getUsers().then(users => {
+                users.drivers.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.username;
+                    opt.textContent = d.displayName + (d.extra ? ` (${d.extra})` : '');
+                    select.appendChild(opt);
+                });
+                document.getElementById('restaurantPickupError').style.display = 'none';
+                document.getElementById('restaurantPickupModal').style.display = 'block';
+            }).catch(() => {
+                showNotification('فشل في تحميل قائمة الكباتن', 'error');
+            });
+        }
+
+        function closeRestaurantPickupModal() {
+            document.getElementById('restaurantPickupModal').style.display = 'none';
+            pendingPickupOrderId = null;
+        }
+
+        async function confirmRestaurantPickup() {
+            const select = document.getElementById('restaurantPickupDriverSelect');
+            const driverUsername = select.value;
+            if (!driverUsername) {
+                document.getElementById('restaurantPickupError').style.display = 'block';
+                return;
+            }
+            document.getElementById('restaurantPickupError').style.display = 'none';
+            if (!pendingPickupOrderId) {
+                showNotification('خطأ: لم يتم تحديد طلب', 'error');
+                return;
+            }
+            try {
+                const users = await getUsers();
+                const driver = users.drivers.find(d => d.username === driverUsername);
+                if (!driver) {
+                    showNotification('الكابتن غير موجود', 'error');
+                    return;
+                }
+                await updateOrderStatus(pendingPickupOrderId, 'delivering', {
+                    driverId: driver.username,
+                    driverName: driver.displayName,
+                    driverAssigned: true,
+                    driverPhone: '0590000000',
+                    startedDeliveryAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم تأكيد استلام الطلب #${pendingPickupOrderId} بواسطة ${driver.displayName}`);
+                closeRestaurantPickupModal();
+                await refreshRestaurantViews();
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === pendingPickupOrderId);
+                if (order) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+                console.error(e);
+            }
+        }
+
+        async function confirmRestaurantPickupDirect(orderId) {
+            try {
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'picking') {
+                    showNotification('الطلب ليس في حالة استلام', 'warning');
+                    return;
+                }
+                if (!order.driverId) {
+                    showNotification('لا يوجد كابتن معين لهذا الطلب', 'error');
+                    return;
+                }
+                await updateOrderStatus(orderId, 'delivering', {
+                    startedDeliveryAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم تأكيد استلام الطلب #${orderId} بواسطة ${order.driverName}`);
+                await refreshRestaurantViews();
+                const allOrders2 = await getOrders();
+                const order2 = allOrders2.find(o => o.id === orderId);
+                if (order2) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order2 });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders2 });
+            } catch (e) {
+                showNotification('فشل في تأكيد الاستلام', 'error');
+                console.error(e);
+            }
+        }
+
+        async function resendDriverNotification(orderId) {
+            try {
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (order && order.status === 'ready_for_pickup') {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                    fetch(`${API_BASE}/orders/${orderId}/notify-driver`, { method: 'POST' }).catch(() => {});
+                    showNotification(`🔔 تم إرسال إشعار جديد للكابتن للطلب #${orderId}`);
+                } else {
+                    showNotification('⚠️ الطلب ليس في حالة جاهزة', 'warning');
+                }
+            } catch (e) {
+                showNotification('فشل في إرسال الإشعار', 'error');
+            }
+        }
+
+        async function restaurantAccept(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'preparing');
+                showNotification(`✅ تم قبول الطلب #${orderId}`);
+                await refreshRestaurantViews();
+            } catch (e) {
+                showNotification('فشل في قبول الطلب', 'error');
+            }
+        }
+
+        async function restaurantReject(orderId) {
+            if (!confirm('تأكيد رفض الطلب؟')) return;
+            try {
+                await updateOrderStatus(orderId, 'cancelled');
+                showNotification(`❌ تم رفض الطلب #${orderId}`);
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    channel.postMessage({ type: 'ORDER_REJECTED', order: order });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+                await refreshRestaurantViews();
+            } catch (e) {
+                showNotification('فشل في رفض الطلب', 'error');
+            }
+        }
+
+        async function restaurantReady(orderId) {
+            try {
+                await updateOrderStatus(orderId, 'ready_for_pickup', { readyAt: new Date().toISOString() });
+                showNotification(`📦 الطلب #${orderId} جاهز للاستلام`);
+                await refreshRestaurantViews();
+                const allOrders = await getOrders();
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    channel.postMessage({ type: 'NEW_READY_ORDER', order: order });
+                }
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في تحديث الطلب', 'error');
+            }
+        }
+
+        function showRestaurantNotifications() {
+            showNotification('🔔 تحقق من الطلبات الجديدة في اللوحة');
+        }
 
         // =================================================================
-        //  التحقق من الخادم والتهيئة (نفسها)
+        //  الكابتن (Driver) - بدون تغيير
+        // =================================================================
+        let currentDriverUser = null;
+        let driverFilter = 'all';
+        let driverDateFilter = null;
+        let driverOnline = true;
+        let driverStatsData = { completedOrders: 0, totalEarnings: 0, rating: 5.0 };
+        let pendingVerifyOrderId = null;
+        let lastDriverOrders = [];
+        let displayedReadyOrderIds = new Set();
+        let pendingReadyOrderId = null;
+
+        function setDriverStatus(online) {
+            if (!currentDriverUser) return;
+            driverOnline = online;
+            localStorage.setItem(`driver_online_${currentDriverUser.username}`, JSON.stringify(driverOnline));
+            updateDriverStatusUI();
+            if (online) {
+                showNotification('🟢 تم تغيير حالتك إلى متصل، يمكنك استلام طلبات جديدة', 'success');
+            } else {
+                showNotification('🔴 تم تغيير حالتك إلى غير متصل أثناء التوصيل', 'warning');
+            }
+        }
+
+        function initDriver() {
+            const saved = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION) || 'null');
+            if (saved) {
+                currentDriverUser = saved;
+                showDriverDashboard();
+                startAutoRefresh('driver', refreshDriverViews, 3000);
+                registerFcmTokenIfNeeded('driver', saved.username);
+            } else {
+                document.getElementById('driverLoginPage').style.display = 'flex';
+                document.getElementById('driverDashboard').style.display = 'none';
+                populateDriverSelect();
+                stopAutoRefresh('driver');
+            }
+        }
+
+        async function populateDriverSelect() {
+            const sel = document.getElementById('driverUserSelect');
+            sel.innerHTML = '<option value="">اختر الكابتن</option>';
+            try {
+                const users = await getUsers();
+                users.drivers.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.username;
+                    opt.textContent = u.displayName + (u.extra ? ` (${u.extra})` : '');
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                showNotification('فشل في جلب بيانات الكباتن', 'error');
+            }
+        }
+
+        async function driverLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('driverUserSelect').value;
+            const pass = document.getElementById('driverPassword').value;
+            try {
+                const users = await getUsers();
+                const found = users.drivers.find(u => u.username === username && u.password === pass);
+                if (!found) {
+                    document.getElementById('driverLoginError').style.display = 'block';
+                    return;
+                }
+                document.getElementById('driverLoginError').style.display = 'none';
+                currentDriverUser = found;
+                localStorage.setItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION, JSON.stringify(found));
+                const stats = JSON.parse(localStorage.getItem(`driver_stats_${found.username}`) || 'null');
+                if (stats) driverStatsData = stats;
+                showDriverDashboard();
+                startAutoRefresh('driver', refreshDriverViews, 3000);
+                registerFcmTokenIfNeeded('driver', found.username);
+            } catch (e) {
+                showNotification('فشل في تسجيل الدخول', 'error');
+            }
+        }
+
+        function showDriverDashboard() {
+            document.getElementById('driverLoginPage').style.display = 'none';
+            document.getElementById('driverDashboard').style.display = 'block';
+            document.getElementById('driverBadge').textContent = `🚗 ${currentDriverUser.displayName}`;
+            const savedStatus = JSON.parse(localStorage.getItem(`driver_online_${currentDriverUser.username}`) || 'true');
+            driverOnline = savedStatus;
+            updateDriverStatusUI();
+            lastDriverOrders = [];
+            refreshDriverViews();
+        }
+
+        function logoutDriver() {
+            if (currentDriverUser) {
+                localStorage.setItem(`driver_online_${currentDriverUser.username}`, JSON.stringify(driverOnline));
+            }
+            currentDriverUser = null;
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.DRIVER_SESSION);
+            document.getElementById('driverDashboard').style.display = 'none';
+            document.getElementById('driverLoginPage').style.display = 'flex';
+            document.getElementById('driverPassword').value = '';
+            stopAutoRefresh('driver');
+            displayedReadyOrderIds.clear();
+        }
+
+        function showNewReadyOrderModal(order) {
+            if (displayedReadyOrderIds.has(order.id)) return;
+            displayedReadyOrderIds.add(order.id);
+            pendingReadyOrderId = order.id;
+            const details = document.getElementById('driverNewReadyDetails');
+            details.innerHTML = `
+                <p><strong>طلب #${order.id}</strong></p>
+                <p>العميل: ${order.customerName}</p>
+                <p>الهاتف: ${order.phone}</p>
+                <p>العنوان: ${order.address}</p>
+                <p>المطعم: ${order.restaurantName}</p>
+                <div class="order-items">${order.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                <p>المجموع: ${order.total} شيكل</p>
+                <p>رسوم التوصيل: ${order.deliveryFee || CONFIG.DELIVERY_FEE} شيكل</p>
+            `;
+            document.getElementById('driverNewReadyModal').style.display = 'block';
+            playDriverSound();
+            sendDesktopNotification('📦 طلب جاهز للاستلام', `طلب #${order.id} من ${order.restaurantName}`);
+        }
+
+        function closeDriverNewReadyModal() {
+            document.getElementById('driverNewReadyModal').style.display = 'none';
+            pendingReadyOrderId = null;
+        }
+
+        function pickupNewReadyOrder() {
+            if (pendingReadyOrderId) {
+                driverPickupFromRestaurant(pendingReadyOrderId);
+                closeDriverNewReadyModal();
+            }
+        }
+
+        async function refreshDriverViews() {
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                const myOrders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                const newReady = myOrders.filter(o => o.status === 'ready_for_pickup' && !displayedReadyOrderIds.has(o.id));
+                if (newReady.length > 0 && driverOnline) {
+                    const lastNew = newReady[newReady.length - 1];
+                    showNewReadyOrderModal(lastNew);
+                }
+
+                lastDriverOrders = JSON.parse(JSON.stringify(myOrders));
+                displayDriverOrders();
+                displayDriverStatusSections();
+                updateDriverStats();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                console.error('خطأ في تحديث الكابتن:', e);
+            }
+        }
+
+        async function displayDriverOrders() {
+            const grid = document.getElementById('driverOrdersGrid');
+            grid.innerHTML = '';
+            if (!currentDriverUser) return;
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                if (driverDateFilter) {
+                    const start = new Date(driverDateFilter);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(driverDateFilter);
+                    end.setHours(23, 59, 59, 999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                if (driverFilter !== 'all') orders = orders.filter(o => o.status === driverFilter);
+
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                if (driverFilter !== 'all') {
+                    grid.style.display = 'none';
+                    return;
+                } else {
+                    grid.style.display = 'grid';
+                }
+
+                if (!orders.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">لا توجد طلبات</div>';
+                    return;
+                }
+
+                orders.forEach(o => {
+                    const card = document.createElement('div');
+                    card.className = `order-card ${o.status}`;
+                    let actions = '';
+                    if (o.status === 'ready_for_pickup') {
+                        actions = `
+                            <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام من المطعم 📦</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'picking' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'delivering' && o.driverId === currentDriverUser.username) {
+                        actions = `
+                            <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم بالرمز 🔐</button>
+                            <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️ خريطة</button>
+                        `;
+                    } else if (o.status === 'completed' && o.driverId === currentDriverUser.username) {
+                        actions = `<span style="color:#00b894;">✅ تم التسليم ✅</span>`;
+                    } else if (o.status === 'cancelled') {
+                        actions = `<span style="color:#ff4757;">❌ ملغي</span>`;
+                    } else {
+                        actions = `<span style="color:#636e72;">-</span>`;
+                    }
+
+                    const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                    const totalPrice = o.total || (itemsTotal + deliveryFee);
+
+                    card.innerHTML = `
+                        <div class="order-header"><span class="order-id">#${o.id}</span><span class="order-time">${formatDate(o.createdAt)}</span></div>
+                        <div><strong>${o.restaurantName}</strong> → ${o.customerName} (📞 ${o.phone})</div>
+                        <div class="customer-details">📍 ${o.address}</div>
+                        <div class="order-items">${o.items.map(i => `<div class="order-item"><span>${i.itemName} × ${i.quantity}</span><span>${i.price*i.quantity} شيكل</span></div>`).join('')}</div>
+                        <div style="font-size:0.95rem; color:#2d3436; margin:0.3rem 0;">
+                            <span>سعر المنتجات: <strong>${itemsTotal}</strong> شيكل</span>
+                            <span style="margin-right:1rem;">+ رسوم التوصيل: <strong>${deliveryFee}</strong> شيكل</span>
+                        </div>
+                        <div class="order-total">المجموع الكلي: ${totalPrice} شيكل</div>
+                        ${o.status === 'delivering' && o.verificationCode ? `<div style="color:#636e72;font-size:0.9rem;">🔐 رمز التأكيد: <strong style="color:#ff6b35;">اطلبه من العميل</strong></div>` : ''}
+                        <div class="order-actions">${actions}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                updateDriverStats();
+            } catch (e) {
+                showNotification('فشل في جلب الطلبات', 'error');
+            }
+        }
+
+        async function displayDriverStatusSections() {
+            if (!currentDriverUser) return;
+            if (driverFilter === 'all') {
+                document.getElementById('driverReadySection').style.display = 'none';
+                document.getElementById('driverPickingSection').style.display = 'none';
+                document.getElementById('driverDeliveringSection').style.display = 'none';
+                document.getElementById('driverCompletedSection').style.display = 'none';
+                return;
+            }
+            try {
+                const allOrders = await getOrders();
+                let orders = allOrders.filter(o => {
+                    if (o.status === 'ready_for_pickup' && driverOnline) return true;
+                    return o.driverId === currentDriverUser.username;
+                });
+
+                if (driverDateFilter) {
+                    const start = new Date(driverDateFilter);
+                    start.setHours(0, 0, 0, 0);
+                    const end = new Date(driverDateFilter);
+                    end.setHours(23, 59, 59, 999);
+                    orders = orders.filter(o => {
+                        const orderDate = new Date(o.createdAt);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                const ready = orders.filter(o => o.status === 'ready_for_pickup');
+                const readyGrid = document.getElementById('driverReadyGrid');
+                const readySection = document.getElementById('driverReadySection');
+                if (ready.length === 0) {
+                    readySection.style.display = 'none';
+                } else {
+                    readySection.style.display = 'block';
+                    readyGrid.innerHTML = ready.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-success" onclick="driverPickupFromRestaurant(${o.id})">استلام 📦</button>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const picking = orders.filter(o => o.status === 'picking' && o.driverId === currentDriverUser.username);
+                const pickGrid = document.getElementById('driverPickingGrid');
+                const pickSection = document.getElementById('driverPickingSection');
+                if (picking.length === 0) {
+                    pickSection.style.display = 'none';
+                } else {
+                    pickSection.style.display = 'block';
+                    pickGrid.innerHTML = picking.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#ffa502;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <span style="color:#ffa502;">⏳ في انتظار تأكيد المطعم</span>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const delivering = orders.filter(o => o.status === 'delivering' && o.driverId === currentDriverUser.username);
+                const delGrid = document.getElementById('driverDeliveringGrid');
+                const delSection = document.getElementById('driverDeliveringSection');
+                if (delivering.length === 0) {
+                    delSection.style.display = 'none';
+                } else {
+                    delSection.style.display = 'block';
+                    delGrid.innerHTML = delivering.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#9c27b0;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-actions">
+                                    <button class="btn btn-warning" onclick="openDriverVerifyModal(${o.id})">تأكيد التسليم 🔐</button>
+                                    <button class="btn btn-info" onclick="driverShowMap(${o.id})">🗺️</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                const completed = orders.filter(o => o.status === 'completed' && o.driverId === currentDriverUser.username);
+                const compGrid = document.getElementById('driverCompletedGrid');
+                const compSection = document.getElementById('driverCompletedSection');
+                if (completed.length === 0) {
+                    compSection.style.display = 'none';
+                } else {
+                    compSection.style.display = 'block';
+                    compGrid.innerHTML = completed.map(o => {
+                        const itemsText = o.items.map(i => `${i.itemName} × ${i.quantity}`).join('، ');
+                        const itemsTotal = o.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const deliveryFee = o.deliveryFee || CONFIG.DELIVERY_FEE;
+                        const totalPrice = o.total || (itemsTotal + deliveryFee);
+                        return `
+                            <div class="mini-order-card" style="border-right-color:#00b894;">
+                                <div class="mini-header"><span>#${o.id}</span><span>${o.customerName}</span></div>
+                                <div class="mini-details">📞 ${o.phone} | ${o.restaurantName} | 🕒 ${formatDate(o.createdAt)}</div>
+                                <div class="mini-items">📋 ${itemsText}</div>
+                                <div style="font-size:0.9rem; color:#2d3436; margin:0.2rem 0;">
+                                    <span>المنتجات: ${itemsTotal}</span>
+                                    <span style="margin-right:0.5rem;">+ توصيل: ${deliveryFee}</span>
+                                    <span style="margin-right:0.5rem; font-weight:bold;">= ${totalPrice} شيكل</span>
+                                </div>
+                                <div class="mini-details">✅ تم التسليم ✅</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                showNotification('فشل في تحديث أقسام الكابتن', 'error');
+            }
+        }
+
+        async function driverPickupFromRestaurant(orderId) {
+            if (!driverOnline) { showNotification('⚠️ يجب أن تكون متصلاً', 'error'); return; }
+            try {
+                const orders = await getOrders();
+                const order = orders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'ready_for_pickup') {
+                    showNotification('الطلب ليس في حالة جاهزة للاستلام', 'warning');
+                    return;
+                }
+                if (order.driverAssigned && order.driverId !== currentDriverUser.username) {
+                    showNotification('⚠️ هذا الطلب تم تعيينه لكابتن آخر', 'warning');
+                    return;
+                }
+                await updateOrderStatus(orderId, 'picking', {
+                    driverId: currentDriverUser.username,
+                    driverAssigned: true,
+                    driverName: currentDriverUser.displayName,
+                    driverPhone: '0590000000',
+                    pickedUpAt: new Date().toISOString()
+                });
+                showNotification(`✅ تم استلام الطلب #${orderId} من المطعم بواسطة ${currentDriverUser.displayName}`);
+                showNotification(`⏳ في انتظار تأكيد المطعم للاستلام`);
+                setDriverStatus(false);
+                await refreshDriverViews();
+                const allOrders = await getOrders();
+                channel.postMessage({ type: 'ORDERS_UPDATED', orders: allOrders });
+            } catch (e) {
+                showNotification('فشل في استلام الطلب', 'error');
+                console.error(e);
+            }
+        }
+
+        function openDriverVerifyModal(orderId) {
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'delivering') {
+                    showNotification('الطلب ليس في حالة توصيل', 'warning');
+                    return;
+                }
+                if (order.driverId !== currentDriverUser.username) {
+                    showNotification('هذا الطلب ليس من مهامك', 'error');
+                    return;
+                }
+                pendingVerifyOrderId = orderId;
+                document.getElementById('driverVerifyCode').value = '';
+                document.getElementById('driverVerifyError').style.display = 'none';
+                document.getElementById('driverVerifyModal').style.display = 'block';
+            }).catch(() => {
+                showNotification('حدث خطأ', 'error');
+            });
+        }
+
+        function closeDriverVerifyModal() {
+            document.getElementById('driverVerifyModal').style.display = 'none';
+            pendingVerifyOrderId = null;
+        }
+
+        async function confirmDriverDelivery() {
+            const code = document.getElementById('driverVerifyCode').value.trim();
+            if (!code || code.length !== 4) {
+                document.getElementById('driverVerifyError').textContent = '⚠️ الرمز يجب أن يكون 4 أرقام';
+                document.getElementById('driverVerifyError').style.display = 'block';
+                return;
+            }
+            if (!pendingVerifyOrderId) {
+                showNotification('خطأ: لم يتم تحديد طلب', 'error');
+                return;
+            }
+            try {
+                const orders = await getOrders();
+                const order = orders.find(o => o.id === pendingVerifyOrderId);
+                if (!order) {
+                    showNotification('الطلب غير موجود', 'error');
+                    return;
+                }
+                if (order.status !== 'delivering') {
+                    showNotification('الطلب ليس في حالة توصيل', 'warning');
+                    closeDriverVerifyModal();
+                    return;
+                }
+                if (order.driverId !== currentDriverUser.username) {
+                    showNotification('هذا الطلب ليس من مهامك', 'error');
+                    closeDriverVerifyModal();
+                    return;
+                }
+                if (order.verificationCode !== code) {
+                    document.getElementById('driverVerifyError').textContent = '⚠️ الرمز غير صحيح، حاول مرة أخرى';
+                    document.getElementById('driverVerifyError').style.display = 'block';
+                    return;
+                }
+                await updateOrderStatus(pendingVerifyOrderId, 'completed', {
+                    completedAt: new Date().toISOString()
+                });
+                driverStatsData.completedOrders += 1;
+                driverStatsData.totalEarnings += CONFIG.DELIVERY_FEE;
+                driverStatsData.rating = Math.min(5, driverStatsData.rating + 0.05);
+                localStorage.setItem(`driver_stats_${currentDriverUser.username}`, JSON.stringify(driverStatsData));
+                showNotification(`✅ تم تسليم الطلب #${pendingVerifyOrderId} بنجاح (كسبت ${CONFIG.DELIVERY_FEE} شيكل)`);
+                setDriverStatus(true);
+                closeDriverVerifyModal();
+                await refreshDriverViews();
+            } catch (e) {
+                showNotification('فشل في تأكيد التسليم', 'error');
+                console.error(e);
+            }
+        }
+
+        function filterDriverOrders(filter) {
+            driverFilter = filter;
+            document.querySelectorAll('#driverFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`#driverFilters [data-filter="${filter}"]`).classList.add('active');
+            displayDriverOrders();
+            displayDriverStatusSections();
+        }
+
+        function updateDriverStats() {
+            if (!currentDriverUser) return;
+            document.getElementById('dAvailable').textContent = '...';
+            document.getElementById('dPicking').textContent = '...';
+            document.getElementById('dDelivering').textContent = '...';
+            document.getElementById('dCompleted').textContent = driverStatsData.completedOrders || 0;
+            document.getElementById('dEarnings').textContent = driverStatsData.totalEarnings || 0;
+            document.getElementById('dRating').textContent = (driverStatsData.rating || 5.0).toFixed(1);
+            getOrders().then(allOrders => {
+                const orders = allOrders.filter(o => o.driverId === currentDriverUser?.username);
+                document.getElementById('dPicking').textContent = orders.filter(o => o.status === 'picking').length;
+                document.getElementById('dDelivering').textContent = orders.filter(o => o.status === 'delivering').length;
+                document.getElementById('dAvailable').textContent = allOrders.filter(o => o.status === 'ready_for_pickup')
+                    .length;
+            }).catch(() => {});
+        }
+
+        function toggleDriverStatus() {
+            driverOnline = !driverOnline;
+            localStorage.setItem(`driver_online_${currentDriverUser?.username}`, JSON.stringify(driverOnline));
+            updateDriverStatusUI();
+            displayDriverOrders();
+            displayDriverStatusSections();
+            showNotification(driverOnline ? '🟢 أنت متصل' : '🔴 أنت غير متصل', driverOnline ? 'success' : 'error');
+        }
+
+        function updateDriverStatusUI() {
+            const btn = document.getElementById('driverStatusBtn');
+            if (driverOnline) {
+                btn.className = 'btn btn-success';
+                btn.textContent = '🟢 متصل';
+            } else {
+                btn.className = 'btn btn-danger';
+                btn.textContent = '🔴 غير متصل';
+            }
+        }
+
+        function driverShowMap(orderId) {
+            getOrders().then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                const url =
+                    `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(order.restaurantName)}&destination=${encodeURIComponent(order.address)}`;
+                window.open(url, '_blank');
+            }).catch(() => {});
+        }
+
+        // =================================================================
+        //  الأدمن (Admin) - بدون تغيير
+        // =================================================================
+        let adminLoggedIn = false;
+
+        function initAdmin() {
+            document.getElementById('adminLoginPage').style.display = 'flex';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLoginUser').value = '';
+            document.getElementById('adminLoginPass').value = '';
+            document.getElementById('adminLoginError').style.display = 'none';
+            stopAutoRefresh('admin');
+        }
+
+        async function adminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminLoginUser').value;
+            const pass = document.getElementById('adminLoginPass').value;
+            try {
+                const result = await adminLoginAPI(user, pass);
+                if (result.success) {
+                    adminLoggedIn = true;
+                    showAdminDashboard();
+                    document.getElementById('adminLoginError').style.display = 'none';
+                    showNotification('✅ مرحباً بك في لوحة الأدمن');
+                } else {
+                    document.getElementById('adminLoginError').style.display = 'block';
+                    document.getElementById('adminLoginError').textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+                }
+            } catch (e) {
+                showNotification('فشل في الاتصال بالخادم', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            adminLoggedIn = false;
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminLoginPage').style.display = 'flex';
+            document.getElementById('adminLoginUser').value = '';
+            document.getElementById('adminLoginPass').value = '';
+            showNotification('تم تسجيل الخروج من لوحة الأدمن');
+            stopAutoRefresh('admin');
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminLoginPage').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            renderAdminUsers();
+            startAutoRefresh('admin', renderAdminUsers, 3000);
+        }
+
+        async function renderAdminUsers() {
+            try {
+                const users = await getUsers();
+                const tbody = document.getElementById('adminUsersTableBody');
+                tbody.innerHTML = '';
+                users.restaurants.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>🍽️ مطعم</td>
+                        <td>${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td>${u.extra || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="adminEditUser('restaurant','${u.username}')">✏️</button>
+                            <button class="btn btn-danger" onclick="adminDeleteUser('restaurant','${u.username}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                users.drivers.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>🛵 كابتن</td>
+                        <td>${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td>${u.extra || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="adminEditUser('driver','${u.username}')">✏️</button>
+                            <button class="btn btn-danger" onclick="adminDeleteUser('driver','${u.username}')">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                if (!users.restaurants.length && !users.drivers.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;">لا يوجد مستخدمين</td></tr>';
+                }
+            } catch (e) {
+                showNotification('فشل في جلب المستخدمين', 'error');
+            }
+        }
+
+        function showAdminAddForm(type) {
+            document.getElementById('adminFormContainer').style.display = 'block';
+            document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '➕ إضافة مطعم' :
+                '➕ إضافة كابتن';
+            document.getElementById('adminEditId').value = '';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminDisplayName').value = '';
+            document.getElementById('adminExtra').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminFormContainer').dataset.type = type;
+        }
+
+        function hideAdminForm() {
+            document.getElementById('adminFormContainer').style.display = 'none';
+        }
+
+        async function adminSaveUser(e) {
+            e.preventDefault();
+            const type = document.getElementById('adminFormContainer').dataset.type;
+            const editId = document.getElementById('adminEditId').value;
+            const username = document.getElementById('adminUsername').value.trim();
+            const displayName = document.getElementById('adminDisplayName').value.trim();
+            const extra = document.getElementById('adminExtra').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            if (!username || !displayName || !password) { showNotification('جميع الحقول مطلوبة', 'error'); return; }
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                if (!editId && list.find(u => u.username === username)) {
+                    showNotification('اسم المستخدم موجود مسبقاً', 'error');
+                    return;
+                }
+                if (editId) {
+                    const idx = list.findIndex(u => u.username === editId);
+                    if (idx !== -1) {
+                        list[idx] = { username, displayName, extra, password };
+                    }
+                } else {
+                    list.push({ username, displayName, extra, password });
+                }
+                await saveUsers(users);
+                hideAdminForm();
+                renderAdminUsers();
+                showNotification(`✅ تم حفظ المستخدم ${displayName}`);
+                populateRestaurantSelect();
+                populateDriverSelect();
+            } catch (e) {
+                showNotification('فشل في حفظ المستخدم', 'error');
+            }
+        }
+
+        async function adminEditUser(type, username) {
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                const found = list.find(u => u.username === username);
+                if (!found) return;
+                document.getElementById('adminFormContainer').style.display = 'block';
+                document.getElementById('adminFormTitle').textContent = type === 'restaurant' ? '✏️ تعديل مطعم' :
+                    '✏️ تعديل كابتن';
+                document.getElementById('adminEditId').value = username;
+                document.getElementById('adminUsername').value = found.username;
+                document.getElementById('adminDisplayName').value = found.displayName;
+                document.getElementById('adminExtra').value = found.extra || '';
+                document.getElementById('adminPassword').value = found.password;
+                document.getElementById('adminFormContainer').dataset.type = type;
+            } catch (e) {
+                showNotification('فشل في تحميل بيانات المستخدم', 'error');
+            }
+        }
+
+        async function adminDeleteUser(type, username) {
+            if (!confirm(`تأكيد حذف المستخدم "${username}"؟`)) return;
+            try {
+                const users = await getUsers();
+                const list = type === 'restaurant' ? users.restaurants : users.drivers;
+                const idx = list.findIndex(u => u.username === username);
+                if (idx !== -1) {
+                    list.splice(idx, 1);
+                    await saveUsers(users);
+                    renderAdminUsers();
+                    showNotification(`🗑️ تم حذف المستخدم`);
+                    populateRestaurantSelect();
+                    populateDriverSelect();
+                    if (type === 'restaurant' && currentRestaurantUser?.username === username) logoutRestaurant();
+                    if (type === 'driver' && currentDriverUser?.username === username) logoutDriver();
+                }
+            } catch (e) {
+                showNotification('فشل في حذف المستخدم', 'error');
+            }
+        }
+
+        // =================================================================
+        //  الاستماع للتحديثات (BroadcastChannel)
+        // =================================================================
+        channel.onmessage = function(event) {
+            if (event.data.type === 'NEW_ORDER') {
+                if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
+                    const order = event.data.order;
+                    if (order.restaurantName === currentRestaurantUser.displayName) {
+                        showNewOrderModal(order);
+                        refreshRestaurantViews();
+                    }
+                }
+            }
+            if (event.data.type === 'NEW_READY_ORDER') {
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser && driverOnline) {
+                    const order = event.data.order;
+                    if (!order.driverId || order.driverId === currentDriverUser.username) {
+                        showNewReadyOrderModal(order);
+                        refreshDriverViews();
+                    }
+                }
+            }
+            if (event.data.type === 'ORDER_REJECTED') {
+                const order = event.data.order;
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    showNotification(`⚠️ تم إلغاء طلبك #${order.id} (غير متوفر)`, 'error');
+                    if (customerTrackingId == order.id) {
+                        showCustomerTracking(order.id);
+                        updateCustomerTrackingSteps('cancelled');
+                    }
+                }
+            }
+            if (event.data.type === 'ORDERS_UPDATED') {
+                if (document.getElementById('restaurantPage').classList.contains('active') && currentRestaurantUser) {
+                    refreshRestaurantViews();
+                }
+                if (document.getElementById('driverPage').classList.contains('active') && currentDriverUser) {
+                    refreshDriverViews();
+                }
+                if (document.getElementById('customerPage').classList.contains('active')) {
+                    refreshCustomerData();
+                }
+            }
+        };
+
+        // =================================================================
+        //  التحقق من الخادم والتهيئة
         // =================================================================
         async function checkServer() {
             const statusEl = document.getElementById('serverStatus');
@@ -2008,7 +3353,7 @@
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
-        console.log('✅ تم تحديث نص حقل المعلم القريب ليشمل: مسجد، مدرسة، بقالة، منزل عائلة');
+        console.log('✅ تم تحديث ميزة اختيار المنطقة: حقل المنطقة للقراءة فقط مع إضافة حقل اختياري للمعلم القريب.');
     </script>
 </body>
 </html>

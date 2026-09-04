@@ -1754,7 +1754,7 @@
         }
 
         // ================================================================
-        //  التعديل المطلوب: عدم تعبئة حقل العنوان من بيانات تسجيل الدخول
+        //  التعديل: إضافة المنطقة إلى حقل العنوان عند إتمام الطلب
         // ================================================================
         function customerCheckout() {
             if (!customerCart.length) { showNotification('السلة فارغة!', 'error'); return; }
@@ -1764,8 +1764,8 @@
             const form = document.querySelector('#customerCheckoutModal form');
             form[0].value = customerUser.name;
             form[1].value = customerUser.phone;
-            // لا نضع العنوان المسجل، نتركه فارغاً
-            form[2].value = '';
+            // نضع المنطقة المختارة في حقل العنوان (مع إمكانية تعديلها من العميل)
+            form[2].value = customerLocation || '';
         }
 
         function closeCustomerCheckout() {
@@ -1782,7 +1782,12 @@
             const itemsTotal = customerCart.reduce((s, i) => s + i.price * i.quantity, 0);
             const total = itemsTotal + CONFIG.DELIVERY_FEE;
             const verificationCode = generateVerificationCode();
-            const address = e.target[2].value.trim() + '، ' + customerLocation;
+            // نأخذ العنوان من الحقل مباشرة (العميل قد يعدله)
+            const address = e.target[2].value.trim();
+            if (!address) {
+                showNotification('الرجاء إدخال العنوان بالتفصيل', 'error');
+                return;
+            }
             const orderData = {
                 restaurantId: customerCart[0].restaurantId,
                 restaurantName: customerCart[0].restaurantName,
@@ -3328,7 +3333,7 @@
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
-        console.log('✅ تم تعديل customerCheckout بحيث لا يعبئ حقل العنوان من بيانات تسجيل الدخول.');
+        console.log('✅ تم إضافة المنطقة تلقائياً في حقل العنوان عند إتمام الطلب، مع إمكانية تعديلها من العميل.');
     </script>
 </body>
 </html>

@@ -821,7 +821,7 @@
     <button class="admin-mini-btn" onclick="navigateTo('admin')" title="لوحة الأدمن">👑</button>
 
     <!-- ============================================================
-    صفحة العميل (تم تعديلها)
+    صفحة العميل
     ============================================================ -->
     <div id="customerPage" class="page">
         <div class="header-bar">
@@ -840,7 +840,6 @@
                 <input type="text" id="customerSearch" placeholder="ابحث عن مطعم..." onkeyup="filterCustomerRestaurants()" style="flex:1;border:none;outline:none;padding:0.5rem;">
                 <button style="background:none;border:none;font-size:1.2rem;">🔍</button>
             </div>
-            <!-- زر اختيار المنطقة مع النص الجديد -->
             <button class="btn btn-light" onclick="changeLocation()" style="background:white;border:none;border-radius:30px;padding:0.3rem 1.2rem;display:flex;align-items:center;gap:0.3rem;">
                 📍 <span id="customerLocationText">اختر المنطقة</span> <span style="font-size:0.8rem;">🔄</span>
             </button>
@@ -880,7 +879,7 @@
                 <p>الوقت المتوقع: <span id="cEstimatedTime">-</span></p>
             </div>
         </div>
-        <!-- مودال اختيار المنطقة (مع التعديلات المطلوبة) -->
+        <!-- مودال اختيار المنطقة -->
         <div class="modal" id="customerLocationModal">
             <div class="modal-content">
                 <h2>📍 اختر المنطقة</h2>
@@ -889,16 +888,14 @@
                     <!-- يتم إنشاؤها بواسطة JS -->
                 </div>
                 <div id="customLocationDiv" style="display:none;margin:1rem 0;">
-                    <!-- الحقل الأول: اسم المنطقة (للقراءة فقط أو قابل للكتابة حسب الاختيار) -->
                     <input type="text" id="locationNameInput" placeholder="اسم المنطقة" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;margin-bottom:0.5rem;">
-                    <!-- الحقل الثاني: معلم قريب (اختياري) -->
                     <input type="text" id="locationLandmarkInput" placeholder="معلم قريب (اختياري) - مثل: مسجد، مدرسة، بقالة، منزل عائلة" style="width:100%;padding:0.8rem;border:2px solid #ddd;border-radius:10px;">
                     <button class="btn btn-success" onclick="confirmCustomLocation()" style="margin-top:0.5rem;width:100%;">تأكيد</button>
                 </div>
                 <button class="btn btn-primary" onclick="closeLocationModal()" style="width:100%;">إلغاء</button>
             </div>
         </div>
-        <!-- باقي المودالات (بدون تغيير) -->
+        <!-- باقي المودالات -->
         <div class="modal" id="customerCartModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="toggleCustomerCart()">&times;</button>
@@ -948,7 +945,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة المطعم (بدون تغيير)
+    صفحة المطعم
     ============================================================ -->
     <div id="restaurantPage" class="page">
         <div class="header-bar">
@@ -962,7 +959,6 @@
             </div>
         </div>
 
-        <!-- مودال الطلب الجديد للمطعم -->
         <div class="modal" id="restaurantNewOrderModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeRestaurantNewOrderModal()">&times;</button>
@@ -1059,7 +1055,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الكابتن (بدون تغيير)
+    صفحة الكابتن
     ============================================================ -->
     <div id="driverPage" class="page">
         <div class="header-bar">
@@ -1074,7 +1070,6 @@
             </div>
         </div>
 
-        <!-- مودال الطلب الجاهز للكابتن -->
         <div class="modal" id="driverNewReadyModal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeDriverNewReadyModal()">&times;</button>
@@ -1164,7 +1159,7 @@
     </div>
 
     <!-- ============================================================
-    صفحة الأدمن (بدون تغيير)
+    صفحة الأدمن
     ============================================================ -->
     <div id="adminPage" class="page">
         <div id="adminLoginPage" class="login-page" style="display:flex;">
@@ -1243,7 +1238,7 @@
         const channel = new BroadcastChannel('food_delivery_channel');
 
         // =================================================================
-        //  Web Audio API - نظام الصوت المحسّن
+        //  Web Audio API
         // =================================================================
         let audioCtx = null;
 
@@ -1458,7 +1453,7 @@
         }
 
         // =================================================================
-        //  العميل (Customer) - مع التعديلات الجديدة للمنطقة
+        //  العميل (Customer)
         // =================================================================
         let customerCart = [];
         let customerUser = null;
@@ -1466,14 +1461,12 @@
         let customerTrackingInterval = null;
         let customerTrackingId = null;
 
-        // قائمة المناطق المعروضة في الأزرار
         const LOCATIONS = [
             'التل', 'القرنعة', 'شعب جاد الله', 'الجلطية', 'واد عزيز',
             'خالة الفول', 'خلة الغزال', 'الذخرة', 'الراس', 'خالة ابراهيم',
             'واد ريشة', 'المنطار', 'جورة السالم', 'خلة اللبيد', 'واد البير', 'أخرى'
         ];
 
-        // متغير لتخزين المنطقة المختارة (نقرأها من localStorage)
         let customerLocation = localStorage.getItem(CONFIG.STORAGE_KEYS.CUSTOMER_LOCATION) || '';
 
         const customerRestaurants = [
@@ -1487,14 +1480,11 @@
                 menu: [{ id: 8, name: 'فلافل', price: 8, desc: 'ساندويتش' }, { id: 9, name: 'حمص باللحمة', price: 20, desc: 'مع لحم' }] }
         ];
 
-        // ----- دوال المنطقة الجديدة -----
-
-        // عرض مودال اختيار المنطقة مع قائمة الأزرار
+        // دوال المنطقة
         function showLocationSelector() {
             const modal = document.getElementById('customerLocationModal');
             const container = document.getElementById('locationOptions');
             container.innerHTML = '';
-            // نعرض الأزرار
             LOCATIONS.forEach(loc => {
                 const btn = document.createElement('button');
                 btn.className = 'btn location-option-btn';
@@ -1502,15 +1492,12 @@
                 btn.onclick = () => selectLocationWithInput(loc);
                 container.appendChild(btn);
             });
-            // إخفاء حقل الإدخال إن كان ظاهراً وإظهار الأزرار
             document.getElementById('customLocationDiv').style.display = 'none';
             document.getElementById('locationOptions').style.display = 'grid';
             modal.style.display = 'block';
         }
 
-        // عند النقر على أي منطقة (بما فيها "أخرى") نعرض حقل الإدخال مع تعبئته بالمنطقة المختارة
         function selectLocationWithInput(loc) {
-            // إخفاء الأزرار وإظهار حقل الإدخال
             document.getElementById('locationOptions').style.display = 'none';
             const customDiv = document.getElementById('customLocationDiv');
             customDiv.style.display = 'block';
@@ -1519,25 +1506,21 @@
             const landmarkInput = document.getElementById('locationLandmarkInput');
             
             if (loc === 'أخرى') {
-                // للحقل الأول: قابل للكتابة (ليس للقراءة فقط)
                 nameInput.readOnly = false;
-                nameInput.className = ''; // إزالة class للقراءة فقط
+                nameInput.className = '';
                 nameInput.value = '';
                 nameInput.placeholder = 'أدخل اسم المنطقة';
             } else {
-                // تعبئة الحقل الأول باسم المنطقة وجعله للقراءة فقط
                 nameInput.readOnly = true;
                 nameInput.className = 'readonly-input';
                 nameInput.value = loc;
                 nameInput.placeholder = '';
             }
-            // تفريغ حقل المعلم القريب وتعيين الـ placeholder
             landmarkInput.value = '';
             landmarkInput.placeholder = 'معلم قريب (اختياري) - مثل: مسجد، مدرسة، بقالة، منزل عائلة';
             nameInput.focus();
         }
 
-        // تأكيد الإدخال وحفظ المنطقة (مع المعلم إن وجد)
         function confirmCustomLocation() {
             const nameInput = document.getElementById('locationNameInput');
             const landmarkInput = document.getElementById('locationLandmarkInput');
@@ -1546,52 +1529,42 @@
                 showNotification('الرجاء إدخال اسم المنطقة', 'error');
                 return;
             }
-            // بناء النص النهائي للمنطقة (مع المعلم إن وجد)
             let fullLocation = locName;
             const landmark = landmarkInput.value.trim();
             if (landmark) {
                 fullLocation += ' - بجوار ' + landmark;
             }
-            // حفظ المنطقة
             customerLocation = fullLocation;
             localStorage.setItem(CONFIG.STORAGE_KEYS.CUSTOMER_LOCATION, fullLocation);
             document.getElementById('customerLocationModal').style.display = 'none';
             document.getElementById('customerLocationText').textContent = fullLocation;
             showNotification(`✅ تم تعيين المنطقة: ${fullLocation}`, 'success');
-            // إعادة تعيين واجهة المودال للاستخدام القادم
             document.getElementById('locationOptions').style.display = 'grid';
             document.getElementById('customLocationDiv').style.display = 'none';
         }
 
-        // إغلاق المودال بدون تغيير (إذا لم يتم التأكيد)
         function closeLocationModal() {
-            // إذا لم تكن هناك منطقة مخزنة، نطلب منه اختيار واحدة
             if (!customerLocation) {
                 showNotification('الرجاء اختيار منطقتك أولاً', 'error');
                 return;
             }
             document.getElementById('customerLocationModal').style.display = 'none';
-            // إعادة تعيين الواجهة
             document.getElementById('locationOptions').style.display = 'grid';
             document.getElementById('customLocationDiv').style.display = 'none';
         }
 
-        // فتح المودال لتغيير المنطقة
         function changeLocation() {
             showLocationSelector();
         }
 
-        // --- تعديل دالة initCustomer ---
         function initCustomer() {
             displayCustomerRestaurants();
             updateCustomerCartUI();
 
-            // تحديث نص زر الموقع
             if (customerLocation) {
                 document.getElementById('customerLocationText').textContent = customerLocation;
             } else {
                 document.getElementById('customerLocationText').textContent = 'اختر المنطقة';
-                // عرض المودال فوراً لاختيار المنطقة
                 showLocationSelector();
             }
 
@@ -1612,7 +1585,6 @@
             startAutoRefresh('customer', refreshCustomerData, 3000);
         }
 
-        // باقي دوال العميل (بدون تغيير) مع إضافة المنطقة للعنوان في الطلب
         function refreshCustomerData() {
             if (customerTrackingId) {
                 getOrders().then(orders => {
@@ -1781,6 +1753,9 @@
             showNotification(`مرحباً ${name}! 👋`);
         }
 
+        // ================================================================
+        //  التعديل المطلوب: عدم تعبئة حقل العنوان من بيانات تسجيل الدخول
+        // ================================================================
         function customerCheckout() {
             if (!customerCart.length) { showNotification('السلة فارغة!', 'error'); return; }
             if (!customerUser) { showCustomerLogin(); return; }
@@ -1789,8 +1764,8 @@
             const form = document.querySelector('#customerCheckoutModal form');
             form[0].value = customerUser.name;
             form[1].value = customerUser.phone;
-            // نضيف المنطقة إلى العنوان تلقائياً
-            form[2].value = customerUser.address + (customerLocation ? '، ' + customerLocation : '');
+            // لا نضع العنوان المسجل، نتركه فارغاً
+            form[2].value = '';
         }
 
         function closeCustomerCheckout() {
@@ -3097,7 +3072,7 @@
         }
 
         // =================================================================
-        //  الأدمن (Admin) - بدون تغيير
+        //  الأدمن (Admin)
         // =================================================================
         let adminLoggedIn = false;
 
@@ -3353,7 +3328,7 @@
         console.log(`📡 API_BASE: ${API_BASE}`);
         console.log('✅ بيانات الأدمن: awad / 050313651');
         console.log('🔄 التحديث التلقائي يعمل كل 3 ثوانٍ في صفحات المطعم والكابتن والأدمن');
-        console.log('✅ تم تحديث ميزة اختيار المنطقة: حقل المنطقة للقراءة فقط مع إضافة حقل اختياري للمعلم القريب.');
+        console.log('✅ تم تعديل customerCheckout بحيث لا يعبئ حقل العنوان من بيانات تسجيل الدخول.');
     </script>
 </body>
 </html>
